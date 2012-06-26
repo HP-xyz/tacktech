@@ -1,0 +1,52 @@
+# use glob syntax.
+syntax: glob
+
+#for c#
+Debug/
+Release/
+bin/
+obj/
+
+#for java
+*.class
+
+#for c++/cmake
+*.vcproj
+*.vcxproj
+*.cbproj
+*.project
+*.cproject
+*.project
+*.cbp
+*.pbxproj
+.project
+nbproject/
+Timelog.txt
+Makefile
+CMakeFiles/
+*.a
+*.o
+*.cmake
+CMakeCache/
+test/
+build*/
+dist/*
+.directory
+*.orig
+*.rej
+*~
+*~$
+.git/
+*.kdev*
+*.exe
+anime_list.xml
+search.xml
+images/*
+settings.dat
+build/
+/nbproject/
+
+# use regexp syntax.
+syntax: regexp
+glob:CMakeCache.txt
+\.class$ 

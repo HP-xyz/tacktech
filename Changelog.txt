@@ -1,0 +1,5 @@
+Changelog
+--------------------------------------------
+- Use libvlcqt for display purposes
+- Added dependancy for libvlcqt
+ 

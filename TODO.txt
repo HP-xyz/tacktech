@@ -1,0 +1,21 @@
+TODO	- Milestone 1
+-----------------------------------------
+Create display app: 			Done
+  - Playlist:					Done
+  - Fullscreen:					Done
+  - Network Playlist Editing:	Not Done
+  - Network Administration:		Not Done
+Display app slitstcreen:		Not Done
+Display Groupings:				Not Done
+Remote Admin:					Not Done
+Administration App:				Busy
+  - Basic GUI design			Done
+  - Add Group GUI design		Done
+	- Add Groupp logic			Busy
+  - Edit Group GUI design		Not Done
+    - Edit Group logic			Not Done
+  - Create Playlist GUI design	Not Done
+    - Create Playlist logic		Not Done
+  - Edit Playlist GUI design	Not Done
+    - Edit Playlist logic		Not Done
+
