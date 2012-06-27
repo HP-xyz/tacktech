@@ -25,6 +25,10 @@ protected:
 	/* Variable for group names */
 	QList<QString> group_names;
 
+	/* Variable for computer names
+	*  Note: This can be hostnames or IP addresses */
+	QList<QString> computer_names;
+
 private slots:
 	void refresh_all_groups();
 
@@ -35,7 +39,7 @@ private slots:
 	void edit_playlist();
 	void edit_preferences();
 
-	/* Slots that recieve signals from GUIs (not this) */
+	/* Slots that receive signals from GUIs (not this) */
 	/* ==================================== */
 	void add_group_input_complete(QString);
 };
