@@ -26,7 +26,6 @@ Makefile
 CMakeFiles/
 *.a
 *.o
-*.cmake
 CMakeCache/
 test/
 build*/
