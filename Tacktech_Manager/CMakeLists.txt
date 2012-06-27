@@ -45,19 +45,19 @@ include_directories (
 					)
 set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Group.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Group.h
 	)
 set ( Tacktech_Manager_RSCS
 		${Tacktech_Manager_SOURCE_DIR}/resources/Tacktech_Manager.qrc
-		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Group.qrc
+		${Tacktech_Manager_SOURCE_DIR}/resources/Edit_Group.qrc
 	)
 set ( Tacktech_Manager_UI_FORMS
 		${Tacktech_Manager_SOURCE_DIR}/ui/Tacktech_Manager.ui
-		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Group.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Edit_Group.ui
 	)
 QT4_ADD_RESOURCES(RSCS ${Tacktech_Manager_RSCS})
 QT4_WRAP_UI (UIS ${Tacktech_Manager_UI_FORMS})

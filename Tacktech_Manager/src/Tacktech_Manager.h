@@ -3,7 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include <iostream>
-#include "Add_Group.h"
+#include "Edit_Group.h"
 #include "ui_Tacktech_Manager.h"
 
 class Tacktech_Manager : public QMainWindow
@@ -18,8 +18,8 @@ private:
 	/* The global ui variable */
 	Ui::MainWindow ui;
 
-	/* Global variable for the Add_Group class */
-	Add_Group *add_group_window;
+	/* Global variable for Edit_Group GUI */
+	Edit_Group *edit_group_class;
 
 protected:
 	/* Variable for group names */
@@ -30,7 +30,6 @@ private slots:
 
 	/* Slots that start GUIs (this)*/
 	/* ===================== */
-	void add_group();
 	void edit_group();
 	void create_playlist();
 	void edit_playlist();

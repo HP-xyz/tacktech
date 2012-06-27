@@ -10,10 +10,8 @@ Display Groupings:				Not Done
 Remote Admin:					Not Done
 Administration App:				Busy
   - Basic GUI design			Done
-  - Add Group GUI design		Done
-	- Add Groupp logic			Busy
-  - Edit Group GUI design		Not Done
-    - Edit Group logic			Not Done
+  - Edit Group GUI design		Done
+    - Edit Group logic			Busy
   - Create Playlist GUI design	Not Done
     - Create Playlist logic		Not Done
   - Edit Playlist GUI design	Not Done
