@@ -12,16 +12,16 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	edit_group_class = new Edit_Group();
 
 #ifdef _DEBUG
+	std::cout << " - Setting up UI" << std::endl;
+#endif // _DEBUG
+	ui.setupUi(this);
+
+#ifdef _DEBUG
 	std::cout << " - Setting management_tree_widget headers" << std::endl;
 #endif // _DEBUG
 	QStringList manager_headers;
 	manager_headers << "Group" << "Playlist";
 	ui.management_tree_widget->setHeaderLabels(manager_headers);
-
-#ifdef _DEBUG
-	std::cout << " - Setting up UI" << std::endl;
-#endif // _DEBUG
-	ui.setupUi(this);
 	
 #ifdef _DEBUG
 	std::cout << " - Connecting action signals" << std::endl;

@@ -7,6 +7,7 @@ Edit_Group::Edit_Group(QWidget *parent, Qt::WFlags flags)
 	std::cout << "= Setting up Edit_Group GUI" << std::endl;
 #endif // _DEBUG
 	ui = new Ui::Edit_GroupClass();
+	ui->setupUi(this);
 #ifdef _DEBUG
 	std::cout << " - Giving group_names null pointer" << std::endl;
 #endif // _DEBUG
@@ -32,7 +33,6 @@ Edit_Group::Edit_Group(QWidget *parent, Qt::WFlags flags)
 #ifdef _DEBUG
 	std::cout << " - Setting up UI" << std::endl;
 #endif // _DEBUG
-	ui->setupUi(this);
 }
 
 Edit_Group::~Edit_Group()
