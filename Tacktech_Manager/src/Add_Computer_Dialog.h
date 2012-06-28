@@ -23,6 +23,8 @@ private:
 private slots:
 	void ok_clicked();
 	void cancel_clicked();
+signals:
+	void computer_name_added(QString);
 };
 
 #endif // ADD_COMPUTER_DIALOG_H

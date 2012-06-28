@@ -6,7 +6,7 @@ Create display app: 			Done
   - Network Playlist Editing:	Not Done
   - Network Administration:		Not Done
 Display app slitstcreen:		Not Done
-Display Groupings:				Not Done
+Display Groupings:				Busy
 Remote Admin:					Not Done
 Administration App:				Busy
   - Basic GUI design			Done

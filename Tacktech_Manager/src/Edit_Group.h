@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QAction>
 #include "ui_Edit_Group.h"
+#include "Typed_QTreeWidgetItem.h"
 #include "Add_Computer_Dialog.h"
 #include "Add_Group_Dialog.h"
 
@@ -40,10 +41,21 @@ private:
 	Add_Group_Dialog *add_group_dialog;
 
 private slots:
+	/* Primary slots for this class */
 	void add_computer_slot();
 	void remove_computer_slot();
 	void add_group_slot();
 	void remove_group_slot();
+	void ok_clicked();
+	void cancel_clicked();
+
+	/* Secondary slots that are fired from classes called from this class*/
+	void group_name_added(QString);
+	void computer_name_added(QString);
+
+signals:
+	void group_editing_complete(QList<QString>);
+	void computer_editing_complete(QList<QString>);
 };
 
 #endif // EDIT_GROUP_H

@@ -36,7 +36,13 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	connect(ui.actionEdit_Preferences, SIGNAL(triggered()),
 		this, SLOT(edit_preferences()));
 
-	/* Connecting secondany signals */
+	/* Connecting secondary signals */
+	connect(edit_group_class,
+		SIGNAL(group_editing_complete(QList<QString>)),
+		this, SLOT(group_editing_complete(QList<QString>)));
+	connect(edit_group_class,
+		SIGNAL(computer_editing_complete(QList<QString>)),
+		this, SLOT(computer_editing_complete(QList<QString>)));
 }
 
 Tacktech_Manager::~Tacktech_Manager()
@@ -58,6 +64,7 @@ void Tacktech_Manager::edit_group()
 #ifdef _DEBUG
 	std::cout << " - Creating and showing Edit_Group GUI" << std::endl;
 #endif // _DEBUG
+	edit_group_class->set_computer_names(computer_names);
 	edit_group_class->set_group_names(group_names);
 	edit_group_class->show();
 }
@@ -89,32 +96,20 @@ void Tacktech_Manager::edit_preferences()
 #endif // _DEBUG
 }
 
-/** Slot to add group name to the global group_names variable. Validation
- ** happens here, and calls the add_group() slot again if the validation
- ** fails */
-void Tacktech_Manager::add_group_input_complete( QString group_name )
+/** Slot called from the called class to set the group_names to the current
+ ** values. Gets called if the edit_group class object sends the accepted
+ ** signal from its buttonbox */
+void Tacktech_Manager::group_editing_complete(
+	QList<QString> p_new_group_names)
 {
-#ifdef _DEBUG
-	std::cout << " - Received from Add_Group: " 
-		<< qPrintable(group_name) << std::endl;
-	std::cout << " - Printing existing group names:" << std::endl;
-	for(int i = 0; i < group_names.size(); i++)
-		std::cout << "   - " << qPrintable(group_names[i]) << std::endl;
-#endif // _DEBUG
+	group_names = p_new_group_names;
+}
 
-	if (!group_names.contains(group_name))
-	{
-#ifdef _DEBUG
-		std::cout << "  - Adding new group name:" 
-			<< qPrintable(group_name) << std::endl;
-#endif // _DEBUG
-		group_names.append(group_name);
-	}
-	else
-	{
-#ifdef _DEBUG
-		std::cout << "  - Group name already in list, recalling add_group()" 
-			<< std::endl;
-#endif // _DEBUG
-	}
+/** Slot called from the called class to set the computer_names to the 
+ ** current values. Gets called if the edit_group class object sends the 
+ ** accepted signal from its buttonbox */
+void Tacktech_Manager::computer_editing_complete(
+	QList<QString> p_new_computer_names)
+{
+	computer_names = p_new_computer_names;
 }

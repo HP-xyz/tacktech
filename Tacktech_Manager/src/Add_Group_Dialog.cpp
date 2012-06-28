@@ -25,7 +25,7 @@ void Add_Group_Dialog::set_group_names( QList<QString> &p_group_names )
 	for(int i = 0; i < p_group_names.size(); i++)
 		std::cout << "   - " << qPrintable(p_group_names[i]) << std::endl;
 #endif // _DEBUG
-	group_names = group_names;
+	group_names = &p_group_names;
 }
 
 /** Function to handle the accepted() signal from the class buttonbox */
@@ -34,6 +34,10 @@ void Add_Group_Dialog::ok_clicked()
 	if(!group_names->contains(ui.group_name_line_edit->text()))
 	{
 		group_names->append(ui.group_name_line_edit->text());
+
+		/* Emitting the group_name_added signal that is to be caught by
+		 * the calling program */
+		emit group_name_added(ui.group_name_line_edit->text());
 		this->close();
 	}
 	else
@@ -52,3 +56,4 @@ void Add_Group_Dialog::cancle_clicked()
 {
 	this->close();
 }
+

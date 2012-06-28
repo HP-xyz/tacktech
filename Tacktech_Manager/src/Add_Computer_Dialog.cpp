@@ -18,11 +18,13 @@ Add_Computer_Dialog::~Add_Computer_Dialog()
 
 /** Function will set the computer_names variable to the value the calling
  ** class provides */
-void Add_Computer_Dialog::set_computer_names( QList<QString> &p_computer_names)
+void Add_Computer_Dialog::set_computer_names(
+	QList<QString> &p_computer_names)
 {
 	std::cout << " - Printing received computer names:" << std::endl;
 	for(int i = 0; i < p_computer_names.size(); i++)
-		std::cout << "   - " << qPrintable(p_computer_names[i]) << std::endl;
+		std::cout << "   - " << qPrintable(p_computer_names[i]) 
+		<< std::endl;
 	computer_names = &p_computer_names;
 }
 
@@ -32,6 +34,8 @@ void Add_Computer_Dialog::ok_clicked()
 	if (!computer_names->contains(ui.computer_name_line_edit->text()))
 	{
 		computer_names->append(ui.computer_name_line_edit->text());
+		emit computer_name_added(ui.computer_name_line_edit->text());
+		this->close();
 	}
 	else
 	{

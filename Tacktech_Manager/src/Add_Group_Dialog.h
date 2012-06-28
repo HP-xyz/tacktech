@@ -23,6 +23,8 @@ private:
 private slots:
 	void ok_clicked();
 	void cancle_clicked();
+signals:
+	void group_name_added(QString);
 };
 
 #endif // ADD_GROUP_DIALOG_H
