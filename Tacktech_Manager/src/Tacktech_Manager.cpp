@@ -12,7 +12,7 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	edit_group_class = new Edit_Group();
 
 	/* Create new pointer for global variable to groups_and_computers*/
-	groups_and_computers = new QMap<QString, QList<QString>* >;
+	groups_and_computers = new Group_Container();
 
 #ifdef _DEBUG
 	std::cout << " - Setting up UI" << std::endl;

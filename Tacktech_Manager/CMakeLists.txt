@@ -49,6 +49,7 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Computer_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
@@ -56,6 +57,7 @@ set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Computer_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.h
 	)
 set ( Tacktech_Manager_RSCS
 		${Tacktech_Manager_SOURCE_DIR}/resources/Tacktech_Manager.qrc

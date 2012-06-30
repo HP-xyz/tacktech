@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include <QMap>
 #include <iostream>
+#include "Group_Container.h"
 #include "Edit_Group.h"
 #include "ui_Tacktech_Manager.h"
 
@@ -26,7 +27,7 @@ protected:
 	/* Variable for computer names and group names
 	 * Note: Format is groups_and_computers[group_index][computer_index]
 	 * Note: This can be hostnames or IP addresses */
-	QMap<QString, QList<QString>* > *groups_and_computers;
+	Group_Container *groups_and_computers;
 
 private slots:
 	void refresh_all_groups();

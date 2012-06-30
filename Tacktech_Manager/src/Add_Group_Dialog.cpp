@@ -16,14 +16,11 @@ Add_Group_Dialog::~Add_Group_Dialog()
 
 /** Function to set the group names to the value provided by the calling
  ** class */
-void Add_Group_Dialog::set_group_and_computer_names( QMap<QString, QList<QString>* > *p_group_names )
+void Add_Group_Dialog::set_group_and_computer_names(
+	Group_Container *p_group_names )
 {
 #ifdef _DEBUG
-	std::cout << " - Printing received group names:" << std::endl;
-	foreach(QString key, p_group_names->keys())
-	{
-		std::cout << "  - Key: " << qPrintable(key) << std::endl;
-	}
+	p_group_names->print_contents();
 #endif // _DEBUG
 	group_and_computer_names = p_group_names;
 }
@@ -31,10 +28,9 @@ void Add_Group_Dialog::set_group_and_computer_names( QMap<QString, QList<QString
 /** Function to handle the accepted() signal from the class buttonbox */
 void Add_Group_Dialog::ok_clicked()
 {
-	if(!group_and_computer_names->contains(ui.group_name_line_edit->text()))
+	if(group_and_computer_names->
+		add_group_name(ui.group_name_line_edit->text()))
 	{
-		group_and_computer_names->insert(ui.group_name_line_edit->text(),
-			nullptr);
 		/* Emitting the group_name_added signal that is to be caught by
 		 * the calling program */
 		emit group_name_added();

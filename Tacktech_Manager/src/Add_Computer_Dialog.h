@@ -8,6 +8,7 @@
 #include <QtGui/QMainWindow>
 #include <QMessageBox>
 #include "ui_Add_Computer_Dialog.h"
+#include "Group_Container.h"
 
 class Add_Computer_Dialog : public QMainWindow
 {
@@ -16,12 +17,12 @@ class Add_Computer_Dialog : public QMainWindow
 public:
 	Add_Computer_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Add_Computer_Dialog();
-	void set_groups_and_computer_names(QMap<QString, QList<QString>* >*);
-	void set_group_index(int);
+	void set_groups_and_computer_names(Group_Container*);
+	void set_group_name(QString);
 private:
 	Ui::Add_Computer_DialogClass ui;
-	QMap<QString, QList<QString>* > *groups_and_computer_names;
-	int group_index;
+	Group_Container *groups_and_computer_names;
+	QString group_name;
 private slots:
 	void ok_clicked();
 	void cancel_clicked();

@@ -17,14 +17,10 @@ Add_Computer_Dialog::~Add_Computer_Dialog()
 /** Function will set the computer_names variable to the value the calling
  ** class provides */
 void Add_Computer_Dialog::set_groups_and_computer_names(
-	QMap<QString, QList<QString>* > *p_groups_and_computer_names)
+	Group_Container *p_groups_and_computer_names)
 {
 #ifdef _DEBUG
-	std::cout << " - Printing received computer names:" << std::endl;
-	foreach(QString key, p_groups_and_computer_names->keys())
-		foreach(QString computer_name,
-			p_groups_and_computer_names->value(key))
-			std::cout << "  - " << qPrintable(computer_name) << std::endl;
+	p_groups_and_computer_names->print_contents();
 #endif // _DEBUG
 	groups_and_computer_names = p_groups_and_computer_names;
 }
@@ -34,24 +30,10 @@ void Add_Computer_Dialog::ok_clicked()
 {
 #ifdef _DEBUG
 	std::cout << "= Add_Computer_Dialog::ok_clicked()" << std::endl;
-	std::cout << " - Testing that computer is not already in group" 
-		<< std::endl;
 #endif // _DEBUG
-	bool computer_already_in_group = false;
-	foreach(QString key, groups_and_computer_names->keys())
-		foreach(QString computer, groups_and_computer_names->value(key))
-			if(ui.computer_name_line_edit->text() == computer 
-				|| computer == nullptr)
-				computer_already_in_group = true;
-#ifdef _DEBUG
-	std::cout << " - Computer in a group: " << computer_already_in_group
-		<< std::endl;
-#endif // _DEBUG
-	if (!computer_already_in_group)
+	if (groups_and_computer_names->add_computer_name(group_name,
+		ui.computer_name_line_edit->text()))
 	{
-		QList<QString> *new_list = new QList<QString>;
-		groups_and_computer_names->insert(
-			ui.computer_name_line_edit->text(), *new_list);
 		emit computer_name_added();
 		this->close();
 	}
@@ -72,7 +54,7 @@ void Add_Computer_Dialog::cancel_clicked()
 	this->close();
 }
 
-void Add_Computer_Dialog::set_group_index( int p_group_index)
+void Add_Computer_Dialog::set_group_name( QString selected_group_name)
 {
-	group_index = p_group_index;
+	group_name = selected_group_name;
 }

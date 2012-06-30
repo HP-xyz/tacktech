@@ -68,7 +68,7 @@ Edit_Group::~Edit_Group()
 /** Function to populate the global groups_and_computer_names variable with
  ** a pointer to the calling class' groups_and_computer_names variable */
 void Edit_Group::set_groups_and_computer_names(
-	QMap<QString, QList<QString>* >* p_groups_and_computer_names)
+	Group_Container* p_groups_and_computer_names)
 {
 #ifdef _DEBUG
 	std::cout << "= set_groups_and_computer_names()" << std::endl;
@@ -92,8 +92,10 @@ void Edit_Group::add_computer_slot()
 		if (static_cast<Typed_QTreeWidgetItem*>(ui->main_tree_widget->
 			selectedItems().at(0))->get_type() == "GROUP")
 		{
-			add_group_dialog->set_group_and_computer_names(
+			add_computer_dialog->set_groups_and_computer_names(
 				groups_and_computer_names);
+			add_computer_dialog->set_group_name(ui->main_tree_widget->
+				selectedItems().at(0)->text(0));
 			add_computer_dialog->show();
 		}
 		else
@@ -199,7 +201,9 @@ void Edit_Group::repopulate_tree_widget()
 #ifdef _DEBUG
 	std::cout << "  - Beginning population" << std::endl;
 #endif // _DEBUG
-	foreach(QString group_name, groups_and_computer_names->keys())
+	foreach(QString group_name, 
+		groups_and_computer_names->
+		get_groups_and_computers().keys())
 	{
 #ifdef _DEBUG
 		std::cout << "   - Group Name: " << qPrintable(group_name) << std::endl;
@@ -210,7 +214,9 @@ void Edit_Group::repopulate_tree_widget()
 		group_item->setText(0, group_name);
 		ui->main_tree_widget->addTopLevelItem(group_item);
 		foreach(QString computer_name,
-			groups_and_computer_names->value(group_name))
+			groups_and_computer_names->
+			get_groups_and_computers().
+			values(group_name))
 		{
 #ifdef _DEBUG
 			std::cout << "    - Computer Name: " 
