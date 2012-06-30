@@ -4,7 +4,6 @@ Add_Computer_Dialog::Add_Computer_Dialog(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
-	computer_names = new QList<QString>;
 	connect(ui.add_computer_buttonbox, SIGNAL(accepted()),
 		this , SLOT(ok_clicked()));
 	connect(ui.add_computer_buttonbox, SIGNAL(rejected()),
@@ -13,28 +12,47 @@ Add_Computer_Dialog::Add_Computer_Dialog(QWidget *parent, Qt::WFlags flags)
 
 Add_Computer_Dialog::~Add_Computer_Dialog()
 {
-	delete computer_names;
 }
 
 /** Function will set the computer_names variable to the value the calling
  ** class provides */
-void Add_Computer_Dialog::set_computer_names(
-	QList<QString> &p_computer_names)
+void Add_Computer_Dialog::set_groups_and_computer_names(
+	QMap<QString, QList<QString>* > *p_groups_and_computer_names)
 {
+#ifdef _DEBUG
 	std::cout << " - Printing received computer names:" << std::endl;
-	for(int i = 0; i < p_computer_names.size(); i++)
-		std::cout << "   - " << qPrintable(p_computer_names[i]) 
-		<< std::endl;
-	computer_names = &p_computer_names;
+	foreach(QString key, p_groups_and_computer_names->keys())
+		foreach(QString computer_name,
+			p_groups_and_computer_names->value(key))
+			std::cout << "  - " << qPrintable(computer_name) << std::endl;
+#endif // _DEBUG
+	groups_and_computer_names = p_groups_and_computer_names;
 }
 
 /** Function to handle the accepted() signal from the class buttonbox */
 void Add_Computer_Dialog::ok_clicked()
 {
-	if (!computer_names->contains(ui.computer_name_line_edit->text()))
+#ifdef _DEBUG
+	std::cout << "= Add_Computer_Dialog::ok_clicked()" << std::endl;
+	std::cout << " - Testing that computer is not already in group" 
+		<< std::endl;
+#endif // _DEBUG
+	bool computer_already_in_group = false;
+	foreach(QString key, groups_and_computer_names->keys())
+		foreach(QString computer, groups_and_computer_names->value(key))
+			if(ui.computer_name_line_edit->text() == computer 
+				|| computer == nullptr)
+				computer_already_in_group = true;
+#ifdef _DEBUG
+	std::cout << " - Computer in a group: " << computer_already_in_group
+		<< std::endl;
+#endif // _DEBUG
+	if (!computer_already_in_group)
 	{
-		computer_names->append(ui.computer_name_line_edit->text());
-		emit computer_name_added(ui.computer_name_line_edit->text());
+		QList<QString> *new_list = new QList<QString>;
+		groups_and_computer_names->insert(
+			ui.computer_name_line_edit->text(), *new_list);
+		emit computer_name_added();
 		this->close();
 	}
 	else
@@ -52,4 +70,9 @@ void Add_Computer_Dialog::ok_clicked()
 void Add_Computer_Dialog::cancel_clicked()
 {
 	this->close();
+}
+
+void Add_Computer_Dialog::set_group_index( int p_group_index)
+{
+	group_index = p_group_index;
 }

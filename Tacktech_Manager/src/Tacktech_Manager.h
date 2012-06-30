@@ -2,6 +2,7 @@
 #define TACKTECH_MANAGER_H
 
 #include <QtGui/QMainWindow>
+#include <QMap>
 #include <iostream>
 #include "Edit_Group.h"
 #include "ui_Tacktech_Manager.h"
@@ -22,12 +23,10 @@ private:
 	Edit_Group *edit_group_class;
 
 protected:
-	/* Variable for group names */
-	QList<QString> group_names;
-
-	/* Variable for computer names
-	*  Note: This can be hostnames or IP addresses */
-	QList<QString> computer_names;
+	/* Variable for computer names and group names
+	 * Note: Format is groups_and_computers[group_index][computer_index]
+	 * Note: This can be hostnames or IP addresses */
+	QMap<QString, QList<QString>* > *groups_and_computers;
 
 private slots:
 	void refresh_all_groups();

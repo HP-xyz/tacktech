@@ -11,6 +11,9 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	/* Create new pointer to Edit_Group */
 	edit_group_class = new Edit_Group();
 
+	/* Create new pointer for global variable to groups_and_computers*/
+	groups_and_computers = new QMap<QString, QList<QString>* >;
+
 #ifdef _DEBUG
 	std::cout << " - Setting up UI" << std::endl;
 #endif // _DEBUG
@@ -64,8 +67,7 @@ void Tacktech_Manager::edit_group()
 #ifdef _DEBUG
 	std::cout << " - Creating and showing Edit_Group GUI" << std::endl;
 #endif // _DEBUG
-	edit_group_class->set_computer_names(computer_names);
-	edit_group_class->set_group_names(group_names);
+	edit_group_class->set_groups_and_computer_names(groups_and_computers);
 	edit_group_class->show();
 }
 
@@ -102,7 +104,7 @@ void Tacktech_Manager::edit_preferences()
 void Tacktech_Manager::group_editing_complete(
 	QList<QString> p_new_group_names)
 {
-	group_names = p_new_group_names;
+	//group_names = p_new_group_names;
 }
 
 /** Slot called from the called class to set the computer_names to the 
@@ -111,5 +113,5 @@ void Tacktech_Manager::group_editing_complete(
 void Tacktech_Manager::computer_editing_complete(
 	QList<QString> p_new_computer_names)
 {
-	computer_names = p_new_computer_names;
+	//computer_names = p_new_computer_names;
 }

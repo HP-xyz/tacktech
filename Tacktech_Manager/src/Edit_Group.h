@@ -20,8 +20,7 @@ class Edit_Group : public QMainWindow
 public:
 	Edit_Group(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Edit_Group();
-	void set_group_names(QList<QString>&);
-	void set_computer_names(QList<QString>&);
+	void set_groups_and_computer_names(QMap<QString, QList<QString>* >*);
 private:
 	Ui::Edit_GroupClass *ui;
 
@@ -32,9 +31,8 @@ private:
 	QAction *add_group;
 	QAction *remove_group;
 
-	/* Pointers to variables that have to be set by the calling class */
-	QList<QString> *group_names;
-	QList<QString> *computer_names;
+	/* Pointer to variable that have to be set by the calling class */
+	QMap<QString,QList<QString>* > *groups_and_computer_names;
 
 	/* Dialog variables */
 	Add_Computer_Dialog *add_computer_dialog;
@@ -50,8 +48,7 @@ private slots:
 	void cancel_clicked();
 
 	/* Secondary slots that are fired from classes called from this class*/
-	void group_name_added(QString);
-	void computer_name_added(QString);
+	void repopulate_tree_widget();
 
 signals:
 	void group_editing_complete(QList<QString>);

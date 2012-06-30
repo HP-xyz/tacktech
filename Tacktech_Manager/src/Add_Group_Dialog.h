@@ -16,15 +16,15 @@ class Add_Group_Dialog : public QMainWindow
 public:
 	Add_Group_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Add_Group_Dialog();
-	void set_group_names(QList<QString>&);
+	void set_group_and_computer_names(QMap<QString, QList<QString>* >*);
 private:
 	Ui::Add_Group_DialogClass ui;
-	QList<QString> *group_names;
+	QMap<QString, QList<QString>* > *group_and_computer_names;
 private slots:
 	void ok_clicked();
 	void cancle_clicked();
 signals:
-	void group_name_added(QString);
+	void group_name_added();
 };
 
 #endif // ADD_GROUP_DIALOG_H
