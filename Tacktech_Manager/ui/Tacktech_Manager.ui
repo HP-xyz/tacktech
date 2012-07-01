@@ -51,14 +51,12 @@
     <property name="title">
      <string>Playlist</string>
     </property>
-    <addaction name="actionCreate_Playlist"/>
     <addaction name="actionEdit_Playlist"/>
    </widget>
    <widget class="QMenu" name="menuGroups">
     <property name="title">
      <string>Groups</string>
     </property>
-    <addaction name="actionAdd_Group"/>
     <addaction name="actionEdit_Group"/>
    </widget>
    <widget class="QMenu" name="menuPreferences">

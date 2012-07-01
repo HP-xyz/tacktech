@@ -41,16 +41,14 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 
 	/* Connecting secondary signals */
 	connect(edit_group_class,
-		SIGNAL(group_editing_complete(QList<QString>)),
-		this, SLOT(group_editing_complete(QList<QString>)));
-	connect(edit_group_class,
-		SIGNAL(computer_editing_complete(QList<QString>)),
-		this, SLOT(computer_editing_complete(QList<QString>)));
+		SIGNAL(editing_complete()),
+		this, SLOT(group_editing_complete()));
 }
 
 Tacktech_Manager::~Tacktech_Manager()
 {
 	delete edit_group_class;
+	delete groups_and_computers;
 }
 
 /** Function will refresh all group statuses
@@ -98,20 +96,12 @@ void Tacktech_Manager::edit_preferences()
 #endif // _DEBUG
 }
 
-/** Slot called from the called class to set the group_names to the current
- ** values. Gets called if the edit_group class object sends the accepted
+/** Slot called from the called class to set the group_and_computers to the
+ ** current values. Gets called if the edit_group class object sends the accepted
  ** signal from its buttonbox */
-void Tacktech_Manager::group_editing_complete(
-	QList<QString> p_new_group_names)
+void Tacktech_Manager::group_editing_complete()
 {
-	//group_names = p_new_group_names;
+	//TODO
+	//REDRAW GUI
 }
 
-/** Slot called from the called class to set the computer_names to the 
- ** current values. Gets called if the edit_group class object sends the 
- ** accepted signal from its buttonbox */
-void Tacktech_Manager::computer_editing_complete(
-	QList<QString> p_new_computer_names)
-{
-	//computer_names = p_new_computer_names;
-}

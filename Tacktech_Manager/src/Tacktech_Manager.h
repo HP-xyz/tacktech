@@ -41,8 +41,7 @@ private slots:
 
 	/* Slots that receive signals from GUIs (not this) */
 	/* ==================================== */
-	void group_editing_complete(QList<QString>);
-	void computer_editing_complete(QList<QString>);
+	void group_editing_complete();
 };
 
 #endif // TACKTECH_MANAGER_H

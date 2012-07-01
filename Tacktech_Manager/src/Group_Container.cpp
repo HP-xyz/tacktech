@@ -7,7 +7,8 @@ Group_Container::~Group_Container()
 {
 
 }
-
+ /** Function to add a group name to the Group_Container. Returns false
+  ** if the group name already exists */
 bool Group_Container::add_group_name( QString new_group_name)
 {
 	if (groups_and_computers.contains(new_group_name))
@@ -19,6 +20,8 @@ bool Group_Container::add_group_name( QString new_group_name)
 	}
 }
 
+/** Function to add a computer name to the Group_Container. Returns false
+ ** if the computer name is already in another group. */
 bool Group_Container::add_computer_name(QString group_name,
 	QString new_computer_name)
 {
@@ -35,7 +38,10 @@ bool Group_Container::add_computer_name(QString group_name,
 	groups_and_computers.insert(group_name, new_computer_name);
 	return true;
 }
+
 #ifdef _DEBUG
+/** Function to print the contents of the Group_Container. Only compiled
+ ** in debug mode */
 void Group_Container::print_contents()
 {
 	std::cout << "= Group_Container::print_contents()" << std::endl;
@@ -50,6 +56,7 @@ void Group_Container::print_contents()
 }
 #endif // _DEBUG
 
+/** Returns the groups_and_computers map to the calling class */
 QMultiMap<QString, QString> Group_Container::get_groups_and_computers()
 {
 	return groups_and_computers;

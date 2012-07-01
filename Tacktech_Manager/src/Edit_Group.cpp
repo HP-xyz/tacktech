@@ -237,8 +237,7 @@ void Edit_Group::repopulate_tree_widget()
  ** computer_editing_complete signals */
 void Edit_Group::ok_clicked()
 {
-	//emit group_editing_complete(*group_names);
-	//emit computer_editing_complete(*computer_names);
+	emit editing_complete();
 	this->close();
 }
 

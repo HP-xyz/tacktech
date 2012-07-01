@@ -52,8 +52,7 @@ private slots:
 	void repopulate_tree_widget();
 
 signals:
-	void group_editing_complete(QList<QString>);
-	void computer_editing_complete(QList<QString>);
+	void editing_complete();
 };
 
 #endif // EDIT_GROUP_H
