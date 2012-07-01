@@ -20,6 +20,7 @@ public:
 #endif // _DEBUG
 private:
 	QMultiMap<QString, QPair<QString, int> > playlist;
+	QPair<QString, int> temp_pair;
 };
 
 #endif //PLAYLIST_CONTAINER_H

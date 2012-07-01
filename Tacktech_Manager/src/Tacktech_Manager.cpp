@@ -8,11 +8,11 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	std::cout << " - Creating new edit_group_class" << std::endl;
 #endif // _DEBUG
 
-	/* Create new pointer to Edit_Group */
 	edit_group_class = new Edit_Group();
+	edit_playlist_class = new Edit_Playlist();
 
-	/* Create new pointer for global variable to groups_and_computers*/
 	groups_and_computers = new Group_Container();
+	playlist = new Playlist_Container();
 
 #ifdef _DEBUG
 	std::cout << " - Setting up UI" << std::endl;
@@ -47,8 +47,22 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 
 Tacktech_Manager::~Tacktech_Manager()
 {
+#ifdef _DEBUG
+	std::cout << "= ~Tacktech_Manager" << std::endl;
+	std::cout << " - Deleting edit_group_class" << std::endl;
+#endif // _DEBUG
 	delete edit_group_class;
+#ifdef _DEBUG
+	std::cout << " - Deleting edit_playlist_class" << std::endl;
+#endif // _DEBUG
+	delete edit_playlist_class;
+#ifdef _DEBUG
+	std::cout << " - Deleting groups_and_computers" << std::endl;
+#endif // _DEBUG
 	delete groups_and_computers;
+#ifdef _DEBUG
+	std::cout << " - Deleting playlist" << std::endl;
+#endif // _DEBUG
 }
 
 /** Function will refresh all group statuses
@@ -85,6 +99,8 @@ void Tacktech_Manager::edit_playlist()
 #ifdef _DEBUG
 	std::cout << " - Creating and showing Edit_Playlist GUI" << std::endl;
 #endif // _DEBUG
+	edit_playlist_class->set_playlist(playlist);
+	edit_playlist_class->show();
 }
 
 /** Function will open the edit preferences GUI

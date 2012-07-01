@@ -51,3 +51,33 @@ QString Typed_QTreeWidgetItem::get_computer_name()
 {
 	return computer_name;
 }
+
+void Typed_QTreeWidgetItem::set_playlist_name( QString p_playlist_name)
+{
+	playlist_name = p_playlist_name;
+}
+
+void Typed_QTreeWidgetItem::set_filename( QString p_filename)
+{
+	filename = p_filename;
+}
+
+void Typed_QTreeWidgetItem::set_pause( int p_pause)
+{
+	pause = p_pause;
+}
+
+QString Typed_QTreeWidgetItem::get_playlist_name()
+{
+	return playlist_name;
+}
+
+QString Typed_QTreeWidgetItem::get_filename()
+{
+	return filename;
+}
+
+int Typed_QTreeWidgetItem::get_pause()
+{
+	return pause;
+}

@@ -5,7 +5,9 @@
 #include <QMap>
 #include <iostream>
 #include "Group_Container.h"
+#include "Playlist_Container.h"
 #include "Edit_Group.h"
+#include "Edit_Playlist.h"
 #include "ui_Tacktech_Manager.h"
 
 class Tacktech_Manager : public QMainWindow
@@ -22,12 +24,16 @@ private:
 
 	/* Global variable for Edit_Group GUI */
 	Edit_Group *edit_group_class;
+	Edit_Playlist *edit_playlist_class;
 
 protected:
 	/* Variable for computer names and group names
 	 * Note: Format is groups_and_computers[group_index][computer_index]
 	 * Note: This can be hostnames or IP addresses */
 	Group_Container *groups_and_computers;
+
+	/* Variable for the playlis */
+	Playlist_Container *playlist;
 
 private slots:
 	void refresh_all_groups();

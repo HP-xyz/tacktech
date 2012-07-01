@@ -52,6 +52,9 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Playlist.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_Playlist_Dialog.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_File_Dialog.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_Pause_Dialog.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
@@ -62,6 +65,9 @@ set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Playlist.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_Playlist_Dialog.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_File_Dialog.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_Pause_Dialog.h
 	)
 #FOR NOW, THERE ARE NO RESOURCES
 set ( Tacktech_Manager_RSCS
@@ -70,6 +76,9 @@ set ( Tacktech_Manager_RSCS
 		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Computer_Dialog.qrc
 		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Group_Dialog.qrc
 		${Tacktech_Manager_SOURCE_DIR}/resources/Edit_Playlist.qrc
+		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Playlist_Dialog.qrc
+		${Tacktech_Manager_SOURCE_DIR}/resources/Add_File_Dialog.qrc
+		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Pause_Dialog.qrc
 	)
 set ( Tacktech_Manager_UI_FORMS
 		${Tacktech_Manager_SOURCE_DIR}/ui/Tacktech_Manager.ui
@@ -77,6 +86,9 @@ set ( Tacktech_Manager_UI_FORMS
 		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Computer_Dialog.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Group_Dialog.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Edit_Playlist.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Playlist_Dialog.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Add_File_Dialog.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Pause_Dialog.ui
 	)
 QT4_ADD_RESOURCES(RSCS ${Tacktech_Manager_RSCS})
 QT4_WRAP_UI (UIS ${Tacktech_Manager_UI_FORMS})

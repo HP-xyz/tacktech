@@ -1,8 +1,10 @@
 #include "Playlist_Container.h"
 Playlist_Container::Playlist_Container()
 {
-
+	temp_pair.first = "TEMP_ITEM";
+	temp_pair.second = 0;
 }
+
 Playlist_Container::~Playlist_Container()
 {
 
@@ -12,15 +14,12 @@ Playlist_Container::~Playlist_Container()
  ** false if the playlist name already exists. */
 bool Playlist_Container::add_playlist_name( QString playlist_name)
 {
-	if (!playlist.contains(playlist_name))
+	if (playlist.contains(playlist_name))
 	{
 		return false;
 	}
 	else
 	{
-		QPair<QString, int> temp_pair;
-		temp_pair.first = "";
-		temp_pair.second = 0;
 		playlist.insert(playlist_name, temp_pair);
 		return true;
 	}
@@ -30,17 +29,34 @@ bool Playlist_Container::add_playlist_name( QString playlist_name)
 bool Playlist_Container::add_filename(
 	QString playlist_name, QString filename, int pause)
 {
-	/* Removing the temp item, if it exists */
-	QPair<QString, int> *temp_item = new QPair<QString, int>;
-	temp_item->first = "";
-	temp_item->second = 0;
-	playlist.remove(playlist_name, *temp_item);
-	delete temp_item;
-
-	/* Adding the actual item */
+#ifdef _DEBUG
+	print_contents();
+	std::cout << "= Playlist_Container::add_filename()" << std::endl;
+#endif // _DEBUG
 	QPair<QString, int> item_to_add;
 	item_to_add.first = filename;
 	item_to_add.second = pause;
+#ifdef _DEBUG
+	std::cout << " - playlist.values(playlist_name).at(0).first: " 
+		<< qPrintable(playlist.values(playlist_name).at(0).first)
+		<< std::endl;
+	std::cout << " - temp_pair.first: " << qPrintable(temp_pair.first) 
+		<< std::endl;
+	std::cout << " - playlist.values(playlist_name).at(0).second: " 
+		<< qPrintable(playlist.values(playlist_name).at(0).second)
+		<< std::endl;
+	std::cout << " - temp_pair.second: " << qPrintable(temp_pair.second)
+		<< std::endl;
+#endif // _DEBUG
+	if(playlist.values(playlist_name).at(0).first == temp_pair.first
+		&& playlist.values(playlist_name).at(0).second ==
+		temp_pair.second)
+	{//Removing the temp item, if needed
+#ifdef _DEBUG
+		std::cout << " - Replacing the temp variable" << std::endl;
+#endif // _DEBUG
+		playlist.remove(playlist_name);
+	}
 	playlist.insert(playlist_name, item_to_add);
 	return true;
 }

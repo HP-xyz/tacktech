@@ -54,12 +54,25 @@ Edit_Group::Edit_Group(QWidget *parent, Qt::WFlags flags)
 
 Edit_Group::~Edit_Group()
 {
+#ifdef _DEBUG
+	std::cout << "= ~Edit_Group" << std::endl;
+	std::cout << " - Deleting ui" << std::endl;
+#endif // _DEBUG
 	delete ui;
-	delete node_menu;
+#ifdef _DEBUG
+	std::cout << " - Deleting node menu actions" << std::endl;
+#endif // _DEBUG
 	delete add_computer;
 	delete remove_computer;
 	delete add_group;
 	delete remove_group;
+#ifdef _DEBUG
+	std::cout << " - Deleting node menu" << std::endl;
+#endif // _DEBUG
+	delete node_menu;
+#ifdef _DEBUG
+	std::cout << " - Deleting dialog variables" << std::endl;
+#endif // _DEBUG
 	delete add_computer_dialog;
 	delete add_group_dialog;
 	//delete groups_and_computer_names;
