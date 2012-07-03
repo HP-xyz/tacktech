@@ -15,12 +15,6 @@ if (WIN32 AND NOT CYGWIN)
 	add_definitions(-D_WIN32_WINNT=0x0501)
 endif (WIN32 AND NOT CYGWIN)
 
-if (LOCAL_PUGIXML)
-	#lets include pugixml
-	add_subdirectory (${artemis_server_SOURCE_DIR}/pugixml/scripts)
-	set (PUGIXML_INCLUDE_DIR ${artemis_server_SOURCE_DIR}/pugixml/src)
-endif (LOCAL_PUGIXML)
-
 #Needed for windows
 #Change this to your boost path
 if (WIN32)

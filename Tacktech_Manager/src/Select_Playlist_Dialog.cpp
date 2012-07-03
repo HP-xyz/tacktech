@@ -18,6 +18,7 @@ Select_Playlist_Dialog::~Select_Playlist_Dialog()
 void Select_Playlist_Dialog::set_playlist( Playlist_Container *p_playlist )
 {
 	playlist = p_playlist;
+	ui.playlist_combobox->clear();
 	foreach(QString playlist_name, playlist->get_playlist().uniqueKeys())
 		ui.playlist_combobox->addItem(playlist_name);
 }

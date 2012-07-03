@@ -5,6 +5,7 @@
 #include <QMap>
 #include <iostream>
 #include <string>
+#include <boost/lexical_cast.hpp>
 #include <pugixml.hpp>
 #include "Group_Container.h"
 #include "Playlist_Container.h"

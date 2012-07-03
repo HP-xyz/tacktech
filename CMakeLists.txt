@@ -6,6 +6,15 @@ message (STATUS "###### WE ARE BUILDING Tactek IN '${CMAKE_BUILD_TYPE}' MODE")
 SET(CMAKE_MODULE_PATH
     ${CMAKE_SOURCE_DIR}/cmake
 )
+
+OPTION (LOCAL_PUGIXML "Use local pugixml library (RECOMMENDED)" ON)
+
+if (LOCAL_PUGIXML)
+	#lets include pugixml
+	add_subdirectory (${Tactek_SOURCE_DIR}/pugixml/scripts)
+	set (PUGIXML_INCLUDE_DIR ${Tactek_SOURCE_DIR}/pugixml/src)
+endif (LOCAL_PUGIXML)
+
 #The display app can only be build and used in
 #nix for the time being. I suppose it could be
 #cross compiled in linux, but for now I'm just

@@ -17,14 +17,6 @@ IF(CMAKE_BUILD_TYPE MATCHES Release)
   endif(MSVC)
 endif(CMAKE_BUILD_TYPE MATCHES Release)
 
-OPTION (LOCAL_PUGIXML "Use local pugixml library (RECOMMENDED)" ON)
-
-if (LOCAL_PUGIXML)
-	#lets include pugixml
-	add_subdirectory (${Tacktech_Manager_SOURCE_DIR}/pugixml/scripts)
-	set (PUGIXML_INCLUDE_DIR ${Tacktech_Manager_SOURCE_DIR}/pugixml/src)
-endif (LOCAL_PUGIXML)
-
 if (MSVC)
 	set (QT_QMAKE_EXECUTABLE ${QT_DIR}/bin/qmake.exe)
 	set (QT_MOC_EXECUTABLE ${QT_DIR}/bin/moc.exe)
@@ -40,6 +32,20 @@ if (MSVC)
 else (MSVC)
 	find_package (Qt4 COMPONENTS QtNetwork QtCore QtGui REQUIRED)
 endif (MSVC)
+
+#Needed for windows
+#Change this to your boost path
+if (WIN32)
+  #SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "C:/boost")
+  #SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "C:/boost/lib")
+  #message (STATUS "Using user defined boost path")
+  set(Boost_USE_STATIC_LIBS ON)
+  set(Boost_USE_MULTITHREADED ON) 
+  set(Boost_USE_STATIC_RUNTIME OFF)
+endif (WIN32)
+
+#Lets find boost
+find_package(Boost 1.47.0 REQUIRED)
 
 if (NOT WIN32)
 	# We need this for unix machines since Qt internally uses
@@ -67,6 +73,7 @@ include_directories (
 					${QT_INCLUDE_DIR}
 					${QT_INCLUDES}
 					${PUGIXML_INCLUDE_DIR}
+					${Boost_INCLUDE_DIRS}
 					)
 set (Tacktech_Manager_Non_MOC_HDRS
 	${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
@@ -136,6 +143,7 @@ if (LOCAL_PUGIXML)
 	message (STATUS "Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
 	message (STATUS "Pugixml library: ${pugixml}")
 endif (LOCAL_PUGIXML)
+message (STATUS "Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 message (STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS} ")
 message (STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ")
 message (STATUS "CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE} ")

@@ -35,14 +35,18 @@ bool Playlist_Container::add_filename(
 	QPair<QString, int> item_to_add;
 	item_to_add.first = filename;
 	item_to_add.second = pause;
-	if(playlist.values(playlist_name).at(0).first == temp_pair.first
-		&& playlist.values(playlist_name).at(0).second ==
-		temp_pair.second)
-	{//Removing the temp item, if needed
+	if (!playlist.isEmpty())
+	{
+		if(playlist.values(playlist_name).at(0).first == temp_pair.first
+			&& playlist.values(playlist_name).at(0).second ==
+			temp_pair.second)
+		{
+		//Removing the temp item, if needed
 #ifdef _DEBUG
-		std::cout << " - Removing the temp variable" << std::endl;
+			std::cout << " - Removing the temp variable" << std::endl;
 #endif // _DEBUG
-		playlist.remove(playlist_name);
+			playlist.remove(playlist_name);
+		}
 	}
 	playlist.insert(playlist_name, item_to_add);
 	return true;
