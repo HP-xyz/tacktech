@@ -52,7 +52,7 @@ private slots:
 	void repopulate_tree_widget();
 
 signals:
-	void editing_complete();
+	void groups_changed();
 };
 
 #endif // EDIT_GROUP_H

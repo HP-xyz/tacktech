@@ -49,7 +49,7 @@ private slots:
 	void pause_unchanged_slot();
 
 signals:
-	void filename_added();
+	void filelist_changed();
 };
 
 #endif // ADD_FILE_DIALOG_H

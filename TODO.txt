@@ -11,9 +11,9 @@ Remote Admin:					Not Done
 Administration App:				Busy
   - Basic GUI design			Done
   - Edit Group GUI design		Done
-    - Edit Group logic			Busy
-  - Create Playlist GUI design	Not Done
-    - Create Playlist logic		Not Done
-  - Edit Playlist GUI design	Not Done
-    - Edit Playlist logic		Not Done
+    - Edit Group logic			Done
+  - Create Playlist GUI design	Done
+    - Create Playlist logic		Done
+  - Edit Playlist GUI design	Done
+    - Edit Playlist logic		Busy
 

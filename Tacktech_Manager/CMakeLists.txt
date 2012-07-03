@@ -7,6 +7,16 @@ IF( NOT CMAKE_BUILD_TYPE )
   SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_DEBUG" )
 ENDIF( NOT CMAKE_BUILD_TYPE )
 
+#If we're on MSVC and building in Release mode
+IF(CMAKE_BUILD_TYPE MATCHES Release)
+  if (MSVC)
+    message (STATUS "Setting GUI_TYPE to WIN32")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_ITERATOR_DEBUG_LEVEL=0" )
+	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /subsystem:windows")
+	set(GUI_TYPE WIN32)
+  endif(MSVC)
+endif(CMAKE_BUILD_TYPE MATCHES Release)
+
 if (MSVC)
 	set (QT_QMAKE_EXECUTABLE ${QT_DIR}/bin/qmake.exe)
 	set (QT_MOC_EXECUTABLE ${QT_DIR}/bin/moc.exe)
@@ -18,7 +28,7 @@ if (MSVC)
 	MESSAGE (STATUS "QT_MOC_EXECUTABLE: " ${QT_MOC_EXECUTABLE})
 	MESSAGE (STATUS "QT_RCC_EXECUTABLE: " ${QT_RCC_EXECUTABLE})
 	MESSAGE (STATUS "QT_UIC_EXECUTABLE: " ${QT_UIC_EXECUTABLE})	
-	find_package (Qt4 COMPONENTS QtNetwork QtCore QtGui)	
+	find_package (Qt4 COMPONENTS QtMain QtNetwork QtCore QtGui REQUIRED)
 else (MSVC)
 	find_package (Qt4 COMPONENTS QtNetwork QtCore QtGui REQUIRED)
 endif (MSVC)
@@ -35,39 +45,53 @@ include ( ${QT_USE_FILE} )
 #SET(QT_USE_QTNETWORK TRUE)
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
-
+link_libraries(${QT_LIBRARIES}
+				${QT_QTMAIN_LIBRARY}
+				${QT_QTCORE_LIBRARY} 
+				${QT_QTGUI_LIBRARY} 
+				${QT_QTNETWORK_LIBRARY} 
+				)
 include_directories (
 					${CMAKE_SOURCE_DIR} 
 					${CMAKE_CURRENT_BINARY_DIR}
 					${QT_QTCORE_INCLUDE_DIR} 
 					${QT_QTGUI_INCLUDE_DIR} 
 					${QT_INCLUDE_DIR}
+					${QT_INCLUDES}
 					)
+set (Tacktech_Manager_Non_MOC_HDRS
+	${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
+	${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.h
+	${Tacktech_Manager_SOURCE_DIR}/src/Group_Playlist_Container.h
+	${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.h
+	)
+					
 set ( Tacktech_Manager_SRCS
+		${Tacktech_Manager_SOURCE_DIR}/main.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Group.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Computer_Dialog.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.cpp	
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Playlist.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Playlist_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_File_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Pause_Dialog.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Group_Playlist_Container.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Group.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Computer_Dialog.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.h		
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Playlist.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Playlist_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_File_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Pause_Dialog.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.h
 	)
 #FOR NOW, THERE ARE NO RESOURCES
 set ( Tacktech_Manager_RSCS
@@ -79,6 +103,7 @@ set ( Tacktech_Manager_RSCS
 		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Playlist_Dialog.qrc
 		${Tacktech_Manager_SOURCE_DIR}/resources/Add_File_Dialog.qrc
 		${Tacktech_Manager_SOURCE_DIR}/resources/Add_Pause_Dialog.qrc
+		${Tacktech_Manager_SOURCE_DIR}/resources/Select_Playlist_Dialog.qrc
 	)
 set ( Tacktech_Manager_UI_FORMS
 		${Tacktech_Manager_SOURCE_DIR}/ui/Tacktech_Manager.ui
@@ -89,6 +114,7 @@ set ( Tacktech_Manager_UI_FORMS
 		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Playlist_Dialog.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Add_File_Dialog.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Add_Pause_Dialog.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Select_Playlist_Dialog.ui
 	)
 QT4_ADD_RESOURCES(RSCS ${Tacktech_Manager_RSCS})
 QT4_WRAP_UI (UIS ${Tacktech_Manager_UI_FORMS})
@@ -97,7 +123,6 @@ QT4_WRAP_CPP(MOCS ${Tacktech_Manager_HDRS})
 message("")
 message (STATUS "Qt include dir	: ${QT_INCLUDE_DIR}")
 message (STATUS "Qt libraries	: ${QT_LIBRARIES}")
-message (STATUS "Libvlc-qt library: ${LIBVLCQT_LIBRARY}")
 message (STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS} ")
 message (STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ")
 message (STATUS "CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE} ")
@@ -107,7 +132,8 @@ message (STATUS "CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG} ")
 message("")
 
 add_executable ( Tacktech_Manager 
-				${Tacktech_Manager_SOURCE_DIR}/main.cpp
+				${GUI_TYPE}
+				${Tacktech_Manager_Non_MOC_HDRS}
 				${Tacktech_Manager_SRCS} 
 				${Tacktech_Manager_HDRS} 
 				${MOCS} 
@@ -115,8 +141,8 @@ add_executable ( Tacktech_Manager
 				${UIS})
 target_link_libraries ( Tacktech_Manager 
 						${QT_LIBRARIES}
-						${QT_QTCORE_LIBRARY} 
-						${QT_QTGUI_LIBRARY} 
-						${QT_QTNETWORK_LIBRARY} 
+						${QT_QTCORE_LIBRARIES} 
+						${QT_QTGUI_LIBRARIES} 
+						${QT_QTNETWORK_LIBRARIES} 
                         ${CMAKE_THREAD_LIBS_INIT}
                         )

@@ -59,16 +59,9 @@
     </property>
     <addaction name="actionEdit_Group"/>
    </widget>
-   <widget class="QMenu" name="menuPreferences">
-    <property name="title">
-     <string>Preferences</string>
-    </property>
-    <addaction name="actionEdit_Preferences"/>
-   </widget>
    <addaction name="menuDislay"/>
    <addaction name="menuPlaylist"/>
    <addaction name="menuGroups"/>
-   <addaction name="menuPreferences"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionRefresh_All">

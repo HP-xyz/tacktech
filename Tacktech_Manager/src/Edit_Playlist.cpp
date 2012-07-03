@@ -47,9 +47,16 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags)
 		this, SLOT(ok_clicked()));
 	connect(ui.buttonBox, SIGNAL(rejected()),
 		this, SLOT(cancel_clicked()));
+	connect(remove_file, SIGNAL(triggered()),
+		this, SLOT(remove_file_slot()));
+	connect(remove_playlist, SIGNAL(triggered()),
+		this, SLOT(remove_playlist_slot()));
+	
 
 	/* Connecting secondary signals */
 	connect(add_playlist_dialog, SIGNAL(playlist_name_added()),
+		this, SLOT(repopulate_widget()));
+	connect(add_file_dialog, SIGNAL(filelist_changed()),
 		this, SLOT(repopulate_widget()));
 }
 
@@ -68,6 +75,7 @@ Edit_Playlist::~Edit_Playlist()
 void Edit_Playlist::set_playlist( Playlist_Container *p_playlist)
 {
 	playlist = p_playlist;
+	original_playlist = new Playlist_Container(*p_playlist);
 }
 
 /** Slot to start the Add_Playlist GUI and show the GUI */
@@ -77,14 +85,96 @@ void Edit_Playlist::add_playlist_slot()
 	add_playlist_dialog->show();
 }
 
+/** Slot gets fired when the context menu item connected to it is 
+ ** activated. Removes a filename from the widget and global playlist 
+ ** variable. If both a filenames and playlist names are selected, removes
+ ** both.
+ ** Note: This function will take n^2 time to complete. */
 void Edit_Playlist::remove_file_slot()
 {
-
+#ifdef _DEBUG
+	std::cout << "= Edit_Playlist::remove_file_slot()" << std::endl;
+#endif // _DEBUG
+	if(!ui.playlist_tree_widget->selectedItems().count() == 0)
+	{
+		for(int i = 0;
+			i < ui.playlist_tree_widget->selectedItems().size(); i++)
+		{
+			Typed_QTreeWidgetItem *selected_item =
+				static_cast<Typed_QTreeWidgetItem*>
+				(ui.playlist_tree_widget->selectedItems().at(i));
+			if (selected_item->get_type() == "FILENAME")
+			{
+#ifdef _DEBUG
+				std::cout << " - Removing filename" << std::endl;
+#endif // _DEBUG
+				Typed_QTreeWidgetItem *selected_item_parent =
+					static_cast<Typed_QTreeWidgetItem*>
+					(selected_item->parent());
+				for (int j = 0; j < playlist->get_playlist().values(
+					selected_item_parent->get_playlist_name()).size();
+					j++)
+					{
+						playlist->get_playlist().remove(
+							selected_item_parent->get_playlist_name(), 
+							playlist->get_playlist().values(
+							selected_item_parent->get_playlist_name()).
+							at(j));
+					}
+			}
+			else if (selected_item->get_type() == "PLAYLIST")
+			{
+#ifdef _DEBUG
+				std::cout << " - Removing playlist" << std::endl;
+#endif // _DEBUG
+				playlist->get_playlist().remove(
+					selected_item->get_playlist_name());
+			}
+		}
+		/* We now repopulate the widget to reflect the changes */
+		repopulate_widget();
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select a file to remove from playlist");
+		msgBox.exec();
+	}
 }
 
+/** Slot removes a playlist and all its items from the widget and the 
+ ** playlist global variable */
 void Edit_Playlist::remove_playlist_slot()
 {
-
+#ifdef _DEBUG
+	std::cout << "= Edit_Playlist::remove_playlist_slot()" << std::endl;
+#endif // _DEBUG
+	if(ui.playlist_tree_widget->selectedItems().count() > 0 &&
+		ui.playlist_tree_widget->selectedItems().count() < 2)
+	{
+		Typed_QTreeWidgetItem *selected_item =
+			static_cast<Typed_QTreeWidgetItem*>
+			(ui.playlist_tree_widget->selectedItems().at(0));
+		if (selected_item->get_type() == "PLAYLIST")
+		{
+			playlist->get_playlist().remove(
+				selected_item->get_playlist_name());
+			/* Repopulate widget to reflect changes */
+			repopulate_widget();
+		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Select a PLAYLIST to remove from playlist");
+			msgBox.exec();
+		}
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select ONE playlist to remove from playlist");
+		msgBox.exec();
+	}
 }
 
 void Edit_Playlist::add_file_slot()
@@ -99,24 +189,31 @@ void Edit_Playlist::add_file_slot()
 	else
 	{
 		QMessageBox msgBox;
-		msgBox.setText("Selet only ONE playlist to add files to");
+		msgBox.setText("Select only ONE playlist to add files to");
 		msgBox.exec();
 	}
 }
 
 void Edit_Playlist::ok_clicked()
 {
-
+	emit playlist_changed();
+	this->close();
 }
 
 void Edit_Playlist::cancel_clicked()
 {
-
+	delete playlist;
+	playlist = original_playlist;
+	this->close();
 }
 
 void Edit_Playlist::repopulate_widget()
 {
-	foreach(QString playlist_name, playlist->get_playlist().keys())
+	ui.playlist_tree_widget->clear();
+#ifdef _DEBUG
+	playlist->print_contents();
+#endif // _DEBUG
+	foreach(QString playlist_name, playlist->get_playlist().uniqueKeys())
 	{
 		Typed_QTreeWidgetItem *playlist_item = new Typed_QTreeWidgetItem();
 		playlist_item->setText(0, playlist_name);
@@ -141,6 +238,7 @@ void Edit_Playlist::repopulate_widget()
 			filename_item->set_pause(
 				playlist->get_playlist().values(playlist_name)
 				.at(i).second);
+			filename_item->set_type("FILENAME");
 			filename_item->set_playlist_name(playlist_name);
 			playlist_item->addChild(filename_item);
 		}

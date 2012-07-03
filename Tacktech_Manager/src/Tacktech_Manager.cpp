@@ -5,30 +5,22 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 {
 #ifdef _DEBUG
 	std::cout << "= Setting up Tacktech Manager" << std::endl;
-	std::cout << " - Creating new edit_group_class" << std::endl;
 #endif // _DEBUG
 
 	edit_group_class = new Edit_Group();
 	edit_playlist_class = new Edit_Playlist();
+	select_playlist_dialog = new Select_Playlist_Dialog();
 
 	groups_and_computers = new Group_Container();
 	playlist = new Playlist_Container();
+	group_playlist = new Group_Playlist_Container();
 
-#ifdef _DEBUG
-	std::cout << " - Setting up UI" << std::endl;
-#endif // _DEBUG
 	ui.setupUi(this);
 
-#ifdef _DEBUG
-	std::cout << " - Setting management_tree_widget headers" << std::endl;
-#endif // _DEBUG
 	QStringList manager_headers;
 	manager_headers << "Group" << "Playlist";
 	ui.management_tree_widget->setHeaderLabels(manager_headers);
 	
-#ifdef _DEBUG
-	std::cout << " - Connecting action signals" << std::endl;
-#endif // _DEBUG
 	/* Connect the main menu GUI signals */
 	connect(ui.actionEdit_Group, SIGNAL(triggered()),
 		this, SLOT(edit_group()));
@@ -38,31 +30,29 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 		this, SLOT(edit_playlist()));
 	connect(ui.actionEdit_Preferences, SIGNAL(triggered()),
 		this, SLOT(edit_preferences()));
+	connect(ui.management_tree_widget,
+		SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
+		this, SLOT(show_playlist_selection(QTreeWidgetItem*, int)));
 
 	/* Connecting secondary signals */
 	connect(edit_group_class,
-		SIGNAL(editing_complete()),
+		SIGNAL(groups_changed()),
 		this, SLOT(group_editing_complete()));
+	connect(select_playlist_dialog,
+		SIGNAL(group_playlist_changed()),
+		this, SLOT(repopulate_widget()));
 }
 
 Tacktech_Manager::~Tacktech_Manager()
 {
 #ifdef _DEBUG
 	std::cout << "= ~Tacktech_Manager" << std::endl;
-	std::cout << " - Deleting edit_group_class" << std::endl;
 #endif // _DEBUG
 	delete edit_group_class;
-#ifdef _DEBUG
-	std::cout << " - Deleting edit_playlist_class" << std::endl;
-#endif // _DEBUG
 	delete edit_playlist_class;
-#ifdef _DEBUG
-	std::cout << " - Deleting groups_and_computers" << std::endl;
-#endif // _DEBUG
 	delete groups_and_computers;
-#ifdef _DEBUG
-	std::cout << " - Deleting playlist" << std::endl;
-#endif // _DEBUG
+	delete playlist;
+	delete group_playlist;
 }
 
 /** Function will refresh all group statuses
@@ -108,16 +98,72 @@ void Tacktech_Manager::edit_playlist()
 void Tacktech_Manager::edit_preferences()
 {
 #ifdef _DEBUG
-	std::cout << " - Creating and showing Edit_Preferences GUI" << std::endl;
+	std::cout << " - Creating and showing Edit_Preferences GUI" 
+		<< std::endl;
 #endif // _DEBUG
 }
 
-/** Slot called from the called class to set the group_and_computers to the
- ** current values. Gets called if the edit_group class object sends the accepted
- ** signal from its buttonbox */
+/** Slot to repopulate the tree widget. 
+ ** NOTE: Takes linear time to complete */
+void Tacktech_Manager::repopulate_widget()
+{
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::repopulate_widget()" << std::endl;
+#endif // _DEBUG
+	ui.management_tree_widget->clear();
+	for(int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	{
+		QTreeWidgetItem *tree_item = new QTreeWidgetItem();
+		tree_item->setText(0, group_playlist->
+			get_group_playlist()->at(i).first);
+		tree_item->setText(1, group_playlist->
+			get_group_playlist()->at(i).second);
+		ui.management_tree_widget->addTopLevelItem(tree_item);
+	}
+}
+ /** Slot fired when the add_group_dialog sends its groups_changed()
+  ** signal. Adds the groups that have been added to the group_playlist
+  ** list and removes the ones that have been removed.
+  ** NOTE: This function could takes at least linear time to complete, 
+  **		and may take up to n^2 time to complete */
 void Tacktech_Manager::group_editing_complete()
 {
-	//TODO
-	//REDRAW GUI
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::group_editing_complete()" 
+		<< std::endl;
+#endif // _DEBUG
+	for(int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	{
+		if(!groups_and_computers->contains_group_name(
+			group_playlist->get_group_playlist()->at(i).first))
+		{//Removing group name if needed
+			group_playlist->get_group_playlist()->removeAt(i);
+		}
+	}
+	foreach(QString group_name,
+		groups_and_computers->get_groups_and_computers().uniqueKeys())
+	{
+		if(!group_playlist->contains_group_name(group_name))
+		{
+#ifdef _DEBUG
+			std::cout << " - Adding: " << qPrintable(group_name) 
+				<< std::endl;
+#endif // _DEBUG
+			QPair<QString, QString> pair_to_add;
+			pair_to_add.first = group_name;
+			pair_to_add.second = "ADD PLAYLIST HERE";
+			group_playlist->get_group_playlist()->append(pair_to_add);
+		}
+	}
+	repopulate_widget();
+}
+
+void Tacktech_Manager::show_playlist_selection(
+	QTreeWidgetItem* selected_item, int )
+{
+	select_playlist_dialog->set_group_playlist(group_playlist);
+	select_playlist_dialog->set_selected_group(selected_item->text(0));
+	select_playlist_dialog->set_playlist(playlist);
+	select_playlist_dialog->show();
 }
 

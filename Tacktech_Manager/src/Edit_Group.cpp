@@ -139,6 +139,16 @@ void Edit_Group::remove_computer_slot()
 		if (static_cast<Typed_QTreeWidgetItem*>(ui->main_tree_widget->
 			selectedItems().at(0))->get_type() == "COMPUTER")
 		{
+			/* Deleting from the variable */
+			groups_and_computer_names->remove_computer_name(
+				static_cast<Typed_QTreeWidgetItem*>
+				(ui->main_tree_widget->selectedItems().at(0))->
+				get_group_name(),
+				static_cast<Typed_QTreeWidgetItem*>
+				(ui->main_tree_widget->selectedItems().at(0))->
+				get_computer_name());
+
+			/* Deleting from the UI */
 			QPair<QTreeWidgetItem*, int> pair_item;
 			pair_item = static_cast<Typed_QTreeWidgetItem*>
 				(ui->main_tree_widget->
@@ -165,11 +175,13 @@ void Edit_Group::remove_computer_slot()
 /** Slot to start the add_group GUI and show the GUI. */
 void Edit_Group::add_group_slot()
 {
-	add_group_dialog->show();
 	add_group_dialog->set_group_and_computer_names(
 		groups_and_computer_names);
+	add_group_dialog->show();
 }
 
+/** Slot removes a group from the widget and the groups_and_computers
+ ** variable */
 void Edit_Group::remove_group_slot()
 {
 #ifdef _DEBUG
@@ -180,6 +192,10 @@ void Edit_Group::remove_group_slot()
 		if (static_cast<Typed_QTreeWidgetItem*>(ui->main_tree_widget->
 			selectedItems().at(0))->get_type() == "GROUP")
 		{
+			groups_and_computer_names->remove_group_name(
+				static_cast<Typed_QTreeWidgetItem*>
+				(ui->main_tree_widget->selectedItems().at(0))->
+				get_group_name());
 			ui->main_tree_widget->removeItemWidget(ui->main_tree_widget->
 				selectedItems().at(0), 0);
 			delete ui->main_tree_widget->
@@ -216,7 +232,7 @@ void Edit_Group::repopulate_tree_widget()
 #endif // _DEBUG
 	foreach(QString group_name, 
 		groups_and_computer_names->
-		get_groups_and_computers().keys())
+		get_groups_and_computers().uniqueKeys())
 	{
 #ifdef _DEBUG
 		std::cout << "   - Group Name: " << qPrintable(group_name) << std::endl;
@@ -237,6 +253,7 @@ void Edit_Group::repopulate_tree_widget()
 #endif // _DEBUG
 			computer_item = new Typed_QTreeWidgetItem();
 			computer_item->set_computer_name(computer_name);
+			computer_item->set_group_name(group_name);
 			computer_item->set_type("COMPUTER");
 			computer_item->setText(0, computer_name);
 			group_item->addChild(computer_item);
@@ -250,7 +267,7 @@ void Edit_Group::repopulate_tree_widget()
  ** computer_editing_complete signals */
 void Edit_Group::ok_clicked()
 {
-	emit editing_complete();
+	emit groups_changed();
 	this->close();
 }
 

@@ -12,7 +12,10 @@ public:
 	~Group_Container();
 	bool add_group_name(QString);
 	bool add_computer_name(QString ,QString);
+	void remove_group_name(QString);
+	void remove_computer_name(QString, QString);
 	QMultiMap<QString, QString> get_groups_and_computers();
+	bool contains_group_name(QString);
 #ifdef _DEBUG
 	void print_contents();
 #endif // _DEBUG

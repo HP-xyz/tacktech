@@ -49,6 +49,10 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags)
 		this, SLOT(add_pause_slot(QTreeWidgetItem*, int)));
 	connect(ui.browse_button, SIGNAL(clicked()),
 		this, SLOT(add_filename_slot()));
+	connect(ui.buttonBox, SIGNAL(accepted()),
+		this, SLOT(ok_clicked()));
+	connect(ui.buttonBox, SIGNAL(rejected()),
+		this, SLOT(cancel_clicked()));
 
 #ifdef _DEBUG
 	std::cout << " - Connecting secondary signals" << std::endl;
@@ -74,8 +78,11 @@ Add_File_Dialog::~Add_File_Dialog()
  ** */
 void Add_File_Dialog::set_playlist( Playlist_Container *p_playlist )
 {
-	playlist = new Playlist_Container(*p_playlist);
-	original_playlist = p_playlist;
+#ifdef _DEBUG
+	std::cout << "= Add_File_Dialog::set_playlist()" << std::endl;
+#endif // _DEBUG
+	playlist = p_playlist;
+	original_playlist = new Playlist_Container(*p_playlist);
 	repopulate_widget();
 }
 
@@ -140,10 +147,17 @@ void Add_File_Dialog::remove_filename_slot()
  ** playlist variable and the tree widget */
 void Add_File_Dialog::add_filename_slot()
 {
+#ifdef _DEBUG
+	std::cout << "= Add_File_Dialog::add_filename_slot()" << std::endl;
+#endif // _DEBUG
 	QStringList filenames = QFileDialog::getOpenFileNames(this,
 		tr("Select file(s) to add to playlist"));
 	foreach(QString filename, filenames)
 	{
+#ifdef _DEBUG
+		std::cout << " - Adding " << qPrintable(playlist_name) 
+			<< qPrintable(filename) << 0 << std::endl;
+#endif // _DEBUG
 		if(!playlist->add_filename(playlist_name, filename, 0))
 		{
 			QMessageBox msgBox;
@@ -195,6 +209,10 @@ void Add_File_Dialog::pause_unchanged_slot()
 
 void Add_File_Dialog::ok_clicked()
 {
+#ifdef _DEBUG
+	std::cout << "= Add_File_Dialog::ok_clicked()" << std::endl;
+#endif // _DEBUG
+	emit filelist_changed();
 	this->close();
 }
 

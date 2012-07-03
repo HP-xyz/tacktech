@@ -25,6 +25,7 @@ public:
 private:
 	Ui::Edit_PlaylistClass ui;
 	Playlist_Container *playlist;
+	Playlist_Container *original_playlist;
 
 	Add_Playlist_Dialog *add_playlist_dialog;
 	Add_File_Dialog *add_file_dialog;
@@ -47,6 +48,8 @@ private slots:
 
 	/* Seconday slots */
 	void repopulate_widget();
+signals:
+	void playlist_changed();
 };
 
 #endif // EDIT_PLAYLIST_H
