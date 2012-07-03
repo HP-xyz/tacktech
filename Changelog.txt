@@ -2,6 +2,6 @@ Changelog
 --------------------------------------------
 - Use libvlcqt for display purposes
 - Added dependancy for libvlcqt
-- Replaced Add_Group with Edit_Group
+- Added dependancy for pugixml (but is included locally)
 - CMake does not build Tacktech_Display on windows (yet)
  

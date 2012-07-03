@@ -4,6 +4,8 @@
 #include <QtGui/QMainWindow>
 #include <QMap>
 #include <iostream>
+#include <string>
+#include <pugixml.hpp>
 #include "Group_Container.h"
 #include "Playlist_Container.h"
 #include "Group_Playlist_Container.h"
@@ -27,6 +29,9 @@ private:
 	Edit_Group *edit_group_class;
 	Edit_Playlist *edit_playlist_class;
 	Select_Playlist_Dialog *select_playlist_dialog;
+
+	void save_variables_to_xml();
+	void read_variables_from_xml();
 
 protected:
 	/* Variable for computer names and group names

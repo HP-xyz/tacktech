@@ -45,6 +45,7 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 
 Tacktech_Manager::~Tacktech_Manager()
 {
+	save_variables_to_xml();
 #ifdef _DEBUG
 	std::cout << "= ~Tacktech_Manager" << std::endl;
 #endif // _DEBUG
@@ -158,6 +159,7 @@ void Tacktech_Manager::group_editing_complete()
 	repopulate_widget();
 }
 
+/** Slot to show the playlist selection GUI. */
 void Tacktech_Manager::show_playlist_selection(
 	QTreeWidgetItem* selected_item, int )
 {
@@ -165,5 +167,85 @@ void Tacktech_Manager::show_playlist_selection(
 	select_playlist_dialog->set_selected_group(selected_item->text(0));
 	select_playlist_dialog->set_playlist(playlist);
 	select_playlist_dialog->show();
+}
+
+/** Saves the playlist, groups_and_computers and group_playlist variables
+ ** to file, XML encoded */
+void Tacktech_Manager::save_variables_to_xml()
+{
+	/* Save playlist to file */
+	pugi::xml_document playlist_document;
+	pugi::xml_node root_node_playlist =
+		playlist_document.append_child("Playlist");
+	for (int i = 0; i < playlist->get_playlist().uniqueKeys().size(); i++)
+	{
+		pugi::xml_node playlist_node = root_node_playlist.append_child(
+			playlist->get_playlist().uniqueKeys().at(i).toStdString()
+			.c_str());
+		for (int j = 0; j < playlist->get_playlist().values(
+			playlist->get_playlist().uniqueKeys().at(i)).size(); j++)
+		{
+			pugi::xml_node filename_node = playlist_node.append_child(
+				"Filename");
+			filename_node.append_attribute("Filename") = 
+				playlist->get_playlist().values(
+				playlist->get_playlist().uniqueKeys().at(i))
+				.at(j).first.toStdString().c_str();
+			filename_node.append_attribute("Pause") = 
+				playlist->get_playlist().values(
+				playlist->get_playlist().uniqueKeys().at(i))
+				.at(j).second;
+		}
+	}
+	playlist_document.save_file("./playlist.xml");
+
+	/* Save groups_and_computers to file */
+	pugi::xml_document groups_and_computers_document;
+	pugi::xml_node root_node_groups_and_computers =
+		groups_and_computers_document.append_child("Groups And Computers");
+
+	for (int i = 0;
+		i < groups_and_computers->
+		get_groups_and_computers().uniqueKeys().size(); i++)
+	{
+		pugi::xml_node group_node = root_node_groups_and_computers
+			.append_child(
+			groups_and_computers->get_groups_and_computers().uniqueKeys()
+			.at(i).toStdString()
+			.c_str());
+
+		for (int j = 0;
+			j < groups_and_computers->
+			get_groups_and_computers().values(
+			groups_and_computers->get_groups_and_computers()
+			.uniqueKeys().at(i)).size(); j++)
+		{
+			pugi::xml_node computer_node = group_node.append_child(
+				"Computer");
+			computer_node.append_attribute("Hostname") =
+				groups_and_computers->get_groups_and_computers().values(
+				groups_and_computers->get_groups_and_computers()
+				.uniqueKeys().at(i)).at(j).toStdString().c_str();
+		}
+	}
+	groups_and_computers_document.save_file("./groups_and_computers.xml");
+
+	/* Save group_playlist to file */
+	pugi::xml_document group_playlist_document;
+	pugi::xml_node root_node_group_playlist =
+		group_playlist_document.append_child("Group Playlist");
+
+	for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	{
+		pugi::xml_node group_playlist_node =
+			root_node_group_playlist.append_child("Group Playlist Node");
+		group_playlist_node.append_attribute("Group Name") =
+			group_playlist->get_group_playlist()->
+			at(i).first.toStdString().c_str();
+		group_playlist_node.append_attribute("Playlist Name") =
+			group_playlist->get_group_playlist()->
+			at(i).second.toStdString().c_str();
+	}
+	group_playlist_document.save_file("./group_playlist.xml");
 }
 

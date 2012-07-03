@@ -15,5 +15,8 @@ Administration App:				Busy
   - Create Playlist GUI design	Done
     - Create Playlist logic		Done
   - Edit Playlist GUI design	Done
-    - Edit Playlist logic		Busy
+    - Edit Playlist logic		Done
+	
+ISSUES:
+	- Pause not set in edit_playlist
 

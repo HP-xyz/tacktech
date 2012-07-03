@@ -17,6 +17,14 @@ IF(CMAKE_BUILD_TYPE MATCHES Release)
   endif(MSVC)
 endif(CMAKE_BUILD_TYPE MATCHES Release)
 
+OPTION (LOCAL_PUGIXML "Use local pugixml library (RECOMMENDED)" ON)
+
+if (LOCAL_PUGIXML)
+	#lets include pugixml
+	add_subdirectory (${Tacktech_Manager_SOURCE_DIR}/pugixml/scripts)
+	set (PUGIXML_INCLUDE_DIR ${Tacktech_Manager_SOURCE_DIR}/pugixml/src)
+endif (LOCAL_PUGIXML)
+
 if (MSVC)
 	set (QT_QMAKE_EXECUTABLE ${QT_DIR}/bin/qmake.exe)
 	set (QT_MOC_EXECUTABLE ${QT_DIR}/bin/moc.exe)
@@ -58,6 +66,7 @@ include_directories (
 					${QT_QTGUI_INCLUDE_DIR} 
 					${QT_INCLUDE_DIR}
 					${QT_INCLUDES}
+					${PUGIXML_INCLUDE_DIR}
 					)
 set (Tacktech_Manager_Non_MOC_HDRS
 	${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
@@ -123,6 +132,10 @@ QT4_WRAP_CPP(MOCS ${Tacktech_Manager_HDRS})
 message("")
 message (STATUS "Qt include dir	: ${QT_INCLUDE_DIR}")
 message (STATUS "Qt libraries	: ${QT_LIBRARIES}")
+if (LOCAL_PUGIXML)
+	message (STATUS "Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
+	message (STATUS "Pugixml library: ${pugixml}")
+endif (LOCAL_PUGIXML)
 message (STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS} ")
 message (STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ")
 message (STATUS "CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE} ")
@@ -140,6 +153,7 @@ add_executable ( Tacktech_Manager
 				${RSCS} 
 				${UIS})
 target_link_libraries ( Tacktech_Manager 
+						pugixml
 						${QT_LIBRARIES}
 						${QT_QTCORE_LIBRARIES} 
 						${QT_QTGUI_LIBRARIES} 
