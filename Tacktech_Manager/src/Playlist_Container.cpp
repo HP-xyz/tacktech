@@ -10,7 +10,7 @@ Playlist_Container::~Playlist_Container()
 
 }
 
-/** Function to add a playlist name to the Playlist_Container. Returns 
+/** Function to add a playlist name to the Playlist_Container. Returns
  ** false if the playlist name already exists. */
 bool Playlist_Container::add_playlist_name( QString playlist_name)
 {
@@ -25,7 +25,8 @@ bool Playlist_Container::add_playlist_name( QString playlist_name)
 	}
 }
 
-/** Function to add a filename and pause to a playlist */
+/** Function to add a filename and pause to a playlist.
+ ** NOTE: This function takes linear time to complete*/
 bool Playlist_Container::add_filename(
 	QString playlist_name, QString filename, int pause)
 {
@@ -37,19 +38,38 @@ bool Playlist_Container::add_filename(
 	item_to_add.second = pause;
 	if (!playlist.isEmpty())
 	{
-		if(playlist.values(playlist_name).at(0).first == temp_pair.first
-			&& playlist.values(playlist_name).at(0).second ==
-			temp_pair.second)
-		{
-		//Removing the temp item, if needed
 #ifdef _DEBUG
-			std::cout << " - Removing the temp variable" << std::endl;
+		std::cout << " - Playlist is not empty" << std::endl;
 #endif // _DEBUG
-			playlist.remove(playlist_name);
+		for(int i = 0; i < playlist.values(playlist_name).size(); i++)
+		{
+			if(playlist.values(playlist_name).at(i).first == temp_pair.first
+				&& playlist.values(playlist_name).at(i).second ==
+				temp_pair.second)
+			{
+			//Removing the temp item, if needed
+#ifdef _DEBUG
+				std::cout << " - Removing the temp variable" << std::endl;
+#endif // _DEBUG
+				remove_playlist(playlist_name);
+			}
 		}
 	}
 	playlist.insert(playlist_name, item_to_add);
+#ifdef _DEBUG
+    std::cout << " - Function should now contain item with: " << std::endl;
+    std::cout << "  - Key: " << qPrintable(playlist_name) << std::endl;
+    std::cout << "  - Filename: " << qPrintable(filename) << std::endl;
+    std::cout << "  - Pause: " << pause << std::endl;
+#endif // _DEBUG
 	return true;
+}
+
+/** Removes a playlist from the playlist variable. Parameter must
+ ** be a playlist name */
+void Playlist_Container::remove_playlist(QString p_playlist_name)
+{
+    playlist.remove(p_playlist_name);
 }
 
 /** Function to return the playlist to the calling class */
@@ -69,8 +89,8 @@ void Playlist_Container::print_contents()
 		std::cout << qPrintable(playlist_name) << std::endl;
 		for (int i =0; i < playlist.values(playlist_name).size(); i++)
 		{
-			std::cout << "  - " 
-				<< qPrintable(playlist.values(playlist_name).at(i).first) 
+			std::cout << "  - "
+				<< qPrintable(playlist.values(playlist_name).at(i).first)
 				<< " : "
 				<< playlist.values(playlist_name).at(i).second
 				<< std::endl;

@@ -51,7 +51,7 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags)
 		this, SLOT(remove_file_slot()));
 	connect(remove_playlist, SIGNAL(triggered()),
 		this, SLOT(remove_playlist_slot()));
-	
+
 
 	/* Connecting secondary signals */
 	connect(add_playlist_dialog, SIGNAL(playlist_name_added()),
@@ -70,12 +70,13 @@ Edit_Playlist::~Edit_Playlist()
 	delete add_playlist_dialog;
 	delete add_file_dialog;
 }
- /** Function to set the playlist variable to that the calling class 
+ /** Function to set the playlist variable to that the calling class
   ** provides */
 void Edit_Playlist::set_playlist( Playlist_Container *p_playlist)
 {
 	playlist = p_playlist;
 	original_playlist = new Playlist_Container(*p_playlist);
+	repopulate_widget();
 }
 
 /** Slot to start the Add_Playlist GUI and show the GUI */
@@ -85,8 +86,8 @@ void Edit_Playlist::add_playlist_slot()
 	add_playlist_dialog->show();
 }
 
-/** Slot gets fired when the context menu item connected to it is 
- ** activated. Removes a filename from the widget and global playlist 
+/** Slot gets fired when the context menu item connected to it is
+ ** activated. Removes a filename from the widget and global playlist
  ** variable. If both a filenames and playlist names are selected, removes
  ** both.
  ** Note: This function will take n^2 time to complete. */
@@ -116,7 +117,7 @@ void Edit_Playlist::remove_file_slot()
 					j++)
 					{
 						playlist->get_playlist().remove(
-							selected_item_parent->get_playlist_name(), 
+							selected_item_parent->get_playlist_name(),
 							playlist->get_playlist().values(
 							selected_item_parent->get_playlist_name()).
 							at(j));
@@ -127,8 +128,7 @@ void Edit_Playlist::remove_file_slot()
 #ifdef _DEBUG
 				std::cout << " - Removing playlist" << std::endl;
 #endif // _DEBUG
-				playlist->get_playlist().remove(
-					selected_item->get_playlist_name());
+				remove_playlist_slot();
 			}
 		}
 		/* We now repopulate the widget to reflect the changes */
@@ -142,7 +142,7 @@ void Edit_Playlist::remove_file_slot()
 	}
 }
 
-/** Slot removes a playlist and all its items from the widget and the 
+/** Slot removes a playlist and all its items from the widget and the
  ** playlist global variable */
 void Edit_Playlist::remove_playlist_slot()
 {
@@ -157,8 +157,10 @@ void Edit_Playlist::remove_playlist_slot()
 			(ui.playlist_tree_widget->selectedItems().at(0));
 		if (selected_item->get_type() == "PLAYLIST")
 		{
-			playlist->get_playlist().remove(
-				selected_item->get_playlist_name());
+#ifdef _DEBUG
+            std::cout << " - Removing Playlist" << std::endl;
+#endif // _DEBUG
+			playlist->remove_playlist(selected_item->get_playlist_name());
 			/* Repopulate widget to reflect changes */
 			repopulate_widget();
 		}

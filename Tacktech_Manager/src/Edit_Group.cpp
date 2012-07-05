@@ -56,23 +56,13 @@ Edit_Group::~Edit_Group()
 {
 #ifdef _DEBUG
 	std::cout << "= ~Edit_Group" << std::endl;
-	std::cout << " - Deleting ui" << std::endl;
 #endif // _DEBUG
 	delete ui;
-#ifdef _DEBUG
-	std::cout << " - Deleting node menu actions" << std::endl;
-#endif // _DEBUG
 	delete add_computer;
 	delete remove_computer;
 	delete add_group;
 	delete remove_group;
-#ifdef _DEBUG
-	std::cout << " - Deleting node menu" << std::endl;
-#endif // _DEBUG
 	delete node_menu;
-#ifdef _DEBUG
-	std::cout << " - Deleting dialog variables" << std::endl;
-#endif // _DEBUG
 	delete add_computer_dialog;
 	delete add_group_dialog;
 	//delete groups_and_computer_names;
@@ -126,7 +116,7 @@ void Edit_Group::add_computer_slot()
 	}
 }
 
-/** Will be fired on the remove_computer's triggered signal, and will 
+/** Will be fired on the remove_computer's triggered signal, and will
  ** remove a computer from the treewidget if it is selected. If a computer
  ** is not selected, an info message will be displayed */
 void Edit_Group::remove_computer_slot()
@@ -230,7 +220,7 @@ void Edit_Group::repopulate_tree_widget()
 #ifdef _DEBUG
 	std::cout << "  - Beginning population" << std::endl;
 #endif // _DEBUG
-	foreach(QString group_name, 
+	foreach(QString group_name,
 		groups_and_computer_names->
 		get_groups_and_computers().uniqueKeys())
 	{
@@ -248,7 +238,7 @@ void Edit_Group::repopulate_tree_widget()
 			values(group_name))
 		{
 #ifdef _DEBUG
-			std::cout << "    - Computer Name: " 
+			std::cout << "    - Computer Name: "
 				<< qPrintable(computer_name) << std::endl;
 #endif // _DEBUG
 			computer_item = new Typed_QTreeWidgetItem();
@@ -262,7 +252,7 @@ void Edit_Group::repopulate_tree_widget()
 }
 
 
-/** Slot gets fired if the accept signal is received from the class 
+/** Slot gets fired if the accept signal is received from the class
  ** buttonbox. Emits both the group_editing_complete and
  ** computer_editing_complete signals */
 void Edit_Group::ok_clicked()

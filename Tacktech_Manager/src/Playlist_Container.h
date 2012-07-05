@@ -14,7 +14,7 @@ public:
 	bool add_playlist_name(QString);
 	bool add_filename(QString, QString, int);
 	QMultiMap<QString, QPair<QString, int> > get_playlist();
-
+    void remove_playlist(QString);
 #ifdef _DEBUG
 	void print_contents();
 #endif // _DEBUG

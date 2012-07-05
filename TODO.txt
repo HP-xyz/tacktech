@@ -20,4 +20,6 @@ Administration App:				Busy
 ISSUES:
 	- Pause not set in edit_playlist
 	- Select playlist displays playlist names 2 times	= FIXED
+	- Read from XML does not work
+	- Crash if all playlist items are removed
 
