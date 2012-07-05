@@ -1,12 +1,12 @@
-/* 
+/*
  * File:   Playlist.cpp
  * Author: dvorak
- * 
+ *
  * Created on 23 June 2012, 10:58
  */
 #include "Playlist.h"
 
-Playlist::Playlist() 
+Playlist::Playlist()
 {
     Playlist::current_index_of_queue = 0;
 #ifdef _DEBUG
@@ -23,10 +23,12 @@ Playlist::Playlist()
 #endif //_DEBUG
 }
 
-Playlist::Playlist(const Playlist& orig) {
+Playlist::Playlist(const Playlist& orig)
+{
 }
 
-Playlist::~Playlist() {
+Playlist::~Playlist()
+{
 }
 
 /**

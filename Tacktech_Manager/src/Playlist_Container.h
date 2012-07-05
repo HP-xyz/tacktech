@@ -9,18 +9,18 @@
 class Playlist_Container
 {
 public:
-	Playlist_Container();
-	~Playlist_Container();
-	bool add_playlist_name(QString);
-	bool add_filename(QString, QString, int);
-	QMultiMap<QString, QPair<QString, int> > get_playlist();
+    Playlist_Container();
+    ~Playlist_Container();
+    bool add_playlist_name(QString);
+    bool add_filename(QString, QString, int);
+    QMultiMap<QString, QPair<QString, int> > get_playlist();
     void remove_playlist(QString);
 #ifdef _DEBUG
-	void print_contents();
+    void print_contents();
 #endif // _DEBUG
 private:
-	QMultiMap<QString, QPair<QString, int> > playlist;
-	QPair<QString, int> temp_pair;
+    QMultiMap<QString, QPair<QString, int> > playlist;
+    QPair<QString, int> temp_pair;
 };
 
 #endif //PLAYLIST_CONTAINER_H

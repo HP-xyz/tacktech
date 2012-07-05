@@ -118,7 +118,11 @@ void Tacktech_Manager::repopulate_widget()
     ui.management_tree_widget->clear();
     for(int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
     {
-        QTreeWidgetItem *tree_item = new QTreeWidgetItem();
+        Typed_QTreeWidgetItem *tree_item = new Typed_QTreeWidgetItem();
+        tree_item->set_group_name(group_playlist->
+                           get_group_playlist()->at(i).first);
+        tree_item->set_playlist_name(group_playlist->
+                           get_group_playlist()->at(i).second);
         tree_item->setText(0, group_playlist->
                            get_group_playlist()->at(i).first);
         tree_item->setText(1, group_playlist->

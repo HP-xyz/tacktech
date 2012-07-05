@@ -17,47 +17,48 @@
 
 class Tacktech_Manager : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Tacktech_Manager(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~Tacktech_Manager();
+    Tacktech_Manager(QWidget *parent = 0, Qt::WFlags flags = 0);
+    ~Tacktech_Manager();
 
 private:
-	/* The global ui variable */
-	Ui::MainWindow ui;
+    /* The global ui variable */
+    Ui::MainWindow ui;
 
-	Edit_Group *edit_group_class;
-	Edit_Playlist *edit_playlist_class;
-	Select_Playlist_Dialog *select_playlist_dialog;
+    Edit_Group *edit_group_class;
+    Edit_Playlist *edit_playlist_class;
+    Select_Playlist_Dialog *select_playlist_dialog;
 
-	void save_variables_to_xml();
-	void read_variables_from_xml();
+    void save_variables_to_xml();
+    void read_variables_from_xml();
 
 protected:
-	/* Variable for computer names and group names
-	 * Note: Format is groups_and_computers[group_index][computer_index]
-	 * Note: This can be hostnames or IP addresses */
-	Group_Container *groups_and_computers;
+    /* Variable for computer names and group names
+     * Note: Format is groups_and_computers[group_index][computer_index]
+     * Note: This can be hostnames or IP addresses */
+    Group_Container *groups_and_computers;
 
-	/* Variable for the playlis */
-	Playlist_Container *playlist;
+    /* Variable for the playlist */
+    Playlist_Container *playlist;
 
-	Group_Playlist_Container *group_playlist;
+    /* Variable for the group_playlist container */
+    Group_Playlist_Container *group_playlist;
 
 private slots:
-	void refresh_all_groups();
+    void refresh_all_groups();
 
-	/* Slots that start GUIs (this)*/
-	/* ===================== */
-	void edit_group();
-	void create_playlist();
-	void edit_playlist();
-	void edit_preferences();
-	void show_playlist_selection(QTreeWidgetItem*, int);
+    /* Slots that start GUIs (this)*/
+    /* ===================== */
+    void edit_group();
+    void create_playlist();
+    void edit_playlist();
+    void edit_preferences();
+    void show_playlist_selection(QTreeWidgetItem*, int);
 
-	void group_editing_complete();
-	void repopulate_widget();
+    void group_editing_complete();
+    void repopulate_widget();
 };
 
 #endif // TACKTECH_MANAGER_H

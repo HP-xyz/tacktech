@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Playlist.h
  * Author: dvorak
  *
@@ -12,7 +12,8 @@
 #include <QList>
 #include <QPair>
 
-class Playlist {
+class Playlist
+{
 public:
     Playlist();
     Playlist(const Playlist& orig);

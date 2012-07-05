@@ -10,12 +10,12 @@
 class Group_Playlist_Container
 {
 public:
-	Group_Playlist_Container();
-	~Group_Playlist_Container();
-	QList<QPair<QString, QString> >* get_group_playlist();
-	bool contains_group_name(QString);
-	void connect_group_to_playlist(QString, QString);
+    Group_Playlist_Container();
+    ~Group_Playlist_Container();
+    QList<QPair<QString, QString> >* get_group_playlist();
+    bool contains_group_name(QString);
+    void connect_group_to_playlist(QString, QString);
 private:
-	QList<QPair<QString, QString> > *group_playlist;
+    QList<QPair<QString, QString> > *group_playlist;
 };
 #endif //GROUP_PLAYLIST_CONTAINER

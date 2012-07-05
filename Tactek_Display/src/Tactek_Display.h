@@ -30,8 +30,9 @@
 #include <iostream>
 #include "Playlist.h"
 #include "ui_Tactek_Display.h"
-namespace Ui {
-    class Tactek_Display;
+namespace Ui
+{
+class Tactek_Display;
 }
 
 class VlcInstance;
@@ -40,7 +41,7 @@ class VlcMediaPlayer;
 
 class Tactek_Display : public QMainWindow
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit Tactek_Display(QWidget *parent = 0);
     ~Tactek_Display();

@@ -27,23 +27,23 @@ Tactek_Display::Tactek_Display(QWidget *parent)
     ui(new Ui::Tactek_Display),
     m_vlc_media(0)
 {
-  ui->setupUi(this);
+    ui->setupUi(this);
 
-  Tactek_Display::update_timer = new QTimer(this);
-  Tactek_Display::playlist = new Playlist();
-  
-  m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
-  m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
-  m_vlc_player->setVideoWidget(ui->vlc_video_widget);
+    Tactek_Display::update_timer = new QTimer(this);
+    Tactek_Display::playlist = new Playlist();
 
-  ui->vlc_video_widget->setMediaPlayer(m_vlc_player);
+    m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
+    m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
+    m_vlc_player->setVideoWidget(ui->vlc_video_widget);
 
-  connect(update_timer, SIGNAL(timeout()),
-          this, SLOT(check_media_state()));
-  connect(this, SIGNAL(start_next_media()),
-          this, SLOT(play_next_media_in_queue()));
-  
-  update_timer->start(1000);
+    ui->vlc_video_widget->setMediaPlayer(m_vlc_player);
+
+    connect(update_timer, SIGNAL(timeout()),
+            this, SLOT(check_media_state()));
+    connect(this, SIGNAL(start_next_media()),
+            this, SLOT(play_next_media_in_queue()));
+
+    update_timer->start(1000);
 }
 
 Tactek_Display::~Tactek_Display()
@@ -70,16 +70,16 @@ void Tactek_Display::open_and_play(QString filepath)
  */
 void Tactek_Display::check_media_state()
 {
-    std::cout << "Current media state: " << 
-            Tactek_Display::m_vlc_player->state() << std::endl;
+    std::cout << "Current media state: " <<
+              Tactek_Display::m_vlc_player->state() << std::endl;
     if (Tactek_Display::m_vlc_player->state() == 0 || Tactek_Display::m_vlc_player->state() == 6)
         emit Tactek_Display::start_next_media();
 }
 
 /**
- * Slot to play the next media in the playlist. Gets called by the 
+ * Slot to play the next media in the playlist. Gets called by the
  * start_next_media() signal. Will pause the output for the specified number
- * of seconds in the playlist, if the pause is not equal to 0. Does nothing 
+ * of seconds in the playlist, if the pause is not equal to 0. Does nothing
  * when there is no media in the playlist.
  */
 void Tactek_Display::play_next_media_in_queue()
@@ -89,8 +89,8 @@ void Tactek_Display::play_next_media_in_queue()
         if (playlist->current_index_of_queue == playlist->get_playlist().size())
             playlist->current_index_of_queue = 0;
         QPair<QString, int> queue_item =
-                                playlist->get_playlist()
-                                [playlist->current_index_of_queue];
+            playlist->get_playlist()
+            [playlist->current_index_of_queue];
         if(queue_item.second == 0)
         {
             open_and_play(queue_item.first);
@@ -98,8 +98,8 @@ void Tactek_Display::play_next_media_in_queue()
         else
         {
             std::cout << "Pausing for: " << queue_item.second * 1000 << std::endl;
-            QTimer::singleShot((queue_item.second * 1000), this, 
-                    NULL);
+            QTimer::singleShot((queue_item.second * 1000), this,
+                               NULL);
             open_and_play(queue_item.first);
         }
         playlist->current_index_of_queue += 1;

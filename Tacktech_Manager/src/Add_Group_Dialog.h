@@ -12,20 +12,20 @@
 
 class Add_Group_Dialog : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Add_Group_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~Add_Group_Dialog();
-	void set_group_and_computer_names(Group_Container*);
+    Add_Group_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
+    ~Add_Group_Dialog();
+    void set_group_and_computer_names(Group_Container*);
 private:
-	Ui::Add_Group_DialogClass ui;
-	Group_Container *group_and_computer_names;
+    Ui::Add_Group_DialogClass ui;
+    Group_Container *group_and_computer_names;
 private slots:
-	void ok_clicked();
-	void cancle_clicked();
+    void ok_clicked();
+    void cancle_clicked();
 signals:
-	void group_name_added();
+    void group_name_added();
 };
 
 #endif // ADD_GROUP_DIALOG_H

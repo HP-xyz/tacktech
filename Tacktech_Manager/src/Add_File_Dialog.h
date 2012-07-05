@@ -18,38 +18,38 @@
 
 class Add_File_Dialog : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Add_File_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~Add_File_Dialog();
-	void set_playlist(Playlist_Container*);
-	void set_playlist_name(QString);
+    Add_File_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
+    ~Add_File_Dialog();
+    void set_playlist(Playlist_Container*);
+    void set_playlist_name(QString);
 private:
-	Ui::Add_File_DialogClass ui;
-	Playlist_Container *original_playlist;
-	Playlist_Container *playlist;
+    Ui::Add_File_DialogClass ui;
+    Playlist_Container *original_playlist;
+    Playlist_Container *playlist;
 
-	Add_Pause_Dialog *add_pause_dialog;
-	QString playlist_name;
+    Add_Pause_Dialog *add_pause_dialog;
+    QString playlist_name;
 
-	QMenu *node_menu;
-	QAction *remove_filename;
+    QMenu *node_menu;
+    QAction *remove_filename;
 
-	void repopulate_widget();
+    void repopulate_widget();
 private slots:
-	void ok_clicked();
-	void cancel_clicked();
-	void remove_filename_slot();
-	void add_filename_slot();
-	void add_pause_slot(QTreeWidgetItem*, int);
+    void ok_clicked();
+    void cancel_clicked();
+    void remove_filename_slot();
+    void add_filename_slot();
+    void add_pause_slot(QTreeWidgetItem*, int);
 
-	/* Secondary slots, called by other class */
-	void pause_changed_slot(int);
-	void pause_unchanged_slot();
+    /* Secondary slots, called by other class */
+    void pause_changed_slot(int);
+    void pause_unchanged_slot();
 
 signals:
-	void filelist_changed();
+    void filelist_changed();
 };
 
 #endif // ADD_FILE_DIALOG_H
