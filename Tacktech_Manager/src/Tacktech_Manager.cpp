@@ -10,8 +10,18 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     edit_group_class = new Edit_Group();
     edit_playlist_class = new Edit_Playlist();
     select_playlist_dialog = new Select_Playlist_Dialog();
+	upload_data_dialog = new Upload_Data();
 
     ui.setupUi(this);
+
+	node_menu = new QMenu();
+	ui.centralwidget->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+	/* Creating context menu actions */
+	schedule_upload = new QAction(tr("Schedule Upload"), node_menu);
+
+	/* Adding actions to context_menu */
+	ui.centralwidget->addAction(schedule_upload);
 
     QStringList manager_headers;
     manager_headers << "Group" << "Playlist";
@@ -29,6 +39,8 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     connect(ui.management_tree_widget,
             SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
             this, SLOT(show_playlist_selection(QTreeWidgetItem*, int)));
+	connect(schedule_upload, SIGNAL(triggered()),
+		this, SLOT(show_schedule_upload_dialog()));
 
     /* Connecting secondary signals */
     connect(edit_group_class,
@@ -37,10 +49,13 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     connect(select_playlist_dialog,
             SIGNAL(group_playlist_changed()),
             this, SLOT(repopulate_widget()));
+	connect(upload_data_dialog, SIGNAL(scheduled_item_added(QDate)),
+		this, SLOT(scheduled_item_added(QDate)));
 
     groups_and_computers = new Group_Container();
     playlist = new Playlist_Container();
     group_playlist = new Group_Playlist_Container();
+	upload_data = new Upload_Data_Container();
 
     read_variables_from_xml();
     repopulate_widget();
@@ -54,9 +69,16 @@ Tacktech_Manager::~Tacktech_Manager()
 #endif // _DEBUG
     delete edit_group_class;
     delete edit_playlist_class;
+	delete select_playlist_dialog;
+	delete upload_data_dialog;
+
+	delete schedule_upload;
+	delete node_menu;
+
     delete groups_and_computers;
     delete playlist;
     delete group_playlist;
+	delete upload_data;
 }
 
 /** Function will refresh all group statuses
@@ -371,4 +393,24 @@ void Tacktech_Manager::read_variables_from_xml()
             group_playlist_item.child_value("Playlist_Name"));
     }
 }
+
+void Tacktech_Manager::scheduled_item_added( QDate date)
+{
+	Typed_QTreeWidgetItem *selected_item =
+		static_cast<Typed_QTreeWidgetItem*>
+		(ui.management_tree_widget->selectedItems().at(0));
+	upload_data->set_group_name(selected_item->get_group_name());
+	upload_data->set_groups(groups_and_computers);
+	upload_data->set_playlist(playlist);
+	upload_data->set_playlist_name(selected_item->get_playlist_name());
+	upload_data->set_upload_time(date.toString(Qt::ISODate));
+	upload_data->get_xml_upload();
+}
+
+void Tacktech_Manager::show_schedule_upload_dialog()
+{
+	upload_data_dialog->show();
+}
+
+
 
