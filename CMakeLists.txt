@@ -1,6 +1,15 @@
 Project(Tactek)
 cmake_minimum_required(VERSION 2.8)
- 
+
+IF( NOT CMAKE_BUILD_TYPE )
+  message (STATUS "###### WE ARE BUILD IN 'Debug' MODE")
+  SET( CMAKE_BUILD_TYPE Debug ) 
+  SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_DEBUG" )
+if (NOT WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+endif (NOT WIN32)
+ENDIF( NOT CMAKE_BUILD_TYPE )
+
 message (STATUS "###### WE ARE BUILDING Tactek IN '${CMAKE_BUILD_TYPE}' MODE")
 
 SET(CMAKE_MODULE_PATH
@@ -24,4 +33,4 @@ add_subdirectory(Tacktech_Manager)
 if (NOT WIN32)
 	add_subdirectory(Tactek_Display)
 endif (NOT WIN32)
-#add_subdirectory(Artemis_Server)
+add_subdirectory(Artemis_Server)

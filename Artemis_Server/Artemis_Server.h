@@ -49,12 +49,12 @@ private:
     /** Acceptor used to lister for incoming connections */
     boost::asio::ip::tcp::acceptor acceptor;
     /** The next connection to be accepted */
-	//boost::shared_ptr<Artemis::Artemis_Server_Connection> new_connection;
+    //boost::shared_ptr<Artemis::Artemis_Server_Connection> new_connection;
     Artemis_Server_Connection_ptr new_connection;
     /** The handler for all incoming requests*/
     Artemis_Request_Handler request_handler;
 
-	std::map<std::string, std::string> parameters;
+    std::map<std::string, std::string> parameters;
     std::set<std::string> options;
 
     /** Reads a config file*/

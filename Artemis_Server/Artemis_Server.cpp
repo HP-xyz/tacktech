@@ -5,7 +5,7 @@ namespace Artemis
 //************************************
 // Method:    read_config
 // FullName:  Artemis::Artemis_Server::read_config
-// Access:    private 
+// Access:    private
 // Returns:   void
 // Qualifier:
 //************************************
@@ -22,14 +22,14 @@ void Artemis_Server::read_config()
     try
     {
 #ifdef _DEBUG
-				std::cout << "Config file read: " << std::endl <<
-                "===================" << std::endl;
+        std::cout << "Config file read: " << std::endl <<
+                  "===================" << std::endl;
 #endif
         for (boost::program_options::detail::config_file_iterator
-            i(config, options), e; i != e; ++i)
+                i(config, options), e; i != e; ++i)
         {
 #ifdef _DEBUG
-			std::cout << i->string_key << " " << i->value[0] << std::endl;
+            std::cout << i->string_key << " " << i->value[0] << std::endl;
 #endif
             parameters[i->string_key] = i->value[0];
         }
@@ -43,17 +43,17 @@ void Artemis_Server::read_config()
 //************************************
 // Method:    Artemis_Server
 // FullName:  Artemis::Artemis_Server::Artemis_Server
-// Access:    public 
-// Returns:   
+// Access:    public
+// Returns:
 // Qualifier: : thread_pool_size(p_thread_pool_size), signals(io_service), acceptor(io_service), new_connection(), request_handler()
 // Parameter: std::size_t p_thread_pool_size
 //************************************
 Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size)
-: thread_pool_size(p_thread_pool_size),
-signals(io_service),
-acceptor(io_service),
-new_connection(),
-request_handler()
+    : thread_pool_size(p_thread_pool_size),
+    signals(io_service),
+    acceptor(io_service),
+    new_connection(),
+    request_handler()
 {
 #ifdef _DEBUG
     std::cout << "=Artemis_Server::Artemis_Server(p_thread_pool_size)" << std::endl
@@ -69,16 +69,16 @@ request_handler()
 
     boost::asio::ip::tcp::resolver resolver(io_service);
     boost::asio::ip::tcp::resolver::query query(parameters["general.server_ip"],
-                                                parameters["general.listen_port"]);
+            parameters["general.listen_port"]);
 #ifdef _DEBUG
-	std::cout << "Artemis Server" << std::endl
-			  << "==============" << std::endl
-			  << " -- Server IP:   " << parameters["general.server_ip"] << std::endl
-			  << " -- Server PORT: " << parameters["general.listen_port"] << std::endl;
+    std::cout << "Artemis Server" << std::endl
+              << "==============" << std::endl
+              << " -- Server IP:   " << parameters["general.server_ip"] << std::endl
+              << " -- Server PORT: " << parameters["general.listen_port"] << std::endl;
 #endif // _DEBUG
     boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
     acceptor.open(endpoint.protocol());
-    //acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     acceptor.bind(endpoint);
     acceptor.listen();
 
@@ -88,21 +88,21 @@ request_handler()
 //************************************
 // Method:    run
 // FullName:  Artemis::Artemis_Server::run
-// Access:    public 
+// Access:    public
 // Returns:   void
 // Qualifier:
 //************************************
 void Artemis_Server::run()
 {
     std::cout << " =Artemis_Server::run()" << std::endl
-            << " ======================" << std::endl;
+              << " ======================" << std::endl;
     //Create a pool of threads to run all of the io_services
     std::vector<boost::shared_ptr<boost::thread> > threads;
     for (std::size_t i = 0; i < Artemis_Server::thread_pool_size; ++i)
     {
         boost::shared_ptr<boost::thread>
-                thread(new boost::thread(boost::bind(&boost::asio::io_service::run,
-                                                     &io_service)));
+        thread(new boost::thread(boost::bind(&boost::asio::io_service::run,
+                                             &io_service)));
         threads.push_back(thread);
     }
 
@@ -114,14 +114,14 @@ void Artemis_Server::run()
 //************************************
 // Method:    start_accept
 // FullName:  Artemis::Artemis_Server::start_accept
-// Access:    private 
+// Access:    private
 // Returns:   void
 // Qualifier:
 //************************************
 void Artemis_Server::start_accept()
 {
     new_connection.reset(new Artemis_Server_Connection(io_service,
-													   parameters));
+                         parameters));
     acceptor.async_accept(new_connection->socket(),
                           boost::bind(&Artemis_Server::handle_accept,
                                       this, boost::asio::placeholders::error));
@@ -130,7 +130,7 @@ void Artemis_Server::start_accept()
 //************************************
 // Method:    handle_accept
 // FullName:  Artemis::Artemis_Server::handle_accept
-// Access:    private 
+// Access:    private
 // Returns:   void
 // Qualifier:
 // Parameter: const boost::system::error_code & error_code
@@ -148,7 +148,7 @@ void Artemis_Server::handle_accept(const boost::system::error_code& error_code)
 //************************************
 // Method:    handle_stop
 // FullName:  Artemis::Artemis_Server::handle_stop
-// Access:    private 
+// Access:    private
 // Returns:   void
 // Qualifier:
 //************************************

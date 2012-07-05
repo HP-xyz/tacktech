@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Artemis_Server_Connection.h
  * Author: dvorak
  *
@@ -19,7 +19,6 @@
 #include "boost/tuple/tuple.hpp"
 #include <boost/lexical_cast.hpp>
 #include "Artemis_Request_Handler.h"
-#include "Artemis_SQL_Handler.h"
 #include <pugixml.hpp>
 #include <exception>
 #include <vector>
@@ -28,17 +27,17 @@
 namespace Artemis
 {
 
-class Artemis_Server_Connection 
-        : public boost::enable_shared_from_this<Artemis_Server_Connection>,
-		private boost::noncopyable
-          
+class Artemis_Server_Connection
+    : public boost::enable_shared_from_this<Artemis_Server_Connection>,
+private boost::noncopyable
+
 {
 public:
-    
+
     /** Constructs a connection withe the given io_service */
     explicit Artemis_Server_Connection(boost::asio::io_service& io_service,
-									   std::map<std::string, std::string>&);
-    
+                                       std::map<std::string, std::string>&);
+
     /** Get the socket associated with the connection*/
     boost::asio::ip::tcp::socket& socket();
     /** Start the first asynchronous operation for the connection */
@@ -55,13 +54,13 @@ private:
     boost::asio::ip::tcp::socket m_socket;
     /** Buffer for incoming data */
     boost::array<char, 8192> buffer;
-	/** Generated reply, XML */
-	std::vector<std::vector<char> > reply_xml;
+    /** Generated reply, XML */
+    std::vector<std::vector<char> > reply_xml;
 
-	std::map<std::string, std::string> parms;
+    std::map<std::string, std::string> parms;
 };
 typedef boost::shared_ptr<Artemis_Server_Connection>
-                                Artemis_Server_Connection_ptr;
+Artemis_Server_Connection_ptr;
 }
 #endif	/* ARTEMIS_SERVER_CONNECTION_H */
 

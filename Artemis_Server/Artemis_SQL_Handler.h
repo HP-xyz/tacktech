@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Artemis_SQL_Handler.h
  * Author: dvorak
  *
@@ -7,15 +7,6 @@
 
 #ifndef ARTEMIS_SQL_HANDLER_H
 #define	ARTEMIS_SQL_HANDLER_H
-#include <driver.h>
-#include <connection.h>
-#include <statement.h>
-#include <prepared_statement.h>
-#include <resultset.h>
-#include <metadata.h>
-#include <resultset_metadata.h>
-#include <exception.h>
-#include <warning.h>
 #include <iostream>
 #include <sstream>
 #include <memory>
@@ -65,7 +56,7 @@ private:
 	const std::string *password;
 	const std::string *database;
 
-	/** Parameters received in config file, will be initialized by 
+	/** Parameters received in config file, will be initialized by
 	 ** constructor */
 	std::map<std::string, std::string> parameters;
 };
