@@ -98,7 +98,7 @@ void Upload_Data_Container::set_upload_time(QString p_upload_time)
   * Tacktech
   *
   */
-std::string Upload_Data_Container::get_xml_upload()
+void Upload_Data_Container::get_xml_upload()
 {
     std::string xml_string;
     pugi::xml_document transmit_document;
@@ -141,7 +141,9 @@ std::string Upload_Data_Container::get_xml_upload()
                 playlist->get_playlist().values(playlist_name).at(j).second).c_str());
         }
     }
-    transmit_document.print(std::cout);
-	return "";
+#ifdef _DEBUG
+	std::cout << " - Emitting xml_creation complete signal " << std::endl;
+#endif // _DEBUG
+	emit xml_creation_complete(xml_string);
 }
 

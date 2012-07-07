@@ -11,6 +11,12 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     edit_playlist_class = new Edit_Playlist();
     select_playlist_dialog = new Select_Playlist_Dialog();
 	upload_data_dialog = new Upload_Data();
+	send_data = new Send_Data();
+
+	groups_and_computers = new Group_Container();
+	playlist = new Playlist_Container();
+	group_playlist = new Group_Playlist_Container();
+	upload_data = new Upload_Data_Container();
 
     ui.setupUi(this);
 
@@ -51,11 +57,8 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
             this, SLOT(repopulate_widget()));
 	connect(upload_data_dialog, SIGNAL(scheduled_item_added(QDate)),
 		this, SLOT(scheduled_item_added(QDate)));
-
-    groups_and_computers = new Group_Container();
-    playlist = new Playlist_Container();
-    group_playlist = new Group_Playlist_Container();
-	upload_data = new Upload_Data_Container();
+	connect(upload_data, SIGNAL(xml_creation_complete(std::string)),
+		this, SLOT(start_upload(std::string)));
 
     read_variables_from_xml();
     repopulate_widget();
@@ -396,6 +399,10 @@ void Tacktech_Manager::read_variables_from_xml()
 
 void Tacktech_Manager::scheduled_item_added( QDate date)
 {
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::scheduled_item_added()" << std::endl;
+#endif // _DEBUG
+
 	Typed_QTreeWidgetItem *selected_item =
 		static_cast<Typed_QTreeWidgetItem*>
 		(ui.management_tree_widget->selectedItems().at(0));
@@ -411,6 +418,17 @@ void Tacktech_Manager::show_schedule_upload_dialog()
 {
 	upload_data_dialog->show();
 }
+
+//TODO
+//CHECK PARAMETER COPY/POINTER etc
+void Tacktech_Manager::start_upload( std::string xml_string)
+{
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
+#endif // _DEBUG
+	send_data->send_data_to_server("143.160.143.182", 9000, xml_string);
+}
+
 
 
 

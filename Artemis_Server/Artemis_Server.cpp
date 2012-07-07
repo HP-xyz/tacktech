@@ -56,7 +56,7 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size)
     request_handler()
 {
 #ifdef _DEBUG
-    std::cout << "=Artemis_Server::Artemis_Server(p_thread_pool_size)" << std::endl
+    std::cout << "=Artemis_Server::Artemis_Server()" << std::endl
               << "====================================================" << std::endl;
 #endif // _DEBUG
     Artemis_Server::read_config();
@@ -74,14 +74,27 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size)
     std::cout << "Artemis Server" << std::endl
               << "==============" << std::endl
               << " -- Server IP:   " << parameters["general.server_ip"] << std::endl
-              << " -- Server PORT: " << parameters["general.listen_port"] << std::endl;
+              << " -- Server PORT: " << parameters["general.listen_port"] << std::endl
+			  << " -- Creating endpoint" << std::endl;
 #endif // _DEBUG
     boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+#ifdef _DEBUG
+	std::cout << " -- Opening acceptor" << std::endl;
+#endif // _DEBUG
     acceptor.open(endpoint.protocol());
-    acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    //acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+#ifdef _DEBUG
+	std::cout << " -- Binding to endpoint" << std::endl;
+#endif // _DEBUG
     acceptor.bind(endpoint);
+#ifdef _DEBUG
+	std::cout << " -- Starting to listen" << std::endl;
+#endif // _DEBUG
     acceptor.listen();
 
+#ifdef _DEBUG
+	std::cout << " -- Calling start_accept()" << std::endl;
+#endif // _DEBUG
     start_accept();
 }
 

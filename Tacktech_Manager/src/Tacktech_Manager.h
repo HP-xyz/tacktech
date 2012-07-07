@@ -18,6 +18,7 @@
 #include "Select_Playlist_Dialog.h"
 #include "Upload_Data.h"
 #include "Upload_Data_Container.h"
+#include "Send_Data.h"
 #include "ui_Tacktech_Manager.h"
 
 class Tacktech_Manager : public QMainWindow
@@ -57,6 +58,9 @@ protected:
 
 	/* Variable for the upload_data container */
 	Upload_Data_Container *upload_data;
+
+	/* Variable for the send_data class */
+	Send_Data *send_data;
 private slots:
     void refresh_all_groups();
 
@@ -69,6 +73,7 @@ private slots:
     void show_playlist_selection(QTreeWidgetItem*, int);
 	void show_schedule_upload_dialog();
 	void scheduled_item_added(QDate);
+	void start_upload(std::string);
 
     void group_editing_complete();
     void repopulate_widget();
