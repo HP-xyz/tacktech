@@ -29,6 +29,7 @@ void Send_Data::send_data_to_server(
 {
 #ifdef _DEBUG
 	std::cout << "= Send_Data::send_data_to_server()" << std::endl;
+	std::cout << " - p_xml_string: " << p_xml_string << std::endl;
 #endif // _DEBUG
     QMutexLocker locker(&mutex);
     xml_string = p_xml_string;
@@ -91,6 +92,11 @@ void Send_Data::run()
         QDataStream out (&block, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_0);
 
+#ifdef _DEBUG
+		std::cout << " - xml_string: " << xml_string << std::endl;
+		std::cout << " - QSTring - xml_string: " << qPrintable(QString::fromStdString(xml_string)) << std::endl;
+#endif // _DEBUG
+
         out << (quint16)0;
         out << QString::fromStdString(xml_string);
         out.device()->seek(0);
@@ -98,7 +104,15 @@ void Send_Data::run()
 
         connect (&socket, SIGNAL(disconnected()),
                  &socket, SLOT(deleteLater()));
-
+#ifdef _DEBUG
+		std::cout << " - Writing to server" << std::endl;
+		std::cout << " - Block contains: " << std::endl;
+		for (int i = 0 ; i < block.size(); i++)
+		{
+			std::cout << block.at(i);
+		}
+		std::cout << std::endl;
+#endif // _DEBUG
         emit status_changed("Writing to server");
         socket.write(block);
         socket.disconnectFromHost();

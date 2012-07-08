@@ -20,6 +20,7 @@ Administration App:				Busy
 ISSUES:
 	- Pause not set in edit_playlist
 	- Select playlist displays playlist names 2 times	= FIXED
-	- Read from XML does not work
+	- Read from XML does not work = FIXED
 	- Crash if all playlist items are removed
+	- No data is actually sent by the Tacktech Manager
 

@@ -72,6 +72,11 @@ void Artemis_Server_Connection::handle_read(
     std::cout << " == Handle Read" << std::endl
               << " ==============" << std::endl;
 #endif
+#ifdef _DEBUG
+	std::cout << " -- Before checking for error" << std::endl;
+	std::cout << " --Buffer_Data -> " << Artemis_Server_Connection::buffer.data() << std::endl;
+	std::cout << " --Bytes_Transferred -> " << bytes_transferred << std::endl;
+#endif
     if (!error)
     {
 #ifdef _DEBUG
@@ -169,6 +174,12 @@ void Artemis_Server_Connection::handle_read(
                                                              boost::asio::placeholders::bytes_transferred)));
         }*/
     }
+	else
+	{
+#ifdef _DEBUG
+		std::cout << " - Error encountered: " << error.message() << std::endl;
+#endif // _DEBUG
+	}
     // If an error occurs then no new asynchronous operations are started. This
     // means that all shared_ptr references to the connection object will
     // disappear and the object will be destroyed automatically after this

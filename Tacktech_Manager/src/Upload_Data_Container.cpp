@@ -1,5 +1,17 @@
 #include "Upload_Data_Container.h"
 
+/** Struct to define a xml_writer to string.
+ ** Copied directly from the pugixml quickstart */
+struct xml_string_writer: pugi::xml_writer
+{
+	std::string result;
+
+	virtual void write(const void* data, size_t size)
+	{
+		result += std::string(static_cast<const char*>(data), size);
+	}
+};
+
 Upload_Data_Container::Upload_Data_Container()
 {
     //ctor
@@ -100,7 +112,6 @@ void Upload_Data_Container::set_upload_time(QString p_upload_time)
   */
 void Upload_Data_Container::get_xml_upload()
 {
-    std::string xml_string;
     pugi::xml_document transmit_document;
     pugi::xml_node root_node = transmit_document.append_child("Tacktech");
     pugi::xml_node type_node = root_node.append_child("Type");
@@ -144,6 +155,8 @@ void Upload_Data_Container::get_xml_upload()
 #ifdef _DEBUG
 	std::cout << " - Emitting xml_creation complete signal " << std::endl;
 #endif // _DEBUG
-	emit xml_creation_complete(xml_string);
+	xml_string_writer writer;
+	transmit_document.print(writer);
+	emit xml_creation_complete(writer.result);
 }
 
