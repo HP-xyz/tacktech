@@ -11,7 +11,6 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     edit_playlist_class = new Edit_Playlist();
     select_playlist_dialog = new Select_Playlist_Dialog();
 	upload_data_dialog = new Upload_Data();
-	send_data = new Send_Data();
 
 	groups_and_computers = new Group_Container();
 	playlist = new Playlist_Container();
@@ -425,11 +424,38 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 {
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
-	std::cout << " - xml_string: " << xml_string << std::endl;
 #endif // _DEBUG
-	send_data->send_data_to_server("143.160.140.220", 9000, xml_string);
+	Send_Data *send_data = new Send_Data("143.160.140.220", 9000, xml_string);
+	connect(send_data, SIGNAL(upload_complete(Send_Data*)),
+		this, SLOT(upload_complete(Send_Data*)));
+	connect(send_data, SIGNAL(socket_connected(Send_Data*)),
+		this, SLOT(run_upload(Send_Data*)));
 }
 
+void Tacktech_Manager::upload_complete( Send_Data *send_data)
+{
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::upload_complete()" << std::endl;
+	std::cout << " - Disconnecting upload_complete signal" << std::endl;
+#endif // _DEBUG
+	disconnect(send_data, SIGNAL(upload_complete(Send_Data*)),
+		this, SLOT(upload_complete(Send_Data*)));
+	disconnect(send_data, SIGNAL(socket_connected(Send_Data*)),
+		this, SLOT(run_upload(Send_Data*)));
+	send_data->exit();
+#ifdef _DEBUG
+	std::cout << " - Deleting send_data pointer" << std::endl;
+#endif // _DEBUG
+	delete send_data;
+#ifdef _DEBUG
+	std::cout << " - Deleted send_data pointer" << std::endl;
+#endif // _DEBUG
+}
 
-
-
+void Tacktech_Manager::run_upload( Send_Data *send_data )
+{
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::run_upload()" << std::endl;
+#endif // _DEBUG
+	send_data->send_data_to_server();
+}

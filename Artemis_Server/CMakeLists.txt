@@ -27,7 +27,7 @@ if (WIN32)
 endif (WIN32)
 
 #Lets find boost
-find_package(Boost 1.47.0 COMPONENTS program_options thread system date_time regex filesystem signals REQUIRED)
+find_package(Boost 1.47.0 COMPONENTS program_options thread system date_time regex filesystem signals chrono REQUIRED)
 if (NOT WIN32)
   find_package (Threads)
 endif (NOT WIN32)
@@ -58,8 +58,9 @@ if(Boost_FOUND)
 			Artemis_Server.cpp Artemis_Server.h
 			Artemis_Server_Connection.cpp Artemis_Server_Connection.h
 			Artemis_Request_Handler.cpp Artemis_Request_Handler.h
+			Artemis_Network_Sender.cpp Artemis_Network_Sender.h
 			)
-    target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CONNECTOR_CPP_LIBRARY} pugixml)
+    target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CONNECTOR_CPP_LIBRARY} pugixml libb64)
 
 endif(Boost_FOUND)
 

@@ -10,6 +10,16 @@ if (NOT WIN32)
 endif (NOT WIN32)
 ENDIF( NOT CMAKE_BUILD_TYPE )
 
+# THIS IS FOR LIBB64
+# select a buffersize
+# a larger size should be faster, but takes more runtime memory
+#set(BUFFERSIZE 4096)
+#set(BUFFERSIZE 65536)
+set(BUFFERSIZE 16777216)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUFFERSIZE=${BUFFERSIZE}")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBUFFERSIZE=${BUFFERSIZE}")
+
 message (STATUS "###### WE ARE BUILDING Tactek IN '${CMAKE_BUILD_TYPE}' MODE")
 
 SET(CMAKE_MODULE_PATH
@@ -23,6 +33,8 @@ if (LOCAL_PUGIXML)
 	add_subdirectory (${Tactek_SOURCE_DIR}/pugixml/scripts)
 	set (PUGIXML_INCLUDE_DIR ${Tactek_SOURCE_DIR}/pugixml/src)
 endif (LOCAL_PUGIXML)
+add_subdirectory(${Tactek_SOURCE_DIR}/libb64)
+set(LIBB64_INCLUDE_DIR ${Tactek_SOURCE_DIR}/libb64/include)
 
 #The display app can only be build and used in
 #nix for the time being. I suppose it could be
