@@ -38,7 +38,7 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
 {
 #if _DEBUG
     std::cout << " = Handle Request " << std::endl;
-    std::cout << "  - Request: " << request << std::endl;
+    //std::cout << "  - Request: " << request << std::endl;
 #endif
     try
     {
@@ -91,17 +91,16 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 {
 #ifdef _DEBUG
     std::cout << " == Generate Queries " << std::endl;
-    std::cout << "  - Request -> " << request << std::endl;
 #endif // _DEBUG
     document.load(request.c_str());
-#ifdef _DEBUG
-    std::cout << "  -- Root: " << document.root() << std::endl;
-#endif // _DEBUG
     pugi::xml_node tacktech = document.child("Tacktech");
 	std::string type_string =
 		tacktech.child("Type").attribute("TYPE").as_string();
 	if (type_string == "UPLOAD")
 	{//Handle uploads
+#ifdef _DEBUG
+		std::cout << " - Received upload command" << std::endl;
+#endif // _DEBUG
 
 	}
 

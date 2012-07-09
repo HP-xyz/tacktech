@@ -74,19 +74,31 @@ void Artemis_Server_Connection::handle_read(
 #endif
 #ifdef _DEBUG
 	std::cout << " -- Before checking for error" << std::endl;
-	std::cout << " --Buffer_Data -> " << Artemis_Server_Connection::buffer.data() << std::endl;
 	std::cout << " --Bytes_Transferred -> " << bytes_transferred << std::endl;
 #endif
     if (!error)
     {
 #ifdef _DEBUG
-        std::cout << "Buffer_Data -> " << Artemis_Server_Connection::buffer.data() << std::endl;
         std::cout << "Bytes_Transferred -> " << bytes_transferred << std::endl;
 #endif
-
-        try
+		for (unsigned int i = 0; i < bytes_transferred; i++)
+			received_xml += buffer[i];
+		if (bytes_transferred >= 8192)
+		{
+			m_socket.async_read_some( boost::asio::buffer(Artemis_Server_Connection::buffer),
+				boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred));
+		}
+		else
+		{
+			Artemis_Request_Handler request_handler;
+			request_handler.handle_request(received_xml, reply_xml,
+				Artemis_Server_Connection::parms);
+		}
+        /*try
         {
-            Artemis_Request_Handler request_handler;
+            
             std::string message;
             std::size_t pos = reply_xml.size();
             for (unsigned int i = 0; i < bytes_transferred; i++)
@@ -138,7 +150,7 @@ void Artemis_Server_Connection::handle_read(
             		boost::bind(&Artemis_Server_Connection::handle_write,
             		shared_from_this(),
             		boost::asio::placeholders::error)));
-            }*/
+            }
         }
         catch(std::exception& e)
         {
