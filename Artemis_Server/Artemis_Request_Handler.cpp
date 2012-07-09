@@ -42,22 +42,22 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
 #endif
     try
     {
-        queries = new std::vector< std::pair<std::string, std::string> >;
+        return_messages = new std::vector< std::string >;
         if (request.size() > 0)
         {
             Artemis_Request_Handler::generate_queries(request);
-            for (unsigned int i = 0; i < Artemis_Request_Handler::queries->size(); i++)
+            for (unsigned int i = 0; i < Artemis_Request_Handler::return_messages->size(); i++)
             {
-                if (queries->at(i).first == "DIRECT")
+                if (return_messages->at(i) == "DIRECT")
                 {
                     //std::vector<char> result_xml(return_string.begin(),
                     //	return_string.end());
                     //reply.push_back(result_xml);
                 }
             }
-            if (queries->size() == 0)
+            if (return_messages->size() == 0)
                 result_status = NO_RESULT;
-            else if(queries->size() == 1)
+            else if(return_messages->size() == 1)
                 result_status = SINGLE_RESULT;
             else
                 result_status = MULTIPLE_RESULTS;
@@ -69,12 +69,12 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
 #endif
             result_status = NO_RESULT;
         }
-        delete queries;
+        delete return_messages;
     }
     catch(std::exception &e)
     {
-        if (queries == 0)
-            delete queries;
+        if (return_messages == 0)
+            delete return_messages;
         std::cerr << "EXCEPTION_SQL: " << e.what() << std::endl;
     }
 }
@@ -96,17 +96,14 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
     document.load(request.c_str());
 #ifdef _DEBUG
     std::cout << "  -- Root: " << document.root() << std::endl;
-    std::cout << "  -- Root.child(Artemis).name: " << document.child("Artemis").name() << std::endl;
-    std::cout << "  -- Root.child(Artemis).child(query).name: " << document.child("Artemis").child("query").name() << std::endl;
 #endif // _DEBUG
-    pugi::xml_node artemis = document.child("Artemis");
-    for (pugi::xml_node query = artemis.child("query"); query; query = query.next_sibling("query"))
-    {
-#ifdef _DEBUG
-        std::cout << "   -> Type: " << query.child_value("type") << std::endl;
-        std::cout << "   -> Data: " << query.child_value("data") << std::endl;
-#endif // _DEBUG
-    }
-}
+    pugi::xml_node tacktech = document.child("Tacktech");
+	std::string type_string =
+		tacktech.child("Type").attribute("TYPE").as_string();
+	if (type_string == "UPLOAD")
+	{//Handle uploads
 
+	}
+
+}
 }

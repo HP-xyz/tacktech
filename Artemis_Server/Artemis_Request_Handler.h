@@ -37,7 +37,7 @@ private:
     /** Result xml document to be returned */
     pugi::xml_document document;
     /** Vector of SQL queries to be executed */
-    std::vector< std::pair<std::string, std::string> > *queries;
+    std::vector< std::string > *return_messages;
 
     /** Function to parse received XML to find queries to be run */
     void generate_queries(const std::string&);
