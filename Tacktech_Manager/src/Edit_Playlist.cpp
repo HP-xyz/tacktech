@@ -52,7 +52,6 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags)
     connect(remove_playlist, SIGNAL(triggered()),
             this, SLOT(remove_playlist_slot()));
 
-
     /* Connecting secondary signals */
     connect(add_playlist_dialog, SIGNAL(playlist_name_added()),
             this, SLOT(repopulate_widget()));

@@ -1,13 +1,8 @@
 #ifndef SEND_DATA_H
 #define SEND_DATA_H
 
-#include <QThread.h>
-#include <QMutex>
-#include <QMutexLocker>
 #include <QTcpSocket>
 #include <string>
-#include <QByteArray>
-#include <QDataStream>
 #include "Start_Send_Data_Thread.h"
 
 #ifdef _DEBUG

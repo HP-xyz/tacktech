@@ -27,7 +27,7 @@ if (WIN32)
 endif (WIN32)
 
 #Lets find boost
-find_package(Boost 1.47.0 COMPONENTS program_options thread system date_time regex filesystem signals REQUIRED)
+find_package(Boost 1.5.0 COMPONENTS program_options thread system date_time regex filesystem signals REQUIRED)
 if (NOT WIN32)
   find_package (Threads)
 endif (NOT WIN32)

@@ -29,8 +29,8 @@ endif (LOCAL_PUGIXML)
 #cross compiled in linux, but for now I'm just
 #adding this if statement to not build it in
 #win32
-add_subdirectory(Tacktech_Manager)
+#add_subdirectory(Tacktech_Manager)
 if (NOT WIN32)
 	add_subdirectory(Tactek_Display)
 endif (NOT WIN32)
-add_subdirectory(Artemis_Server)
+#add_subdirectory(Artemis_Server)
