@@ -30,6 +30,7 @@
 #include <iostream>
 #include "Playlist.h"
 #include "ui_Tactek_Display.h"
+#include "Recieve_Data.h"
 namespace Ui
 {
 class Tactek_Display;
@@ -58,6 +59,7 @@ private:
     VlcInstance *m_vlc_instance;
     VlcMedia *m_vlc_media;
     VlcMediaPlayer *m_vlc_player;
+//    Receive_Data *server;
 };
 
 #endif // TACTEK_DISPLAY_H
