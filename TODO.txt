@@ -1,0 +1,26 @@
+TODO	- Milestone 1
+-----------------------------------------
+Create display app: 			Done
+  - Playlist:					Done
+  - Fullscreen:					Done
+  - Network Playlist Editing:	Not Done
+  - Network Administration:		Not Done
+Display app slitstcreen:		Not Done
+Display Groupings:				Busy
+Remote Admin:					Not Done
+Administration App:				Busy
+  - Basic GUI design			Done
+  - Edit Group GUI design		Done
+    - Edit Group logic			Done
+  - Create Playlist GUI design	Done
+    - Create Playlist logic		Done
+  - Edit Playlist GUI design	Done
+    - Edit Playlist logic		Done
+	
+ISSUES:
+	- Pause not set in edit_playlist
+	- Select playlist displays playlist names 2 times	= FIXED
+	- Read from XML does not work = FIXED
+	- Crash if all playlist items are removed
+	- No data is actually sent by the Tacktech Manager
+
