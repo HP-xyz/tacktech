@@ -8,33 +8,26 @@
 #include <string>
 #include <QByteArray>
 #include <QDataStream>
-#include <QWaitCondition>
+#include "Start_Send_Data_Thread.h"
+
 #ifdef _DEBUG
 #include <iostream>
 #endif // _DEBUG
 
-class Send_Data : public QThread
+class Send_Data : public QTcpSocket
 {
-    Q_OBJECT
+Q_OBJECT
     public:
-        /** Default constructor */
-        Send_Data();
-        /** Default destructor */
-        virtual ~Send_Data();
+        Send_Data(const QString&, quint16, std::string&);
+        ~Send_Data();
 
-        void run();
-        void send_data_to_server(const QString&, quint16, std::string&);
     private:
-        QString host_name;
-        quint16 port;
-        QMutex mutex;
-        QWaitCondition cond;
-        bool quit;
-
+		QTcpSocket *socket;
         std::string xml_string;
     signals:
-        void error(int, const QString&);
-        void status_changed(const QString&);
+		void upload_complete(Send_Data *);
+	private slots:
+		void send_data_to_server();
 };
 
 #endif // SEND_DATA_H

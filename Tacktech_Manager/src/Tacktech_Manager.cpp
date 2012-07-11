@@ -11,7 +11,6 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     edit_playlist_class = new Edit_Playlist();
     select_playlist_dialog = new Select_Playlist_Dialog();
 	upload_data_dialog = new Upload_Data();
-	send_data = new Send_Data();
 
 	groups_and_computers = new Group_Container();
 	playlist = new Playlist_Container();
@@ -427,8 +426,15 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
 	std::cout << " - xml_string: " << xml_string << std::endl;
 #endif // _DEBUG
-	send_data->send_data_to_server("143.160.140.220", 9000, xml_string);
+	send_data = new Send_Data("143.160.143.182", 9000, xml_string);
+	connect (send_data, SIGNAL(upload_complete(Send_Data*)), send_data, SLOT(deleteLater()));
+#ifdef _DEBUG
+	std::cout << "done sending" << std::endl;
+#endif // _DEBUG
+
 }
+
+
 
 
 

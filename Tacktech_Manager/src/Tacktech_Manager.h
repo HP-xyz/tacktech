@@ -20,6 +20,7 @@
 #include "Upload_Data_Container.h"
 #include "Send_Data.h"
 #include "ui_Tacktech_Manager.h"
+#include "Start_Send_Data_Thread.h"
 
 class Tacktech_Manager : public QMainWindow
 {
@@ -63,7 +64,6 @@ protected:
 	Send_Data *send_data;
 private slots:
     void refresh_all_groups();
-
     /* Slots that start GUIs (this)*/
     /* ===================== */
     void edit_group();
