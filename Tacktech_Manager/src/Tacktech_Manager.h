@@ -60,8 +60,6 @@ protected:
 	/* Variable for the upload_data container */
 	Upload_Data_Container *upload_data;
 
-	/* Variable for the send_data class */
-	Send_Data *send_data;
 private slots:
     void refresh_all_groups();
     /* Slots that start GUIs (this)*/
@@ -74,6 +72,8 @@ private slots:
 	void show_schedule_upload_dialog();
 	void scheduled_item_added(QDate);
 	void start_upload(std::string);
+	void upload_complete(Send_Data*);
+	void run_upload(Send_Data*);
 
     void group_editing_complete();
     void repopulate_widget();
