@@ -426,7 +426,7 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
 	std::cout << " - xml_string: " << xml_string << std::endl;
 #endif // _DEBUG
-	send_data = new Send_Data("143.160.143.182", 9000, xml_string);
+	send_data = new Send_Data("143.160.142.177", 9000, xml_string);
 	connect (send_data, SIGNAL(upload_complete(Send_Data*)), send_data, SLOT(deleteLater()));
 #ifdef _DEBUG
 	std::cout << "done sending" << std::endl;
@@ -434,8 +434,21 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 
 }
 
-
-
-
-
-
+void Tacktech_Manager::upload_complete( Send_Data *send_data)
+{
+#ifdef _DEBUG
+        std::cout << "= Tacktech_Manager::upload_complete()" << std::endl;
+        std::cout << " - Disconnecting upload_complete signal" << std::endl;
+#endif // _DEBUG
+        disconnect(send_data, SIGNAL(upload_complete(Send_Data*)),
+                this, SLOT(upload_complete(Send_Data*)));
+        disconnect(send_data, SIGNAL(socket_connected(Send_Data*)),
+                this, SLOT(run_upload(Send_Data*)));
+#ifdef _DEBUG
+        std::cout << " - Deleting send_data pointer" << std::endl;
+#endif // _DEBUG
+        delete send_data;
+#ifdef _DEBUG
+        std::cout << " - Deleted send_data pointer" << std::endl;
+#endif // _DEBUG
+}
