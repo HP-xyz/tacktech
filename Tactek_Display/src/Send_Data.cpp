@@ -1,9 +1,9 @@
-#include "Recieve_Data.h"
+#include "Send_Data.h"
 
-Send_Data::Send_Data (int socket_descriptor, std::string t_data, QObject *parent): QObject(parent)
+Send_Data::Send_Data (int socket_descriptor, std::string t_data)
 {
     socket = new QTcpSocket();
-    if (!socket->setSocketDescriptor(socket_sdescriptor))
+    if (!socket->setSocketDescriptor(socket_descriptor))
     {
         emit error(socket->error());
         return;
@@ -19,5 +19,7 @@ Send_Data::~Send_Data ()
 
 void Send_Data::send_data()
 {
-    socket.write(data);
+    socket->write(data.c_str());
+    socket->disconnectFromHost();
+    socket->waitForDisconnected();
 }
