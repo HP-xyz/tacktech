@@ -7,11 +7,14 @@
 
 #ifndef ARTEMIS_REQUEST_HANDLER_H
 #define	ARTEMIS_REQUEST_HANDLER_H
+#include "Artemis_Network_Sender.h"
+#include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/array.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/thread.hpp>
 #include <iostream>
 #include <map>
 #include <fstream>
@@ -39,8 +42,11 @@ private:
     /** Vector of SQL queries to be executed */
     std::vector< std::string > *return_messages;
 
+	void handle_upload(std::string upload_xml, std::string dest_ip);
+
     /** Function to parse received XML to find queries to be run */
     void generate_queries(const std::string&);
+
 };
 }
 #endif	/* ARTEMIS_REQUEST_HANDLER_H */

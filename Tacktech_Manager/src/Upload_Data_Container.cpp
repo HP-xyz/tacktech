@@ -112,18 +112,17 @@ void Upload_Data_Container::set_upload_time(QString p_upload_time)
   * The XML is generated in this format:
   *
   * Tacktech
-  *     Type
-  *         Command = COMMAND_HERE
+  *     Type TYPE=TYPE_HERE
   *     Type
   *     Upload <Upload_Time=TIME_HERE>
-  *         Computer = COMPUTER_IP
+  *         Computer Computer_IP = COMPUTER_IP
   *             Item
   *                 <Filename>FILENAME_HERE</Filename>
   *                 <File_Data>FILE_DATA_HERE</File_Data>
   *                 <Pause>PAUSE_HERE</Pause>
   *             Item
   *         Computer
-  *     Data
+  *     Upload
   * Tacktech
   *
   */
@@ -135,6 +134,8 @@ void Upload_Data_Container::get_xml_upload()
     pugi::xml_document transmit_document;
     pugi::xml_node root_node = transmit_document.append_child("Tacktech");
     pugi::xml_node type_node = root_node.append_child("Type");
+	pugi::xml_node command_node = type_node.append_child("Command");
+	type_node.append_attribute("TYPE") = "UPLOAD";
     pugi::xml_node upload_node = type_node.append_child("Upload");
     upload_node.append_attribute("Upload_Time") = upload_time.toStdString().c_str();
     for (int i = 0; i < groups->get_groups_and_computers().values(group_name).size(); i++)
