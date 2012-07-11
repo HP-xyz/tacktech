@@ -8,7 +8,17 @@
 #include "Artemis_Request_Handler.h"
 namespace Artemis
 {
+/** Struct to define a xml_writer to string.
+ ** Copied directly from the pugixml quickstart */
+struct xml_string_writer: pugi::xml_writer
+{
+	std::string result;
 
+	virtual void write(const void* data, size_t size)
+	{
+		result += std::string(static_cast<const char*>(data), size);
+	}
+};
 //************************************
 // Method:    Artemis_Request_Handler
 // FullName:  Artemis::Artemis_Request_Handler::Artemis_Request_Handler
@@ -38,26 +48,26 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
 {
 #if _DEBUG
     std::cout << " = Handle Request " << std::endl;
-    std::cout << "  - Request: " << request << std::endl;
+    //std::cout << "  - Request: " << request << std::endl;
 #endif
     try
     {
-        queries = new std::vector< std::pair<std::string, std::string> >;
+        return_messages = new std::vector< std::string >;
         if (request.size() > 0)
         {
             Artemis_Request_Handler::generate_queries(request);
-            for (unsigned int i = 0; i < Artemis_Request_Handler::queries->size(); i++)
+            for (unsigned int i = 0; i < Artemis_Request_Handler::return_messages->size(); i++)
             {
-                if (queries->at(i).first == "DIRECT")
+                if (return_messages->at(i) == "DIRECT")
                 {
                     //std::vector<char> result_xml(return_string.begin(),
                     //	return_string.end());
                     //reply.push_back(result_xml);
                 }
             }
-            if (queries->size() == 0)
+            if (return_messages->size() == 0)
                 result_status = NO_RESULT;
-            else if(queries->size() == 1)
+            else if(return_messages->size() == 1)
                 result_status = SINGLE_RESULT;
             else
                 result_status = MULTIPLE_RESULTS;
@@ -69,12 +79,12 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
 #endif
             result_status = NO_RESULT;
         }
-        delete queries;
+        delete return_messages;
     }
     catch(std::exception &e)
     {
-        if (queries == 0)
-            delete queries;
+        if (return_messages == 0)
+            delete return_messages;
         std::cerr << "EXCEPTION_SQL: " << e.what() << std::endl;
     }
 }
@@ -91,22 +101,48 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 {
 #ifdef _DEBUG
     std::cout << " == Generate Queries " << std::endl;
-    std::cout << "  - Request -> " << request << std::endl;
 #endif // _DEBUG
     document.load(request.c_str());
+    pugi::xml_node tacktech = document.child("Tacktech");
+	std::string type_string =
+		tacktech.child("Type").attribute("TYPE").as_string();
+	if (type_string == "UPLOAD")
+	{//Handle uploads
 #ifdef _DEBUG
-    std::cout << "  -- Root: " << document.root() << std::endl;
-    std::cout << "  -- Root.child(Artemis).name: " << document.child("Artemis").name() << std::endl;
-    std::cout << "  -- Root.child(Artemis).child(query).name: " << document.child("Artemis").child("query").name() << std::endl;
+		std::cout << " - Received upload command" << std::endl;
 #endif // _DEBUG
-    pugi::xml_node artemis = document.child("Artemis");
-    for (pugi::xml_node query = artemis.child("query"); query; query = query.next_sibling("query"))
-    {
-#ifdef _DEBUG
-        std::cout << "   -> Type: " << query.child_value("type") << std::endl;
-        std::cout << "   -> Data: " << query.child_value("data") << std::endl;
-#endif // _DEBUG
-    }
+		pugi::xml_node upload = tacktech.child("Upload");
+		for (pugi::xml_node computer = upload.child("Computer"); computer;
+			computer = computer.next_sibling("Computer"))
+		{
+			std::string dest_ip =
+				computer.attribute("Computer_IP").as_string();
+			xml_string_writer writer;
+			computer.child("Item").print(writer);
+			boost::thread upload_thread(boost::bind(
+				&Artemis::Artemis_Request_Handler::handle_upload, this,
+				writer.result, dest_ip));
+		}
+	}
+
 }
 
+/** Function handles the upload of data to a display client. Receives 
+ ** the xml to upload in parameter, as well as the ip to that the upload
+ ** should be sent to.*/
+void Artemis_Request_Handler::handle_upload( 
+	std::string upload_xml, std::string dest_ip )
+{
+#ifdef _DEBUG
+	std::cout << "= Artemis_Request_Handler::handle_upload()" << std::endl;
+#endif // _DEBUG
+	boost::asio::io_service io_service;
+	boost::asio::ip::tcp::resolver resolver(io_service);
+	boost::asio::ip::tcp::resolver::query query(dest_ip,
+		"9000");
+	boost::asio::ip::tcp::resolver::iterator endpoint_iterator =
+		resolver.resolve(query);
+	Artemis_Network_Sender network_sender(io_service, endpoint_iterator);
+	network_sender.write(upload_xml);
+}
 }

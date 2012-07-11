@@ -73,6 +73,7 @@ include_directories (
 					${QT_INCLUDE_DIR}
 					${QT_INCLUDES}
 					${PUGIXML_INCLUDE_DIR}
+					${LIBB64_INCLUDE_DIR}
 					${Boost_INCLUDE_DIRS}
 					)
 set (Tacktech_Manager_Non_MOC_HDRS
@@ -152,6 +153,7 @@ if (LOCAL_PUGIXML)
 	message (STATUS "Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
 	message (STATUS "Pugixml library: ${pugixml}")
 endif (LOCAL_PUGIXML)
+message (STATUS "Libb64 include dir: ${LIBB64_INCLUDE_DIR}")
 message (STATUS "Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 message (STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS} ")
 message (STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ")
@@ -171,6 +173,7 @@ add_executable ( Tacktech_Manager
 				${UIS})
 target_link_libraries ( Tacktech_Manager 
 						pugixml
+						libb64
 						${QT_LIBRARIES}
 						${QT_QTCORE_LIBRARIES} 
 						${QT_QTGUI_LIBRARIES} 

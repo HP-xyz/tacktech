@@ -66,17 +66,34 @@ void Upload_Data_Container::set_playlist(Playlist_Container *p_playlist_containe
   */
 char* Upload_Data_Container::get_binary_file(QString filename)
 {
-    char *binary_file;
-    std::ifstream file(filename.toStdString().c_str());
+#ifdef _DEBUG
+	std::cout << "= Upload_Data_Container::get_binary_file()" << std::endl;
+#endif // _DEBUG
+    char *file_encoded = NULL;
+    std::ifstream file(filename.toStdString().c_str(), std::ios::binary);
     if (file.is_open())
     {
-        m_size = file.tellg();
-        binary_file = new char[m_size];
-        file.seekg(0, std::ios::beg);
-        file.read(binary_file, m_size);
+#ifdef _DEBUG
+		std::cout << " - File is open" << std::endl;
+#endif // _DEBUG
+		base64::encoder E;
+		std::stringstream file_out;
+		E.encode(file, file_out);
+
+		file_out.seekg(0, std::ios::end);
+		int file_length(file_out.tellg());
+#ifdef _DEBUG
+		std::cout << " - Creating char of size: " << file_length 
+<< std::endl;
+#endif // _DEBUG
+        file_out.seekg(0, std::ios::beg);
+
+		file_encoded = new char[file_length + 1];
+		file_out.read(file_encoded, file_length);
+		file_encoded[file_length] = 0;
         file.close();
     }
-    return binary_file;
+    return file_encoded;
 }
 
 /** @brief set_upload_time
@@ -95,26 +112,30 @@ void Upload_Data_Container::set_upload_time(QString p_upload_time)
   * The XML is generated in this format:
   *
   * Tacktech
-  *     Type
-  *         Command = COMMAND_HERE
+  *     Type TYPE=TYPE_HERE
   *     Type
   *     Upload <Upload_Time=TIME_HERE>
-  *         Computer = COMPUTER_IP
+  *         Computer Computer_IP = COMPUTER_IP
   *             Item
   *                 <Filename>FILENAME_HERE</Filename>
   *                 <File_Data>FILE_DATA_HERE</File_Data>
   *                 <Pause>PAUSE_HERE</Pause>
   *             Item
   *         Computer
-  *     Data
+  *     Upload
   * Tacktech
   *
   */
 void Upload_Data_Container::get_xml_upload()
 {
+#ifdef _DEBUG
+	std::cout << "= Upload_Data_Container::get_xml_upload()" << std::endl;
+#endif // _DEBUG
     pugi::xml_document transmit_document;
     pugi::xml_node root_node = transmit_document.append_child("Tacktech");
     pugi::xml_node type_node = root_node.append_child("Type");
+	pugi::xml_node command_node = type_node.append_child("Command");
+	type_node.append_attribute("TYPE") = "UPLOAD";
     pugi::xml_node upload_node = type_node.append_child("Upload");
     upload_node.append_attribute("Upload_Time") = upload_time.toStdString().c_str();
     for (int i = 0; i < groups->get_groups_and_computers().values(group_name).size(); i++)
@@ -145,9 +166,9 @@ void Upload_Data_Container::get_xml_upload()
 			if (temp_filename.find("/") != std::string::npos)
 				temp_filename = temp_filename.substr(temp_filename.find_last_of("/") + 1);
             filename_pcdata.set_value(temp_filename.c_str());
-            file_data_pcdata.set_value(
-                 get_binary_file(
-                     playlist->get_playlist().values(playlist_name).at(j).first));
+
+			file_data_pcdata.set_value(get_binary_file(
+				playlist->get_playlist().values(playlist_name).at(j).first));
             pause_pcdata.set_value(boost::lexical_cast<std::string>(
                 playlist->get_playlist().values(playlist_name).at(j).second).c_str());
         }
