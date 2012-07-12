@@ -59,7 +59,7 @@ private:
     VlcInstance *m_vlc_instance;
     VlcMedia *m_vlc_media;
     VlcMediaPlayer *m_vlc_player;
-    Receive_Data *server;
+    Recieve_Data *server;
 };
 
 #endif // TACTEK_DISPLAY_H

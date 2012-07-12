@@ -426,10 +426,10 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
 	std::cout << " - xml_string: " << xml_string << std::endl;
 #endif // _DEBUG
-	send_data = new Send_Data("143.160.142.177", 9000, xml_string);
+	send_data = new Send_Data("143.160.140.220", 9000, xml_string);
 	connect (send_data, SIGNAL(upload_complete(Send_Data*)), send_data, SLOT(deleteLater()));
 #ifdef _DEBUG
-	std::cout << "done sending" << std::endl;
+	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
 
 }
