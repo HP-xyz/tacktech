@@ -48,6 +48,8 @@ include_directories (
 					${QT_QTNETWORK_INCLUDE_DIR} 
 					${QT_INCLUDE_DIR}
 					${LIBVLCQT_INCLUDE_DIR}
+					${LIBB64_INCLUDE_DIR}
+					${PUGIXML_INCLUDE_DIR}
 					)
 set ( Tacktech_Display_SRCS
 		${Tacktech_Display_SOURCE_DIR}/src/Tactek_Display.cpp
@@ -96,5 +98,7 @@ target_link_libraries ( Tacktech_Display
 						${QT_QTGUI_LIBRARY} 
 						${QT_QTNETWORK_LIBRARY} 
 						${LIBVLCQT_LIBRARY}
-                        ${CMAKE_THREAD_LIBS_INIT}
+						${CMAKE_THREAD_LIBS_INIT}
+						libb64
+						pugixml
                         )

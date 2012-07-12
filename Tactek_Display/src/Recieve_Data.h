@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   TCPServer.h
  * Author: G-spot
  *
@@ -13,6 +13,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <iostream>
+#include <string>
 
 class Recieve_Data: public QObject
 {
@@ -26,6 +27,8 @@ public slots:
 private:
   QTcpServer server;
   QTcpSocket* client;
+signals:
+    void data_recieved(std::string xml_data);
 };
 
 

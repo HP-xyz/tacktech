@@ -43,6 +43,8 @@ Tactek_Display::Tactek_Display(QWidget *parent)
             this, SLOT(check_media_state()));
     connect(this, SIGNAL(start_next_media()),
             this, SLOT(play_next_media_in_queue()));
+    connect(server, SIGNAL(data_recieved(std::string)),
+            this, SLOT(handle_recieved_data(std::string)));
 
     update_timer->start(1000);
 }
@@ -109,4 +111,21 @@ void Tactek_Display::play_next_media_in_queue()
     {
         std::cout << "There is no media in the playlist" << std::endl;
     }
+}
+
+/** Slots gets called by the data_recieved() signal of the
+ ** recieve_data class object. Parses the data recieved into
+ ** xml format, and calls the appropriate functions to handle
+ ** the commands specified in the xml */
+void Tactek_Display::handle_recieved_data(std::string data)
+{
+    /*std::stringstream stream;
+    stream << data;
+
+    base64::decoder D;
+    D.decode(stream, stream);
+    data = stream.str();*/
+    pugi::xml_document tacktech;
+    tacktech.load(data.c_str());
+    tacktech.print(std::cout);
 }

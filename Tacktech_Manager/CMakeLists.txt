@@ -178,6 +178,6 @@ target_link_libraries ( Tacktech_Manager
 						${QT_QTCORE_LIBRARIES} 
 						${QT_QTGUI_LIBRARIES} 
 						${QT_QTNETWORK_LIBRARIES} 
-                        ${CMAKE_THREAD_LIBS_INIT}
+						${CMAKE_THREAD_LIBS_INIT}
 						${Boost_LIBRARIES}
                         )
