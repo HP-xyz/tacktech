@@ -45,7 +45,7 @@ if (WIN32)
 endif (WIN32)
 
 #Lets find boost
-find_package(Boost 1.47.0 REQUIRED)
+find_package(Boost 1.47.0 COMPONENTS program_options REQUIRED)
 
 if (NOT WIN32)
 	# We need this for unix machines since Qt internally uses
@@ -179,4 +179,5 @@ target_link_libraries ( Tacktech_Manager
 						${QT_QTGUI_LIBRARIES} 
 						${QT_QTNETWORK_LIBRARIES} 
                         ${CMAKE_THREAD_LIBS_INIT}
+						${Boost_LIBRARIES}
                         )

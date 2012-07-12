@@ -9,6 +9,8 @@
 #include <iostream>
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options/detail/config_file.hpp>
+#include <boost/program_options/parsers.hpp>
 #include <pugixml.hpp>
 #include "Group_Container.h"
 #include "Playlist_Container.h"
@@ -43,6 +45,13 @@ private:
     Edit_Playlist *edit_playlist_class;
     Select_Playlist_Dialog *select_playlist_dialog;
 	Upload_Data *upload_data_dialog;
+
+	/** Variables for the config file */
+	std::map<std::string, std::string> parameters;
+	std::set<std::string> options;
+
+	/** Reads a config file*/
+	void read_config();
 
     void save_variables_to_xml();
     void read_variables_from_xml();
