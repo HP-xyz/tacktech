@@ -31,7 +31,7 @@ Tactek_Display::Tactek_Display(QWidget *parent)
 
     Tactek_Display::update_timer = new QTimer(this);
     Tactek_Display::playlist = new Playlist();
-    server = new Receive_Data();
+    server = new Recieve_Data();
 
     m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
     m_vlc_player = new VlcMediaPlayer(m_vlc_instance);

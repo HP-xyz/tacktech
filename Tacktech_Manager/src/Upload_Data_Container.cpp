@@ -134,7 +134,6 @@ void Upload_Data_Container::get_xml_upload()
     pugi::xml_document transmit_document;
     pugi::xml_node root_node = transmit_document.append_child("Tacktech");
     pugi::xml_node type_node = root_node.append_child("Type");
-	pugi::xml_node command_node = type_node.append_child("Command");
 	type_node.append_attribute("TYPE") = "UPLOAD";
     pugi::xml_node upload_node = type_node.append_child("Upload");
     upload_node.append_attribute("Upload_Time") = upload_time.toStdString().c_str();

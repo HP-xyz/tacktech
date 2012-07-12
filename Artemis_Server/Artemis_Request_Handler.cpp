@@ -106,31 +106,39 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
     pugi::xml_node tacktech = document.child("Tacktech");
 	std::string type_string =
 		tacktech.child("Type").attribute("TYPE").as_string();
+#ifdef _DEBUG
+	tacktech.print(std::cout);
+#endif // _DEBUG
 	if (type_string == "UPLOAD")
 	{//Handle uploads
 #ifdef _DEBUG
 		std::cout << " - Received upload command" << std::endl;
 #endif // _DEBUG
-		pugi::xml_node upload = tacktech.child("Upload");
+		pugi::xml_node upload = tacktech.child("Type").child("Upload");
 		for (pugi::xml_node computer = upload.child("Computer"); computer;
 			computer = computer.next_sibling("Computer"))
 		{
 			std::string dest_ip =
 				computer.attribute("Computer_IP").as_string();
+			
+#ifdef _DEBUG
+            std::cout << " - Sending to: " << dest_ip << std::endl;
+#endif //_DEBUG
 			xml_string_writer writer;
 			computer.child("Item").print(writer);
 			boost::thread upload_thread(boost::bind(
 				&Artemis::Artemis_Request_Handler::handle_upload, this,
 				writer.result, dest_ip));
+			
 		}
 	}
 
 }
 
-/** Function handles the upload of data to a display client. Receives 
+/** Function handles the upload of data to a display client. Receives
  ** the xml to upload in parameter, as well as the ip to that the upload
  ** should be sent to.*/
-void Artemis_Request_Handler::handle_upload( 
+void Artemis_Request_Handler::handle_upload(
 	std::string upload_xml, std::string dest_ip )
 {
 #ifdef _DEBUG
@@ -143,6 +151,9 @@ void Artemis_Request_Handler::handle_upload(
 	boost::asio::ip::tcp::resolver::iterator endpoint_iterator =
 		resolver.resolve(query);
 	Artemis_Network_Sender network_sender(io_service, endpoint_iterator);
+#ifdef _DEBUG
+	std::cout << " - Calling write" << std::endl;
+#endif // _DEBUG
 	network_sender.write(upload_xml);
 }
 }
