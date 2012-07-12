@@ -7,6 +7,8 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     std::cout << "= Setting up Tacktech Manager" << std::endl;
 #endif // _DEBUG
 
+	read_config();
+
     edit_group_class = new Edit_Group();
     edit_playlist_class = new Edit_Playlist();
     select_playlist_dialog = new Select_Playlist_Dialog();
@@ -61,6 +63,45 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 
     read_variables_from_xml();
     repopulate_widget();
+}
+
+void Tacktech_Manager::read_config()
+{
+	std::ifstream config("config.ini");
+	if (!config)
+	{
+		std::cerr << " == Error -> No config found" << std::endl;
+	}
+	else
+	{
+		ui.statusbar->showMessage("No config file 'config.ini' found");
+	}
+
+	Tacktech_Manager::options.insert("*");
+
+	try
+	{
+#ifdef _DEBUG
+		std::cout << "Config file read: " << std::endl <<
+			"===================" << std::endl;
+#endif
+		for (boost::program_options::detail::config_file_iterator
+			i(config, options), e; i != e; ++i)
+		{
+#ifdef _DEBUG
+			std::cout << i->string_key << " " << i->value[0] << std::endl;
+#endif
+			parameters[i->string_key] = i->value[0];
+		}
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "Exception: " << e.what() << std::endl;
+		std::string error_msg;
+		error_msg = "Config ERROR: ";
+		error_msg += e.what();
+		ui.statusbar->showMessage(error_msg.c_str());
+	}
 }
 
 Tacktech_Manager::~Tacktech_Manager()
@@ -426,8 +467,12 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
 	std::cout << " - xml_string: " << xml_string << std::endl;
 #endif // _DEBUG
-	send_data = new Send_Data("143.160.140.220", 9000, xml_string);
-	connect (send_data, SIGNAL(upload_complete(Send_Data*)), send_data, SLOT(deleteLater()));
+	send_data = new Send_Data(
+		parameters["general.server_ip"].c_str(),
+		boost::lexical_cast<int>(parameters["general.server_port"]),
+		xml_string);
+	connect (send_data, SIGNAL(upload_complete(Send_Data*)),
+		send_data, SLOT(deleteLater()));
 #ifdef _DEBUG
 	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
