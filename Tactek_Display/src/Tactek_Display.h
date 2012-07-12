@@ -28,6 +28,9 @@
 #include <vlc-qt/Media.h>
 #include <vlc-qt/MediaPlayer.h>
 #include <iostream>
+#include <sstream>
+#include <b64/decode.h>
+#include <pugixml.hpp>
 #include "Playlist.h"
 #include "ui_Tactek_Display.h"
 #include "Recieve_Data.h"
@@ -52,6 +55,7 @@ private slots:
     void check_media_state();
     void play_next_media_in_queue();
     void open_and_play(QString);
+    void handle_recieved_data(std::string data);
 private:
     Ui::Tactek_Display *ui;
     Playlist *playlist;

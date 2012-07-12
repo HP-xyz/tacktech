@@ -29,8 +29,10 @@ void Recieve_Data::acceptConnection()
 
 void Recieve_Data::startRead()
 {
-  char buffer[1024] = {0};
+  char buffer[8092] = {0};
   client->read(buffer, client->bytesAvailable());
   std::cout << buffer << std::endl;
   client->close();
+  std::string data = buffer;
+  emit data_recieved(data);
 }
