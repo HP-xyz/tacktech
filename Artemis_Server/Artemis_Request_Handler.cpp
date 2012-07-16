@@ -116,9 +116,6 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
     pugi::xml_node tacktech = document.child("Tacktech");
     std::string type_string =
         tacktech.child("Type").attribute("TYPE").as_string();
-#ifdef _DEBUG
-    tacktech.print(std::cout);
-#endif // _DEBUG
     if (type_string == "UPLOAD")
     {
         //Handle uploads
@@ -156,6 +153,7 @@ void Artemis_Request_Handler::handle_upload(
 #ifdef _DEBUG
     std::cout << "= Artemis_Request_Handler::handle_upload()" << std::endl;
     std::cout << " - Dest_Ip: " << dest_ip << std::endl;
+    std::cout << " - Sending file of size: " << upload_xml.size() << std::endl;
 #endif // _DEBUG
     boost::shared_ptr<boost::asio::io_service> io_service(new boost::asio::io_service);
     Artemis_Network_Sender_Connection_ptr network_send_connector(

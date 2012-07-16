@@ -61,6 +61,8 @@ private:
     std::string received_xml;
 
     std::map<std::string, std::string> parms;
+
+    long long received_size;
 };
 typedef boost::shared_ptr<Artemis_Server_Connection>
 Artemis_Server_Connection_ptr;
