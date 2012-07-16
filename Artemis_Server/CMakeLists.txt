@@ -58,7 +58,8 @@ if(Boost_FOUND)
 			Artemis_Server.cpp Artemis_Server.h
 			Artemis_Server_Connection.cpp Artemis_Server_Connection.h
 			Artemis_Request_Handler.cpp Artemis_Request_Handler.h
-			Artemis_Network_Sender.cpp Artemis_Network_Sender.h
+			#Artemis_Network_Sender.cpp Artemis_Network_Sender.h
+			Artemis_Network_Sender_Connection.cpp Artemis_Network_Sender_Connection.h
 			)
     target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CONNECTOR_CPP_LIBRARY} pugixml libb64)
 

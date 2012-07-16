@@ -73,32 +73,32 @@ void Artemis_Server_Connection::handle_read(
               << " ==============" << std::endl;
 #endif
 #ifdef _DEBUG
-	std::cout << " -- Before checking for error" << std::endl;
-	std::cout << " --Bytes_Transferred -> " << bytes_transferred << std::endl;
+    std::cout << " -- Before checking for error" << std::endl;
+    std::cout << " --Bytes_Transferred -> " << bytes_transferred << std::endl;
 #endif
     if (!error)
     {
 #ifdef _DEBUG
         std::cout << "Bytes_Transferred -> " << bytes_transferred << std::endl;
 #endif
-		for (unsigned int i = 0; i < bytes_transferred; i++)
-			received_xml += buffer[i];
-		if (bytes_transferred >= 8192)
-		{
-			m_socket.async_read_some( boost::asio::buffer(Artemis_Server_Connection::buffer),
-				boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred));
-		}
-		else
-		{
-			Artemis_Request_Handler request_handler;
-			request_handler.handle_request(received_xml, reply_xml,
-				Artemis_Server_Connection::parms);
-		}
+        for (unsigned int i = 0; i < bytes_transferred; i++)
+            received_xml += buffer[i];
+        if (bytes_transferred >= 8192)
+        {
+            m_socket.async_read_some( boost::asio::buffer(Artemis_Server_Connection::buffer),
+                                      boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
+                                                  boost::asio::placeholders::error,
+                                                  boost::asio::placeholders::bytes_transferred));
+        }
+        else
+        {
+            Artemis_Request_Handler request_handler;
+            request_handler.handle_request(received_xml, reply_xml,
+                                           Artemis_Server_Connection::parms);
+        }
         /*try
         {
-            
+
             std::string message;
             std::size_t pos = reply_xml.size();
             for (unsigned int i = 0; i < bytes_transferred; i++)
@@ -110,13 +110,13 @@ void Artemis_Server_Connection::handle_read(
             //
             if (request_handler.result_status == NO_RESULT)
             {
-#ifdef _DEBUG
+        #ifdef _DEBUG
                 std::cout << "	Query generated no results" << std::endl;
-#endif // _DEBUG
+        #endif // _DEBUG
             }
             else if (request_handler.result_status == SINGLE_RESULT)
             {
-#ifdef _DEBUG
+        #ifdef _DEBUG
                 std::cout << "	Query generated ONE result" << std::endl;
                 std::cout << "	 - Reply_XML: ";
                 for (unsigned int i = 0; i < reply_xml[pos].size(); i++)
@@ -124,7 +124,7 @@ void Artemis_Server_Connection::handle_read(
                     std::cout << reply_xml[pos][i];
                 }
                 std::cout << std::endl;
-#endif // _DEBUG
+        #endif // _DEBUG
                 boost::asio::async_write(m_socket, boost::asio::buffer(reply_xml[pos]),
                                          strand.wrap(
                                              boost::bind(&Artemis_Server_Connection::handle_write,
@@ -186,12 +186,12 @@ void Artemis_Server_Connection::handle_read(
                                                              boost::asio::placeholders::bytes_transferred)));
         }*/
     }
-	else
-	{
+    else
+    {
 #ifdef _DEBUG
-		std::cout << " - Error encountered: " << error.message() << std::endl;
+        std::cout << " - Error encountered: " << error.message() << std::endl;
 #endif // _DEBUG
-	}
+    }
     // If an error occurs then no new asynchronous operations are started. This
     // means that all shared_ptr references to the connection object will
     // disappear and the object will be destroyed automatically after this

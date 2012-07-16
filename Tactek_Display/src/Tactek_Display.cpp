@@ -127,5 +127,8 @@ void Tactek_Display::handle_recieved_data(std::string data)
     data = stream.str();*/
     pugi::xml_document tacktech;
     tacktech.load(data.c_str());
+#ifdef _DEBUG
+    std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
+#endif //_DEBUG
     tacktech.print(std::cout);
 }
