@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QAction>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options/detail/config_file.hpp>

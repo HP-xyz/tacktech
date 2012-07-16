@@ -7,7 +7,8 @@
 
 #ifndef ARTEMIS_REQUEST_HANDLER_H
 #define	ARTEMIS_REQUEST_HANDLER_H
-#include "Artemis_Network_Sender.h"
+
+#include "Artemis_Network_Sender_Connection.h"
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -31,6 +32,7 @@ class Artemis_Request_Handler : private boost::noncopyable
 public:
     /** Construct Artemis_Request_Handler object */
     explicit Artemis_Request_Handler();
+    ~Artemis_Request_Handler();
 
     /** Handle a request and produce a reply*/
     void handle_request(const std::string&,
@@ -47,6 +49,8 @@ private:
 
     /** Function to parse received XML to find queries to be run */
     void generate_queries(const std::string&);
+
+    std::map<std::string, std::string> parameters;
 
 };
 }

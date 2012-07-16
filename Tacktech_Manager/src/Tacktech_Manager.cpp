@@ -67,17 +67,29 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 
 void Tacktech_Manager::read_config()
 {
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::read_config()" << std::endl;
+#endif // _DEBUG
 	std::ifstream config("config.ini");
+#ifdef _DEBUG
+	std::cout << " - Created config ifstream" << std::endl;
+#endif // _DEBUG
 	if (!config)
 	{
 		std::cerr << " == Error -> No config found" << std::endl;
+		//TODO
+		//Displaying something in the statusbar crashed the manager
+		ui.statusbar->showMessage("No config file 'config.ini' found");
 	}
 	else
 	{
-		ui.statusbar->showMessage("No config file 'config.ini' found");
+
 	}
 
-	Tacktech_Manager::options.insert("*");
+#ifdef _DEBUG
+	std::cout << " - Creating options.insert" << std::endl;
+#endif // _DEBUG
+	options.insert("*");
 
 	try
 	{

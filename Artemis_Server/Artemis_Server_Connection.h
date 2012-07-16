@@ -47,7 +47,8 @@ private:
     void handle_read(const boost::system::error_code& error,
                      std::size_t bytes_transferred);
     /** Handle completion of a write operation */
-    void handle_write(const boost::system::error_code& error, std::vector<std::vector<char> >&, std::size_t);
+    void handle_write(const boost::system::error_code& error,
+                      std::vector<std::vector<char> >&, std::size_t);
     /** Strand to ensure the connections handlers are not called concurrently */
     boost::asio::io_service::strand strand;
     /** Socket for the connection */
@@ -57,7 +58,7 @@ private:
     /** Generated reply, XML */
     std::vector<std::vector<char> > reply_xml;
 
-	std::string received_xml;
+    std::string received_xml;
 
     std::map<std::string, std::string> parms;
 };
