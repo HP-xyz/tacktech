@@ -28,6 +28,7 @@
 #include <vlc-qt/Media.h>
 #include <vlc-qt/MediaPlayer.h>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <b64/decode.h>
 #include <pugixml.hpp>

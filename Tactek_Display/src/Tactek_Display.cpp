@@ -119,16 +119,40 @@ void Tactek_Display::play_next_media_in_queue()
  ** the commands specified in the xml */
 void Tactek_Display::handle_recieved_data(std::string data)
 {
-    /*std::stringstream stream;
-    stream << data;
-
-    base64::decoder D;
-    D.decode(stream, stream);
-    data = stream.str();*/
-    pugi::xml_document tacktech;
-    tacktech.load(data.c_str());
 #ifdef _DEBUG
     std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
 #endif //_DEBUG
-    tacktech.print(std::cout);
+    /*std::stringstream *stream = new std::stringstream();
+    std::stringstream decoded_stream;
+    *stream << data;
+    //std::cout << "Data encoded: " << stream->str() << std::endl;
+    base64::decoder D;
+    D.decode(*stream, decoded_stream);
+
+    delete stream;
+
+    //std::cout << "Data decoded: " << decoded_stream.str() << std::endl;
+    data = decoded_stream.str();*/
+    pugi::xml_document tacktech;
+    tacktech.load(data.c_str());
+    for (pugi::xml_node file_data_node = tacktech.child("Item"); file_data_node; file_data_node = file_data_node.next_sibling("Item"))
+    {
+#ifdef _DEBUG
+        std::cout << "Filename: " << file_data_node.child_value("Filename") << std::endl;
+#endif //_DEBUG
+        std::string filename = file_data_node.child_value("Filename");
+        std::string file_data = file_data_node.child_value("File_Data");
+        std::stringstream encoded_stream;
+        std::stringstream decoded_stream;
+
+        encoded_stream << file_data;
+        base64::decoder D;
+        D.decode(encoded_stream, decoded_stream);
+        file_data = decoded_stream.str();
+
+        std::ofstream out_file(filename.c_str(), std::ios::binary);
+        out_file << file_data;
+        out_file.close();
+    }
+    //tacktech.print(std::cout);
 }
