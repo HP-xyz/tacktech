@@ -477,7 +477,6 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 {
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
-	std::cout << " - xml_string: " << xml_string << std::endl;
 #endif // _DEBUG
 	send_data = new Send_Data(
 		parameters["general.server_ip"].c_str(),

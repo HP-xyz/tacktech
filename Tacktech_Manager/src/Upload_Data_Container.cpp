@@ -83,7 +83,7 @@ char* Upload_Data_Container::get_binary_file(QString filename)
 		file_out.seekg(0, std::ios::end);
 		int file_length(file_out.tellg());
 #ifdef _DEBUG
-		std::cout << " - Creating char of size: " << file_length 
+		std::cout << " - Creating char of size: " << file_length
 << std::endl;
 #endif // _DEBUG
         file_out.seekg(0, std::ios::beg);

@@ -27,6 +27,7 @@ Artemis_Server_Connection::Artemis_Server_Connection(
     m_socket(io_service)
 {
     Artemis_Server_Connection::parms = parameters;
+    received_size = 0;
 }
 
 //************************************
@@ -72,14 +73,10 @@ void Artemis_Server_Connection::handle_read(
     std::cout << " == Handle Read" << std::endl
               << " ==============" << std::endl;
 #endif
-#ifdef _DEBUG
-    std::cout << " -- Before checking for error" << std::endl;
-    std::cout << " --Bytes_Transferred -> " << bytes_transferred << std::endl;
-#endif
     if (!error)
     {
 #ifdef _DEBUG
-        std::cout << "Bytes_Transferred -> " << bytes_transferred << std::endl;
+    std::cout << " - Buffer full, reading again" << std::endl;
 #endif
         for (unsigned int i = 0; i < bytes_transferred; i++)
             received_xml += buffer[i];
@@ -89,12 +86,18 @@ void Artemis_Server_Connection::handle_read(
                                       boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
                                                   boost::asio::placeholders::error,
                                                   boost::asio::placeholders::bytes_transferred));
+            received_size += bytes_transferred;
         }
         else
         {
+            received_size += bytes_transferred;
+#ifdef _DEBUG
+            std::cout << "Bytes_Transferred Total -> " << received_size << std::endl;
+#endif
             Artemis_Request_Handler request_handler;
             request_handler.handle_request(received_xml, reply_xml,
                                            Artemis_Server_Connection::parms);
+            received_size = 0;
         }
         /*try
         {
