@@ -32,8 +32,8 @@ void Artemis_Network_Sender_Connection::do_write( std::string xml_string )
 #ifdef _DEBUG
     std::cout << " =Artemis_Network_Sender_Connection::do_write()" << std::endl;
 #endif //_DEBUG
-	/** Add delimeter for stream end */
-	xml_string += "\n";
+    /** Add delimeter for stream end */
+    xml_string += ";";
     boost::asio::async_write(m_socket,
                              boost::asio::buffer(xml_string.c_str(), xml_string.size()),
                              boost::bind(&Artemis_Network_Sender_Connection::handle_write, this,
