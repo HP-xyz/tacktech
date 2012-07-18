@@ -21,14 +21,16 @@ Q_OBJECT
 public:
   Recieve_Data(QObject * parent = 0);
   ~Recieve_Data();
-public slots:
-  void acceptConnection();
-  void startRead();
 private:
   QTcpServer server;
   QTcpSocket* client;
+  QString data;
 signals:
     void data_recieved(std::string xml_data);
+private slots:
+    void acceptConnection();
+    void startRead();
+    void recieve_complete();
 };
 
 

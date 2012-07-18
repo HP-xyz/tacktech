@@ -39,7 +39,7 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 //************************************
 boost::asio::ip::tcp::socket& Artemis_Server_Connection::socket()
 {
-    return Artemis_Server_Connection::m_socket;
+    return (Artemis_Server_Connection::m_socket);
 }
 
 //************************************
@@ -71,17 +71,19 @@ void Artemis_Server_Connection::handle_read(
 {
 #ifdef _DEBUG
     std::cout << " == Handle Read" << std::endl
-              << " ==============" << std::endl;
+              << " ==============" << std::endl
+			  << " - Bytes transferred before error check: " 
+			  << bytes_transferred << std::endl;
 #endif
     if (!error)
     {
-#ifdef _DEBUG
-    std::cout << " - Buffer full, reading again" << std::endl;
-#endif
         for (unsigned int i = 0; i < bytes_transferred; i++)
             received_xml += buffer[i];
         if (bytes_transferred >= 8192)
         {
+#ifdef _DEBUG
+			std::cout << " - Buffer full, reading again" << std::endl;
+#endif
             m_socket.async_read_some( boost::asio::buffer(Artemis_Server_Connection::buffer),
                                       boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
                                                   boost::asio::placeholders::error,

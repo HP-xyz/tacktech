@@ -7,8 +7,6 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
     std::cout << "= Setting up Tacktech Manager" << std::endl;
 #endif // _DEBUG
 
-	read_config();
-
     edit_group_class = new Edit_Group();
     edit_playlist_class = new Edit_Playlist();
     select_playlist_dialog = new Select_Playlist_Dialog();
@@ -20,7 +18,7 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	upload_data = new Upload_Data_Container();
 
     ui.setupUi(this);
-
+	read_config();
 	node_menu = new QMenu();
 	ui.centralwidget->setContextMenuPolicy(Qt::ActionsContextMenu);
 
@@ -77,13 +75,11 @@ void Tacktech_Manager::read_config()
 	if (!config)
 	{
 		std::cerr << " == Error -> No config found" << std::endl;
-		//TODO
-		//Displaying something in the statusbar crashed the manager
 		ui.statusbar->showMessage("No config file 'config.ini' found");
 	}
 	else
 	{
-
+		ui.statusbar->showMessage("Config file 'config.ini' found");
 	}
 
 #ifdef _DEBUG
@@ -478,6 +474,13 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
 #endif // _DEBUG
+	std::string status_msg;
+	status_msg += "Sending to: ";
+	status_msg += parameters["general.server_ip"].c_str();
+	status_msg += ":";
+	status_msg += parameters["general.server_port"];
+	ui.statusbar->showMessage(status_msg.c_str());
+
 	send_data = new Send_Data(
 		parameters["general.server_ip"].c_str(),
 		boost::lexical_cast<int>(parameters["general.server_port"]),
@@ -500,11 +503,7 @@ void Tacktech_Manager::upload_complete( Send_Data *send_data)
                 this, SLOT(upload_complete(Send_Data*)));
         disconnect(send_data, SIGNAL(socket_connected(Send_Data*)),
                 this, SLOT(run_upload(Send_Data*)));
-#ifdef _DEBUG
-        std::cout << " - Deleting send_data pointer" << std::endl;
-#endif // _DEBUG
         delete send_data;
-#ifdef _DEBUG
-        std::cout << " - Deleted send_data pointer" << std::endl;
-#endif // _DEBUG
+		
+		ui.statusbar->showMessage("Upload complete");
 }

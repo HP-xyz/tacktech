@@ -14,7 +14,8 @@ struct xml_string_writer: pugi::xml_writer
 
 Upload_Data_Container::Upload_Data_Container()
 {
-    //ctor
+    groups = 0;
+    playlist = 0;
 }
 
 Upload_Data_Container::~Upload_Data_Container()

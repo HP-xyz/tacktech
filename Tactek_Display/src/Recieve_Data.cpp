@@ -6,20 +6,26 @@
  */
 
 #include "Recieve_Data.h"
-  Recieve_Data::Recieve_Data(QObject* parent): QObject(parent)
+Recieve_Data::Recieve_Data(QObject* parent): QObject(parent)
 {
 #ifdef _DEBUG
     std::cout << "= Recieve_Data::Recieve_Data()" << std::endl;
 #endif
-  connect(&server, SIGNAL(newConnection()),
-    this, SLOT(acceptConnection()));
+    connect(&server, SIGNAL(newConnection()),
+            this, SLOT(acceptConnection()));
 
-  server.listen(QHostAddress::Any, 9001);
+    client = 0;
+    server.listen(QHostAddress::Any, 9001);
+    data = "";
 }
 
 Recieve_Data::~Recieve_Data()
 {
-  server.close();
+#ifdef _DEBUG
+    std::cout << "= Recieve_Data::~Recieve_Data()" << std::endl;
+#endif
+    server.close();
+    delete client;
 }
 
 void Recieve_Data::acceptConnection()
@@ -27,9 +33,11 @@ void Recieve_Data::acceptConnection()
 #ifdef _DEBUG
     std::cout << "= Recieve_Data::acceptConnection()" << std::endl;
 #endif
-  client = server.nextPendingConnection();
-  connect(client, SIGNAL(readyRead()),
-    this, SLOT(startRead()));
+    client = server.nextPendingConnection();
+    connect(client, SIGNAL(readyRead()),
+            this, SLOT(startRead()));
+    connect(client, SIGNAL(readChannelFinished()),
+        this, SLOT(recieve_complete()));
 }
 
 void Recieve_Data::startRead()
@@ -37,10 +45,17 @@ void Recieve_Data::startRead()
 #ifdef _DEBUG
     std::cout << "= Recieve_Data::startRead()" << std::endl;
 #endif
-  char buffer[8092] = {0};
-  client->read(buffer, client->bytesAvailable());
-  std::cout << buffer << std::endl;
-  client->close();
-  std::string data = buffer;
-  emit data_recieved(data);
+    QByteArray buffer = client->readAll();
+#ifdef _DEBUG
+    std::cout << " - Read size: " << buffer.size() << std::endl;
+#endif
+    data += QString(buffer);
+}
+
+void Recieve_Data::recieve_complete()
+{
+#ifdef _DEBUG
+    std::cout << "Data recieved size: " << data.size() << std::endl;
+#endif //_DEBUG
+    emit data_recieved(data.toStdString());
 }

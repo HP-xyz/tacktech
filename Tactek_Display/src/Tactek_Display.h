@@ -30,6 +30,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 #include <b64/decode.h>
 #include <pugixml.hpp>
 #include "Playlist.h"
@@ -52,11 +53,13 @@ public:
     ~Tactek_Display();
 signals:
     void start_next_media();
+    void new_file_added(QString, int);
 private slots:
     void check_media_state();
     void play_next_media_in_queue();
     void open_and_play(QString);
     void handle_recieved_data(std::string data);
+    void handle_new_file_added(QString, int);
 private:
     Ui::Tactek_Display *ui;
     Playlist *playlist;

@@ -45,6 +45,8 @@ Tactek_Display::Tactek_Display(QWidget *parent)
             this, SLOT(play_next_media_in_queue()));
     connect(server, SIGNAL(data_recieved(std::string)),
             this, SLOT(handle_recieved_data(std::string)));
+    connect(this, SIGNAL(new_file_added(QString, int)),
+    		this, SLOT(handle_new_file_added(QString, int)));
 
     update_timer->start(1000);
 }
@@ -55,6 +57,8 @@ Tactek_Display::~Tactek_Display()
     delete m_vlc_media;
     delete m_vlc_player;
     delete m_vlc_instance;
+    delete update_timer;
+    delete server;
 }
 
 /**
@@ -122,23 +126,16 @@ void Tactek_Display::handle_recieved_data(std::string data)
 #ifdef _DEBUG
     std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
 #endif //_DEBUG
-    /*std::stringstream *stream = new std::stringstream();
-    std::stringstream decoded_stream;
-    *stream << data;
-    //std::cout << "Data encoded: " << stream->str() << std::endl;
-    base64::decoder D;
-    D.decode(*stream, decoded_stream);
-
-    delete stream;
-
-    //std::cout << "Data decoded: " << decoded_stream.str() << std::endl;
-    data = decoded_stream.str();*/
     pugi::xml_document tacktech;
     tacktech.load(data.c_str());
-    for (pugi::xml_node file_data_node = tacktech.child("Item"); file_data_node; file_data_node = file_data_node.next_sibling("Item"))
+    for (pugi::xml_node file_data_node = tacktech.child("Item");
+    		file_data_node;
+    		file_data_node = file_data_node.next_sibling("Item"))
     {
 #ifdef _DEBUG
-        std::cout << "Filename: " << file_data_node.child_value("Filename") << std::endl;
+        std::cout << "Filename: "
+        		<< file_data_node.child_value("Filename") << std::endl;
+        std::cout << "Pause: " <<  file_data_node.child_value("Pause") << std::endl;
 #endif //_DEBUG
         std::string filename = file_data_node.child_value("Filename");
         std::string file_data = file_data_node.child_value("File_Data");
@@ -150,9 +147,30 @@ void Tactek_Display::handle_recieved_data(std::string data)
         D.decode(encoded_stream, decoded_stream);
         file_data = decoded_stream.str();
 
+#ifdef _DEBUG
+        std::cout << "File_Data size: " << file_data.size() << std::endl;
+#endif
+
         std::ofstream out_file(filename.c_str(), std::ios::binary);
         out_file << file_data;
         out_file.close();
+
+        std::string pause = file_data_node.child_value("Pause");
+        if (pause == "")
+          pause = "0";
+
+        emit new_file_added(QString::fromStdString(filename),
+        		boost::lexical_cast<int>(pause));
     }
     //tacktech.print(std::cout);
+}
+void Tactek_Display::handle_new_file_added(QString new_filename, int pause)
+{
+#ifdef _DEBUG
+	std::cout << "= Tactek_Display::handle_new_file_added()" << std::endl;
+#endif
+	QPair<QString, int> playlist_item;
+	playlist_item.first = new_filename;
+	playlist_item.second = pause;
+	playlist->add_to_playlist(playlist_item);
 }
