@@ -51,7 +51,7 @@ boost::asio::ip::tcp::socket& Artemis_Server_Connection::socket()
 //************************************
 void Artemis_Server_Connection::start()
 {
-    boost::asio::async_read_until(m_socket, buffer, ';',
+    boost::asio::async_read_until(m_socket, buffer, '\n',
         boost::bind(
 			&Artemis_Server_Connection::handle_read, shared_from_this(),
                 boost::asio::placeholders::error,
@@ -79,6 +79,7 @@ void Artemis_Server_Connection::handle_read(
     if (!error)
     {
 		received_xml = boost::asio::buffer_cast<const char*>(buffer.data());
+		std::cout << "XML: " << received_xml << std::endl;
 		received_xml = received_xml.substr(0, received_xml.length());
         Artemis_Request_Handler request_handler;
         request_handler.handle_request(received_xml, reply_xml,

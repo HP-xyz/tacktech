@@ -34,7 +34,8 @@ void Start_Send_Data_Thread::run()
 		emit error(socket.error());
 		return;
 	}
-	xml_string += ";";
+	/** Here we add the delimiter for the end of the stream */
+	xml_string += "\n";
 #ifdef _DEBUG
 	std::cout << " - Sending data " << std::endl;
 	std::cout << " - Filesize: " << xml_string.size() << std::endl;
