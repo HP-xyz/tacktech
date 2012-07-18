@@ -35,7 +35,7 @@ void Start_Send_Data_Thread::run()
 		return;
 	}
 	/** Here we add the delimiter for the end of the stream */
-	xml_string += "\n";
+	xml_string += ";";
 #ifdef _DEBUG
 	std::cout << " - Sending data " << std::endl;
 	std::cout << " - Filesize: " << xml_string.size() << std::endl;
