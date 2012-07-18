@@ -26,6 +26,8 @@ endif (MSVC)
 
 #Find the libvlcqt library
 find_package(LIBVLCQT REQUIRED)
+#Lets find boost
+find_package(Boost 1.47.0 COMPONENTS program_options REQUIRED)
 
 if (NOT WIN32)
 	# We need this for unix machines since Qt internally uses
@@ -50,6 +52,7 @@ include_directories (
 					${LIBVLCQT_INCLUDE_DIR}
 					${LIBB64_INCLUDE_DIR}
 					${PUGIXML_INCLUDE_DIR}
+					${Boost_INCLUDE_DIRS}
 					)
 set ( Tacktech_Display_SRCS
 		${Tacktech_Display_SOURCE_DIR}/src/Tactek_Display.cpp
@@ -99,6 +102,7 @@ target_link_libraries ( Tacktech_Display
 						${QT_QTNETWORK_LIBRARY} 
 						${LIBVLCQT_LIBRARY}
 						${CMAKE_THREAD_LIBS_INIT}
+						${Boost_LIBRARIES}
 						libb64
 						pugixml
                         )

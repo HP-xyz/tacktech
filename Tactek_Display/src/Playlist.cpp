@@ -8,23 +8,15 @@
 
 Playlist::Playlist()
 {
-    Playlist::current_index_of_queue = 0;
 #ifdef _DEBUG
-    QPair<QString, int> item;
-    item.first = "/windows/F/Belaglik/183285456_www.kepfeltoltes.hu_.jpg";
-    item.second = 2;
-    add_to_playlist(item);
-    item.first = "/windows/F/Belaglik/Amazing_Football_Catch.wmv";
-    item.second = 0;
-    add_to_playlist(item);
-    item.first = "//windows/F/Belaglik/Don't Judge too Quickly 8.flv";
-    item.second = 0;
-    add_to_playlist(item);
+    std::cout << "= Playlist()" << std::endl;
 #endif //_DEBUG
+    Playlist::current_index_of_queue = 0;
 }
 
 Playlist::Playlist(const Playlist& orig)
 {
+    current_index_of_queue = 0;
 }
 
 Playlist::~Playlist()
@@ -46,7 +38,7 @@ QList< QPair<QString, int> > Playlist::get_playlist()
         playlist_item.second = Playlist::m_pause[i];
         playlist.append(playlist_item);
     }
-    return playlist;
+    return (playlist);
 }
 
 /**
@@ -59,5 +51,5 @@ bool Playlist::add_to_playlist(QPair<QString, int> playlist_item)
 {
     Playlist::m_filepath.append(playlist_item.first);
     Playlist::m_pause.append(playlist_item.second);
-    return true;
+    return (true);
 }

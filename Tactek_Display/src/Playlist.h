@@ -12,6 +12,10 @@
 #include <QList>
 #include <QPair>
 
+#ifdef _DEBUG
+#include <iostream>
+#endif //_DEBUG
+
 class Playlist
 {
 public:
