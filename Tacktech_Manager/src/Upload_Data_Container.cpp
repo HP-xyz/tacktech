@@ -138,11 +138,13 @@ void Upload_Data_Container::get_xml_upload()
 	type_node.append_attribute("TYPE") = "UPLOAD";
     pugi::xml_node upload_node = type_node.append_child("Upload");
     upload_node.append_attribute("Upload_Time") = upload_time.toStdString().c_str();
+    int computer_count = 0;
     for (int i = 0; i < groups->get_groups_and_computers().values(group_name).size(); i++)
     {
         pugi::xml_node computer_node = upload_node.append_child("Computer");
         computer_node.append_attribute("Computer_IP") =
             groups->get_groups_and_computers().values(group_name).at(i).toStdString().c_str();
+        computer_count += 1;
 
         for (int j = 0; j < playlist->get_playlist().values(playlist_name).size(); j++)
         {
@@ -167,10 +169,19 @@ void Upload_Data_Container::get_xml_upload()
 				temp_filename = temp_filename.substr(temp_filename.find_last_of("/") + 1);
             filename_pcdata.set_value(temp_filename.c_str());
 
-			file_data_pcdata.set_value(get_binary_file(
-				playlist->get_playlist().values(playlist_name).at(j).first));
-            pause_pcdata.set_value(boost::lexical_cast<std::string>(
-                playlist->get_playlist().values(playlist_name).at(j).second).c_str());
+            if (computer_count == 1)
+            {
+                file_data_pcdata.set_value(get_binary_file(
+                        playlist->get_playlist().values(playlist_name).at(j).first));
+                pause_pcdata.set_value(boost::lexical_cast<std::string>(
+                    playlist->get_playlist().values(playlist_name).at(j).second).c_str());
+            }
+            else
+            {
+                pugi::xml_node temp_node = upload_node.child("Computer");
+                file_data_pcdata.set_value(temp_node.child_value("File_Data"));
+                pause_pcdata.set_value(temp_node.child_value("Pause"));
+            }
         }
     }
 #ifdef _DEBUG
