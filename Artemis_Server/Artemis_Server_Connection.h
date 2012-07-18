@@ -54,7 +54,7 @@ private:
     /** Socket for the connection */
     boost::asio::ip::tcp::socket m_socket;
     /** Buffer for incoming data */
-    boost::array<char, 8192> buffer;
+    boost::asio::streambuf buffer;
     /** Generated reply, XML */
     std::vector<std::vector<char> > reply_xml;
 

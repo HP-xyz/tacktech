@@ -160,8 +160,8 @@ void Artemis_Request_Handler::handle_upload(
         new Artemis_Network_Sender_Connection(*io_service, parameters));
     network_send_connector->connect(dest_ip);
     network_send_connector->start_write(upload_xml);
-    network_send_connector->do_close();
     boost::thread t(boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
     t.join();
+	network_send_connector->do_close();
 }
 }

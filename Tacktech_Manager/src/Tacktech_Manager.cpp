@@ -481,29 +481,12 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 	status_msg += parameters["general.server_port"];
 	ui.statusbar->showMessage(status_msg.c_str());
 
-	send_data = new Send_Data(
-		parameters["general.server_ip"].c_str(),
+	Send_Data *send_data = new Send_Data(parameters["general.server_ip"].c_str(),
 		boost::lexical_cast<int>(parameters["general.server_port"]),
 		xml_string);
-	connect (send_data, SIGNAL(upload_complete(Send_Data*)),
-		send_data, SLOT(deleteLater()));
 #ifdef _DEBUG
 	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
 
 }
 
-void Tacktech_Manager::upload_complete( Send_Data *send_data)
-{
-#ifdef _DEBUG
-        std::cout << "= Tacktech_Manager::upload_complete()" << std::endl;
-        std::cout << " - Disconnecting upload_complete signal" << std::endl;
-#endif // _DEBUG
-        disconnect(send_data, SIGNAL(upload_complete(Send_Data*)),
-                this, SLOT(upload_complete(Send_Data*)));
-        disconnect(send_data, SIGNAL(socket_connected(Send_Data*)),
-                this, SLOT(run_upload(Send_Data*)));
-        delete send_data;
-		
-		ui.statusbar->showMessage("Upload complete");
-}

@@ -19,8 +19,6 @@ Q_OBJECT
     private:
 		QTcpSocket *socket;
         std::string xml_string;
-    signals:
-		void upload_complete(Send_Data*);
 	private slots:
 		void send_data_to_server();
 };

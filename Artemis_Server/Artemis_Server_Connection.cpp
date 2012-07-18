@@ -51,10 +51,11 @@ boost::asio::ip::tcp::socket& Artemis_Server_Connection::socket()
 //************************************
 void Artemis_Server_Connection::start()
 {
-    m_socket.async_read_some(boost::asio::buffer(Artemis_Server_Connection::buffer),
-                             boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
+    boost::asio::async_read_until(m_socket, buffer, ';',
+        boost::bind(
+			&Artemis_Server_Connection::handle_read, shared_from_this(),
+                boost::asio::placeholders::error,
+                boost::asio::placeholders::bytes_transferred));
 }
 
 //************************************
@@ -77,30 +78,11 @@ void Artemis_Server_Connection::handle_read(
 #endif
     if (!error)
     {
-        for (unsigned int i = 0; i < bytes_transferred; i++)
-            received_xml += buffer[i];
-        if (bytes_transferred >= 8192)
-        {
-#ifdef _DEBUG
-			std::cout << " - Buffer full, reading again" << std::endl;
-#endif
-            m_socket.async_read_some( boost::asio::buffer(Artemis_Server_Connection::buffer),
-                                      boost::bind(&Artemis_Server_Connection::handle_read, shared_from_this(),
-                                                  boost::asio::placeholders::error,
-                                                  boost::asio::placeholders::bytes_transferred));
-            received_size += bytes_transferred;
-        }
-        else
-        {
-            received_size += bytes_transferred;
-#ifdef _DEBUG
-            std::cout << "Bytes_Transferred Total -> " << received_size << std::endl;
-#endif
-            Artemis_Request_Handler request_handler;
-            request_handler.handle_request(received_xml, reply_xml,
-                                           Artemis_Server_Connection::parms);
-            received_size = 0;
-        }
+		received_xml = boost::asio::buffer_cast<const char*>(buffer.data());
+		received_xml = received_xml.substr(0, received_xml.length());
+        Artemis_Request_Handler request_handler;
+        request_handler.handle_request(received_xml, reply_xml,
+                                        Artemis_Server_Connection::parms);
         /*try
         {
 
