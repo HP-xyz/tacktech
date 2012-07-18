@@ -38,7 +38,5 @@ void Send_Data::send_data_to_server()
 	std::cout << " - Sending file of size: " << xml_string.size() << std::endl;
 #endif // _DEBUG
 	Start_Send_Data_Thread *ssdt = new Start_Send_Data_Thread(socket->socketDescriptor(), xml_string, this);
-	connect(ssdt, SIGNAL(finished()), ssdt, SLOT(deleteLater()));
-	connect(ssdt, SIGNAL(finished()), this, SIGNAL(upload_complete(this)));
 	ssdt->start();
 }

@@ -17,6 +17,8 @@ signals:
 private:
 	int socket_descriptor;
 	std::string xml_string;
+private slots:
+	void bytes_written(qint64);
 };
 
 #endif

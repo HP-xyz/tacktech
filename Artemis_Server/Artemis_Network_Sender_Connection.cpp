@@ -33,7 +33,7 @@ void Artemis_Network_Sender_Connection::do_write( std::string xml_string )
     std::cout << " =Artemis_Network_Sender_Connection::do_write()" << std::endl;
 #endif //_DEBUG
     boost::asio::async_write(m_socket,
-                             boost::asio::buffer(xml_string, xml_string.size()),
+                             boost::asio::buffer(xml_string.c_str(), xml_string.size()),
                              boost::bind(&Artemis_Network_Sender_Connection::handle_write, this,
                                          boost::asio::placeholders::error));
 }
