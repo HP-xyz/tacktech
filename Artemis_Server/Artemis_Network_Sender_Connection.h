@@ -26,15 +26,16 @@ class Artemis_Network_Sender_Connection :
 public:
     explicit Artemis_Network_Sender_Connection(
         boost::asio::io_service &io_service,
-        std::map<std::string, std::string>&);
+        std::map<std::string, std::string>&,
+		std::string _xml_string);
     virtual ~Artemis_Network_Sender_Connection();
 
     void connect(std::string dest_ip);
-    void start_write(std::string xml_string);
+    void start_write();
     void do_close();
 private:
     /** Handle completion of a write operation */
-    void handle_write(const boost::system::error_code& error);
+    void handle_write(const boost::system::error_code& error, std::size_t);
 
     /** Strand to ensure the connections handlers are not called concurrently */
     boost::asio::io_service::strand strand;
@@ -42,7 +43,11 @@ private:
     boost::asio::ip::tcp::socket m_socket;
 
     std::map<std::string, std::string> parms;
-    void do_write(std::string xml_string);
+	std::string xml_string;
+	unsigned long long sent_buffer_count;
+	unsigned long long start_index;
+	unsigned long long bytes_sent;
+    void do_write();
     void do_connect(boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
     void handle_connect( const boost::system::error_code &error);
 };
