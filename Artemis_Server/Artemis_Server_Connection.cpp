@@ -80,8 +80,8 @@ void Artemis_Server_Connection::handle_read(
     {
 		received_xml = boost::asio::buffer_cast<const char*>(buffer.data());
 		received_xml = received_xml.substr(0, received_xml.length());
-        Artemis_Request_Handler request_handler;
-        request_handler.handle_request(received_xml, reply_xml,
+        boost::shared_ptr<Artemis_Request_Handler> request_handler(new Artemis_Request_Handler);
+        request_handler->handle_request(received_xml, reply_xml,
                                         Artemis_Server_Connection::parms);
         /*try
         {
