@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QMessageBox>
+#include <QKeyEvent>
 #include "ui_Edit_Playlist.h"
 #include "Playlist_Container.h"
 #include "Add_Playlist_Dialog.h"
@@ -37,6 +38,7 @@ private:
     QAction *remove_playlist;
     QAction *remove_file;
 
+	void keyPressEvent(QKeyEvent *event);
 private slots:
     /* Primary slots, called by this class */
     void add_playlist_slot();
@@ -50,6 +52,7 @@ private slots:
     void repopulate_widget();
 signals:
     void playlist_changed();
+	
 };
 
 #endif // EDIT_PLAYLIST_H

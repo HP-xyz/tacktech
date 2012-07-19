@@ -2,6 +2,7 @@
 #define ADD_PAUSE_DIALOG_H
 
 #include <QtGui/QDialog>
+#include <QKeyEvent>
 #include "ui_Add_Pause_Dialog.h"
 
 class Add_Pause_Dialog : public QDialog
@@ -14,6 +15,8 @@ public:
 
 private:
     Ui::Add_Pause_DialogClass ui;
+
+	void keyPressEvent(QKeyEvent *event);
 private slots:
     void ok_clicked();
     void cancel_clicked();

@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QSpinBox>
+#include <QKeyEvent>
 #include "ui_Add_File_Dialog.h"
 #include "Playlist_Container.h"
 #include "Typed_QTreeWidgetItem.h"
@@ -37,6 +38,7 @@ private:
     QAction *remove_filename;
 
     void repopulate_widget();
+	void keyPressEvent(QKeyEvent *event);
 private slots:
     void ok_clicked();
     void cancel_clicked();

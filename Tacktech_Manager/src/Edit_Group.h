@@ -8,6 +8,7 @@
 #include <QtGui/QMainWindow>
 #include <QMenu>
 #include <QAction>
+#include <QKeyEvent>
 #include "ui_Edit_Group.h"
 #include "Typed_QTreeWidgetItem.h"
 #include "Add_Computer_Dialog.h"
@@ -39,6 +40,7 @@ private:
     Add_Computer_Dialog *add_computer_dialog;
     Add_Group_Dialog *add_group_dialog;
 
+	void keyPressEvent(QKeyEvent *event);
 private slots:
     /* Primary slots for this class */
     void add_computer_slot();

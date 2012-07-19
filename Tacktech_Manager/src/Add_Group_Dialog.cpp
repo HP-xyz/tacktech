@@ -53,3 +53,20 @@ void Add_Group_Dialog::cancle_clicked()
     this->close();
 }
 
+void Add_Group_Dialog::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Enter:
+		{  
+			ok_clicked();
+			break;
+		}
+	case Qt::Key_Return:
+		{  
+			ok_clicked();
+			break;
+		}
+	default:
+		QWidget::keyPressEvent(event);
+	}
+}

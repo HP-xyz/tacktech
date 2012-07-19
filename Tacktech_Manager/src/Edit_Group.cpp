@@ -267,3 +267,21 @@ void Edit_Group::cancel_clicked()
 {
     this->close();
 }
+
+void Edit_Group::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Enter:
+		{  
+			ok_clicked();
+			break;
+		}
+	case Qt::Key_Return:
+		{  
+			ok_clicked();
+			break;
+		}
+	default:
+		QWidget::keyPressEvent(event);
+	}
+}

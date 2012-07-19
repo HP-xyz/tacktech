@@ -201,6 +201,24 @@ void Edit_Playlist::ok_clicked()
     this->close();
 }
 
+void Edit_Playlist::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Enter:
+		{  
+			ok_clicked();
+			break;
+		}
+	case Qt::Key_Return:
+		{  
+			ok_clicked();
+			break;
+		}
+	default:
+		QWidget::keyPressEvent(event);
+	}
+}
+
 void Edit_Playlist::cancel_clicked()
 {
     delete playlist;

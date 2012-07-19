@@ -58,3 +58,21 @@ void Add_Computer_Dialog::set_group_name( QString selected_group_name)
 {
     group_name = selected_group_name;
 }
+
+void Add_Computer_Dialog::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Enter:
+		{  
+			ok_clicked();
+			break;
+		}
+	case Qt::Key_Return:
+		{  
+			ok_clicked();
+			break;
+		}
+	default:
+		QWidget::keyPressEvent(event);
+	}
+}

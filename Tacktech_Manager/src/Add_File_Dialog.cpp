@@ -222,3 +222,21 @@ void Add_File_Dialog::cancel_clicked()
     playlist = original_playlist;
     this->close();
 }
+
+void Add_File_Dialog::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Enter:
+		{  
+			ok_clicked();
+			break;
+		}
+	case Qt::Key_Return:
+		{  
+			ok_clicked();
+			break;
+		}
+	default:
+		QWidget::keyPressEvent(event);
+	}
+}

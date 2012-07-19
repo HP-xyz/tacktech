@@ -26,3 +26,21 @@ void Add_Pause_Dialog::cancel_clicked()
     emit pause_unchanged();
     this->close();
 }
+
+void Add_Pause_Dialog::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Enter:
+		{  
+			ok_clicked();
+			break;
+		}
+	case Qt::Key_Return:
+		{  
+			ok_clicked();
+			break;
+		}
+	default:
+		QWidget::keyPressEvent(event);
+	}
+}

@@ -7,6 +7,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QMessageBox>
+#include <QKeyEvent>
 #include "ui_Add_Group_Dialog.h"
 #include "Group_Container.h"
 
@@ -20,7 +21,9 @@ public:
     void set_group_and_computer_names(Group_Container*);
 private:
     Ui::Add_Group_DialogClass ui;
-    Group_Container *group_and_computer_names;
+	Group_Container *group_and_computer_names;
+
+	void keyPressEvent(QKeyEvent *event);
 private slots:
     void ok_clicked();
     void cancle_clicked();
