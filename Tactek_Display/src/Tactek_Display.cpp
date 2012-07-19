@@ -128,8 +128,8 @@ void Tactek_Display::handle_recieved_data(std::string data)
 #endif //_DEBUG
     pugi::xml_document tacktech;
     tacktech.load(data.c_str());
-	tacktech = tacktech.child("Computer");
-    for (pugi::xml_node file_data_node = tacktech.child("Item");
+    pugi::xml_node computer_node = tacktech.child("Computer");
+    for (pugi::xml_node file_data_node = computer_node.child("Item");
     		file_data_node;
     		file_data_node = file_data_node.next_sibling("Item"))
     {
