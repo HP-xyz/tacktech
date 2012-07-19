@@ -58,8 +58,6 @@ private:
     /** Generated reply, XML */
     std::vector<std::vector<char> > reply_xml;
 
-    std::string received_xml;
-
     std::map<std::string, std::string> parms;
 
     long long received_size;

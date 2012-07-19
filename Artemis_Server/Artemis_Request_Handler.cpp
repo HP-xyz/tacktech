@@ -55,7 +55,7 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
         std::vector<std::vector<char> > &reply,
         std::map<std::string, std::string> &parms)
 {
-#if _DEBUG
+#ifdef _DEBUG
     std::cout << " = Handle Request " << std::endl;
     //std::cout << "  - Request: " << request << std::endl;
 #endif
@@ -84,7 +84,7 @@ void Artemis_Request_Handler::handle_request( const std::string &request,
         }
         else
         {
-#if _DEBUG
+#ifdef _DEBUG
             std::cout << " - No request received " << std::endl;
 #endif
             result_status = NO_RESULT;

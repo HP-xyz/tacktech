@@ -178,7 +178,7 @@ void Upload_Data_Container::get_xml_upload()
             }
             else
             {
-                pugi::xml_node temp_node = upload_node.child("Computer");
+                pugi::xml_node temp_node = upload_node.child("Computer").child("Item");
                 file_data_pcdata.set_value(temp_node.child_value("File_Data"));
                 pause_pcdata.set_value(temp_node.child_value("Pause"));
             }
