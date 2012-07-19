@@ -133,10 +133,11 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
             std::cout << " - Sending to: " << dest_ip << std::endl;
 #endif //_DEBUG
             xml_string_writer writer;
-            computer.child("Item").print(writer);
+            computer.print(writer);
             boost::thread upload_thread(boost::bind(
                                             &Artemis::Artemis_Request_Handler::handle_upload, this,
                                             writer.result, dest_ip));
+			upload_thread.join();
             //handle_upload(writer.result, dest_ip);
 
         }
@@ -155,13 +156,14 @@ void Artemis_Request_Handler::handle_upload(
     std::cout << " - Dest_Ip: " << dest_ip << std::endl;
     std::cout << " - Sending file of size: " << upload_xml.size() << std::endl;
 #endif // _DEBUG
-    boost::shared_ptr<boost::asio::io_service> io_service(new boost::asio::io_service);
+    boost::shared_ptr<boost::asio::io_service> 
+		io_service(new boost::asio::io_service);
     Artemis_Network_Sender_Connection_ptr network_send_connector(
-        new Artemis_Network_Sender_Connection(*io_service, parameters));
+        new Artemis_Network_Sender_Connection(*io_service, parameters,
+		upload_xml));
     network_send_connector->connect(dest_ip);
-    network_send_connector->start_write(upload_xml);
+    network_send_connector->start_write();
     boost::thread t(boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
     t.join();
-	network_send_connector->do_close();
 }
 }
