@@ -58,4 +58,5 @@ void Recieve_Data::recieve_complete()
     std::cout << "Data recieved size: " << data.size() << std::endl;
 #endif //_DEBUG
     emit data_recieved(data.toStdString());
+    data = QString();
 }
