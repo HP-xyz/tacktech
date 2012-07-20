@@ -5,11 +5,14 @@
 struct xml_string_writer: pugi::xml_writer
 {
 	std::string result;
-
-	virtual void write(const void* data, size_t size)
+	virtual void write(const void* data, std::size_t size)
 	{
-		result += std::string(static_cast<const char*>(data),
-			(unsigned long long)size);
+#ifdef _DEBUG
+		std::cout << " - (XML_WRITER)write of size: " << size << std::endl;
+#endif // _DEBUG
+		result += static_cast<const char*>(data);
+		//result += std::string(static_cast<const char*>(data),
+		//	size);
 	}
 };
 
@@ -63,36 +66,40 @@ void Upload_Data_Container::set_playlist(Playlist_Container *p_playlist_containe
 
 /** @brief get_binary_file
   *
-  * Reads a file into memory and returns a char* to
+  * Reads a file into memory and returns a std::string to
   * the read file
   */
-char* Upload_Data_Container::get_binary_file(QString filename)
+std::string Upload_Data_Container::get_binary_file(QString filename)
 {
 #ifdef _DEBUG
 	std::cout << "= Upload_Data_Container::get_binary_file()" << std::endl;
 #endif // _DEBUG
-    char *file_encoded = NULL;
+    std::string file_encoded;
+	std::string test;
     std::ifstream file(filename.toStdString().c_str(), std::ios::binary);
     if (file.is_open())
     {
 #ifdef _DEBUG
 		std::cout << " - File is open" << std::endl;
+		file.seekg(0, std::ios::end);
+		std::cout << " - Tellg(): " << file.tellg() << std::endl;
+		file.seekg(0, std::ios::beg);
 #endif // _DEBUG
+		std::stringstream *file_in = new std::stringstream();
+		*file_in << file.rdbuf();
+		std::cout << "file_in size: " << file_in->str().size() << std::endl; 
+		*file_in << std::ends;
 		base64::encoder E;
 		std::stringstream file_out;
-		E.encode(file, file_out);
-
-		file_out.seekg(0, std::ios::end);
-		int file_length(file_out.tellg());
+		E.encode(*file_in, file_out);
+		delete file_in;
+		file_out << std::ends;
+		std::cout << "file_out size: " << file_out.str().size() << std::endl;
+		file_encoded = file_out.str();
 #ifdef _DEBUG
-		std::cout << " - Creating char of size: " << file_length
-<< std::endl;
+		std::cout << " - Encoded filesize: " 
+			<< file_encoded.size() << std::endl;
 #endif // _DEBUG
-        file_out.seekg(0, std::ios::beg);
-
-		file_encoded = new char[file_length + 1];
-		file_out.read(file_encoded, file_length);
-		file_encoded[file_length] = 0;
         file.close();
     }
     return file_encoded;
@@ -173,7 +180,7 @@ void Upload_Data_Container::get_xml_upload()
             if (computer_count == 1)
             {
                 file_data_pcdata.set_value(get_binary_file(
-                        playlist->get_playlist().values(playlist_name).at(j).first));
+                        playlist->get_playlist().values(playlist_name).at(j).first).c_str());
                 pause_pcdata.set_value(boost::lexical_cast<std::string>(
                     playlist->get_playlist().values(playlist_name).at(j).second).c_str());
             }
@@ -189,7 +196,16 @@ void Upload_Data_Container::get_xml_upload()
 	std::cout << " - Emitting xml_creation complete signal " << std::endl;
 #endif // _DEBUG
 	xml_string_writer writer;
-	transmit_document.print(writer);
-	emit xml_creation_complete(writer.result);
+	try
+	{
+		transmit_document.print(writer);
+		emit xml_creation_complete(writer.result);
+	}
+	catch(std::exception ex)
+	{
+		std::cerr << "Exception creating string XML" << std::endl
+			<<		 "=============================" << std::endl
+			<< " - " << ex.what() << std::endl;
+	}
 }
 
