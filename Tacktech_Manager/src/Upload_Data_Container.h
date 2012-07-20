@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <exception>
 #include <pugixml.hpp>
 #include <boost/lexical_cast.hpp>
 #include <b64/encode.h>
@@ -34,7 +35,7 @@ public:
     void get_xml_upload();
 protected:
 private:
-	char *get_binary_file(QString);
+	std::string get_binary_file(QString);
     Playlist_Container *playlist;
     Group_Container *groups;
     QString group_name;
