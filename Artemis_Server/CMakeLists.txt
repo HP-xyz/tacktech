@@ -1,8 +1,6 @@
 project(artemis_server)
 cmake_minimum_required(VERSION 2.8)
 
-OPTION (LOCAL_CONNECTOR_C "Use local connector/c library" ON)
-OPTION (LOCAL_CONNECTOR_CPP "Use local connector/c++ library" ON)
 OPTION (LOCAL_PUGIXML "Use local pugixml library" ON)
 OPTION (DEBUG_ALL "Displays all debug info" ON)
 
@@ -32,36 +30,45 @@ if (NOT WIN32)
   find_package (Threads)
 endif (NOT WIN32)
 
-if(Boost_FOUND)
-#Continue only if boost is found
-    include_directories(${Boost_INCLUDE_DIRS})
+set (ARTEMIS_SERVER_SRCS
+	${artemis_server_SOURCE_DIR}/src/Artemis_Server.cpp
+	${artemis_server_SOURCE_DIR}/src/Artemis_Server_Connection.cpp
+	${artemis_server_SOURCE_DIR}/src/Artemis_Request_Handler.cpp
+	${artemis_server_SOURCE_DIR}/src/Artemis_Network_Sender_Connection.cpp
+	${artemis_server_SOURCE_DIR}/src/Group_Container.cpp
+	${artemis_server_SOURCE_DIR}/src/Playlist_Container.cpp
+	${artemis_server_SOURCE_DIR}/src/Group_Playlist_Container.cpp
+	)
+set (ARTEMIS_SERVER_HDRS
+	${artemis_server_SOURCE_DIR}/src/Artemis_Server.h
+	${artemis_server_SOURCE_DIR}/src/Artemis_Server_Connection.h
+	${artemis_server_SOURCE_DIR}/src/Artemis_Request_Handler.h
+	${artemis_server_SOURCE_DIR}/src/Artemis_Network_Sender_Connection.h
+	${artemis_server_SOURCE_DIR}/src/Group_Container.h
+	${artemis_server_SOURCE_DIR}/src/Playlist_Container.h
+	${artemis_server_SOURCE_DIR}/src/Group_Playlist_Container.h
+	)
 
-	message ("")
-	message (STATUS "	==============================================")
-	message (STATUS "	Using boost_libraries: ${Boost_LIBRARIES}")
-	message (STATUS "	Using boost inclucdes: ${Boost_INCLUDE_DIRS}")
-	if (LOCAL_PUGIXML)
-		message (STATUS "	Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
-		message (STATUS "	Pugixml library: ${pugixml}")
-	endif (LOCAL_PUGIXML)
-	message ("")
+message ("")
+message (STATUS "	==============================================")
+message (STATUS "	Using boost_libraries: ${Boost_LIBRARIES}")
+message (STATUS "	Using boost inclucdes: ${Boost_INCLUDE_DIRS}")
+if (LOCAL_PUGIXML)
+	message (STATUS "	Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
+	message (STATUS "	Pugixml library: ${pugixml_LIBRARY}")
+endif (LOCAL_PUGIXML)
+message ("")
 
-	include_directories(${CONNECTOR_C_INCLUDE_DIR} 
-			${CONNECTOR_CPP_INCLUDE_DIR}
-			${Boost_INCLUDE_DIRS}
-			${PUGIXML_INCLUDE_DIR})
-	#link_directories(${CONNECTOR_C_LIBRARY_DIR}
-	#				 ${CONNECTOR_CPP_LIBRARY_DIR})
-	
-    add_executable(Artemis_Server 
-			main.cpp
-			Artemis_Server.cpp Artemis_Server.h
-			Artemis_Server_Connection.cpp Artemis_Server_Connection.h
-			Artemis_Request_Handler.cpp Artemis_Request_Handler.h
-			#Artemis_Network_Sender.cpp Artemis_Network_Sender.h
-			Artemis_Network_Sender_Connection.cpp Artemis_Network_Sender_Connection.h
-			)
-    target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CONNECTOR_CPP_LIBRARY} pugixml libb64)
+include_directories(
+		${Boost_INCLUDE_DIRS}
+		${PUGIXML_INCLUDE_DIR}
+		)
 
-endif(Boost_FOUND)
+add_executable(Artemis_Server 
+		main.cpp
+		${ARTEMIS_SERVER_SRCS}
+		${ARTEMIS_SERVER_HDRS}
+		)
+target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} pugixml libb64)
+
 

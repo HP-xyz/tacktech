@@ -171,10 +171,13 @@ void Upload_Data_Container::get_xml_upload()
             /* Giving pcdata a value */
 			std::string temp_filename = playlist->get_playlist().
 				values(playlist_name).at(j).first.toStdString();
+
+			/* This will remove the path from the filename */
 			if (temp_filename.find("\\") != std::string::npos)
 				temp_filename = temp_filename.substr(temp_filename.find_last_of("\\") + 1);
 			if (temp_filename.find("/") != std::string::npos)
 				temp_filename = temp_filename.substr(temp_filename.find_last_of("/") + 1);
+
             filename_pcdata.set_value(temp_filename.c_str());
 
             if (computer_count == 1)

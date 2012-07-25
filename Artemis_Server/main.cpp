@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
-#include "Artemis_Server.h"
+#include "src/Artemis_Server.h"
 int main(int argc, char* argv[])
 {
     try

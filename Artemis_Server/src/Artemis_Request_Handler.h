@@ -8,7 +8,6 @@
 #ifndef ARTEMIS_REQUEST_HANDLER_H
 #define	ARTEMIS_REQUEST_HANDLER_H
 
-#include "Artemis_Network_Sender_Connection.h"
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -24,6 +23,10 @@
 #include <string>
 #include <vector>
 #include <pugixml.hpp>
+#include "Artemis_Network_Sender_Connection.h"
+#include "Group_Container.h"
+#include "Playlist_Container.h"
+#include "Group_Playlist_Container.h"
 namespace Artemis
 {
 enum STATUS {NO_RESULT, MULTIPLE_RESULTS, SINGLE_RESULT};
@@ -31,7 +34,10 @@ class Artemis_Request_Handler : private boost::noncopyable
 {
 public:
     /** Construct Artemis_Request_Handler object */
-    explicit Artemis_Request_Handler();
+    explicit Artemis_Request_Handler(
+		boost::shared_ptr<Group_Container> p_groups_and_computers,
+		boost::shared_ptr<Playlist_Container> p_playlist,
+		boost::shared_ptr<Group_Playlist_Container> p_group_playlist);
     ~Artemis_Request_Handler();
 
     /** Handle a request and produce a reply*/
@@ -52,6 +58,16 @@ private:
 
     std::map<std::string, std::string> parameters;
 
+	/* Variable for computer names and group names
+     * Note: Format is groups_and_computers[group_index][computer_index]
+     * Note: This can be hostnames or IP addresses */
+    boost::shared_ptr<Group_Container> groups_and_computers;
+
+    /* Variable for the playlist */
+    boost::shared_ptr<Playlist_Container> playlist;
+
+    /* Variable for the group_playlist container */
+    boost::shared_ptr<Group_Playlist_Container> group_playlist;
 };
 }
 #endif	/* ARTEMIS_REQUEST_HANDLER_H */
