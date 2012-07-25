@@ -22,11 +22,18 @@ namespace Artemis
 //************************************
 Artemis_Server_Connection::Artemis_Server_Connection(
     boost::asio::io_service& io_service,
-    std::map<std::string, std::string>& parameters)
+    std::map<std::string, std::string>& parameters,
+    boost::shared_ptr<Group_Container> p_groups_and_computers,
+    boost::shared_ptr<Playlist_Container> p_playlist,
+    boost::shared_ptr<Group_Playlist_Container> p_group_playlist)
     :	strand(io_service),
     m_socket(io_service)
 {
     Artemis_Server_Connection::parms = parameters;
+	Artemis_Server_Connection::groups_and_computers =
+		p_groups_and_computers;
+	Artemis_Server_Connection::playlist = p_playlist;
+	Artemis_Server_Connection::group_playlist = p_group_playlist;
     received_size = 0;
 }
 
@@ -78,11 +85,14 @@ void Artemis_Server_Connection::handle_read(
 #endif
     if (!error)
     {
-      std::string received_xml = boost::asio::buffer_cast<const char*>(buffer.data());
+		std::string received_xml =
+			boost::asio::buffer_cast<const char*>(buffer.data());
 		received_xml = received_xml.substr(0, received_xml.length());
-        boost::shared_ptr<Artemis_Request_Handler> request_handler(new Artemis_Request_Handler);
-        request_handler->handle_request(received_xml, reply_xml,
-                                        Artemis_Server_Connection::parms);
+		boost::shared_ptr<Artemis_Request_Handler> 
+			request_handler(new Artemis_Request_Handler(
+			groups_and_computers, playlist, group_playlist));
+		request_handler->handle_request(received_xml, reply_xml,
+			Artemis_Server_Connection::parms);
         /*try
         {
 

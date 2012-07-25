@@ -26,11 +26,17 @@ struct xml_string_writer: pugi::xml_writer
 // Returns:
 // Qualifier:
 //************************************
-Artemis_Request_Handler::Artemis_Request_Handler()
+Artemis_Request_Handler::Artemis_Request_Handler(
+	boost::shared_ptr<Group_Container> p_groups_and_computers,
+	boost::shared_ptr<Playlist_Container> p_playlist,
+	boost::shared_ptr<Group_Playlist_Container> p_group_playlist)
 {
 #ifdef _DEBUG
     std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()" << std::endl;
 #endif //_DEBUG
+	groups_and_computers = p_groups_and_computers;
+	playlist = p_playlist;
+	group_playlist = p_group_playlist;
 }
 
 Artemis_Request_Handler::~Artemis_Request_Handler()

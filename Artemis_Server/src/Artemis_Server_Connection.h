@@ -18,11 +18,14 @@
 #include <boost/logic/tribool.hpp>
 #include "boost/tuple/tuple.hpp"
 #include <boost/lexical_cast.hpp>
-#include "Artemis_Request_Handler.h"
 #include <pugixml.hpp>
 #include <exception>
 #include <vector>
 #include <list>
+#include "Artemis_Request_Handler.h"
+#include "Group_Container.h"
+#include "Playlist_Container.h"
+#include "Group_Playlist_Container.h"
 
 namespace Artemis
 {
@@ -35,8 +38,12 @@ private boost::noncopyable
 public:
 
     /** Constructs a connection withe the given io_service */
-    explicit Artemis_Server_Connection(boost::asio::io_service& io_service,
-                                       std::map<std::string, std::string>&);
+    explicit Artemis_Server_Connection(
+		boost::asio::io_service& io_service,
+        std::map<std::string, std::string>&,
+		boost::shared_ptr<Group_Container> p_groups_and_computers,
+		boost::shared_ptr<Playlist_Container> p_playlist,
+		boost::shared_ptr<Group_Playlist_Container> p_group_playlist);
 
     /** Get the socket associated with the connection*/
     boost::asio::ip::tcp::socket& socket();
@@ -61,6 +68,17 @@ private:
     std::map<std::string, std::string> parms;
 
     long long received_size;
+
+	/* Variable for computer names and group names
+     * Note: Format is groups_and_computers[group_index][computer_index]
+     * Note: This can be hostnames or IP addresses */
+    boost::shared_ptr<Group_Container> groups_and_computers;
+
+    /* Variable for the playlist */
+    boost::shared_ptr<Playlist_Container> playlist;
+
+    /* Variable for the group_playlist container */
+    boost::shared_ptr<Group_Playlist_Container> group_playlist;
 };
 typedef boost::shared_ptr<Artemis_Server_Connection>
 Artemis_Server_Connection_ptr;
