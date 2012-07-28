@@ -10,7 +10,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include "ui_Edit_Playlist.h"
-#include "Playlist_Container.h"
+#include <Playlist_Container.h>
 #include "Add_Playlist_Dialog.h"
 #include "Add_File_Dialog.h"
 #include "Typed_QTreeWidgetItem.h"
@@ -22,10 +22,10 @@ class Edit_Playlist : public QWidget
 public:
     Edit_Playlist(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~Edit_Playlist();
-    void set_playlist(Playlist_Container*);
+    void set_playlist(Playlist_Container_Ptr);
 private:
     Ui::Edit_PlaylistClass ui;
-    Playlist_Container *playlist;
+    Playlist_Container_Ptr playlist;
     Playlist_Container *original_playlist;
 
     Add_Playlist_Dialog *add_playlist_dialog;

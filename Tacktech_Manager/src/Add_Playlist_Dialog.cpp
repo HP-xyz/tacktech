@@ -15,14 +15,14 @@ Add_Playlist_Dialog::~Add_Playlist_Dialog()
 
 }
 
-void Add_Playlist_Dialog::set_playlist( Playlist_Container *p_playlist )
+void Add_Playlist_Dialog::set_playlist( Playlist_Container_Ptr p_playlist )
 {
     playlist = p_playlist;
 }
 
 void Add_Playlist_Dialog::ok_clicked()
 {
-    if(playlist->add_playlist_name(ui.playlist_name_line_edit->text()))
+    if(playlist->add_playlist_name(ui.playlist_name_line_edit->text().toStdString()))
     {
         emit playlist_name_added();
         this->close();

@@ -75,12 +75,10 @@ include_directories (
 					${PUGIXML_INCLUDE_DIR}
 					${LIBB64_INCLUDE_DIR}
 					${Boost_INCLUDE_DIRS}
+					${Tacktech_Common_INCLUDE_DIR}
 					)
 set (Tacktech_Manager_Non_MOC_HDRS
 	${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
-	${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.h
-	${Tacktech_Manager_SOURCE_DIR}/src/Group_Playlist_Container.h
-	${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.h
 	)
 					
 set ( Tacktech_Manager_SRCS
@@ -90,13 +88,10 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Computer_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Group_Dialog.cpp	
 		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Playlist.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Playlist_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Playlist_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_File_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Add_Pause_Dialog.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Group_Playlist_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Group_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data_Container.cpp
@@ -151,10 +146,10 @@ message (STATUS "Qt include dir	: ${QT_INCLUDE_DIR}")
 message (STATUS "Qt libraries	: ${QT_LIBRARIES}")
 if (LOCAL_PUGIXML)
 	message (STATUS "Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
-	message (STATUS "Pugixml library: ${pugixml}")
 endif (LOCAL_PUGIXML)
 message (STATUS "Libb64 include dir: ${LIBB64_INCLUDE_DIR}")
 message (STATUS "Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
+message (STATUS "Tacktech_Common_INCLUDE_DIR: " ${Tacktech_Common_INCLUDE_DIR})
 message (STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS} ")
 message (STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ")
 message (STATUS "CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE} ")
@@ -170,10 +165,12 @@ add_executable ( Tacktech_Manager
 				${Tacktech_Manager_HDRS} 
 				${MOCS} 
 				${RSCS} 
-				${UIS})
+				${UIS}
+				)
 target_link_libraries ( Tacktech_Manager 
 						pugixml
 						libb64
+						Tacktech_Common
 						${QT_LIBRARIES}
 						${QT_QTCORE_LIBRARIES} 
 						${QT_QTGUI_LIBRARIES} 

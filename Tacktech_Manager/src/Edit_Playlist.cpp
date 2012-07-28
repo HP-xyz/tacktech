@@ -71,7 +71,7 @@ Edit_Playlist::~Edit_Playlist()
 }
 /** Function to set the playlist variable to that the calling class
  ** provides */
-void Edit_Playlist::set_playlist( Playlist_Container *p_playlist)
+void Edit_Playlist::set_playlist( Playlist_Container_Ptr p_playlist)
 {
     playlist = p_playlist;
     original_playlist = new Playlist_Container(*p_playlist);
@@ -111,15 +111,13 @@ void Edit_Playlist::remove_file_slot()
                 Typed_QTreeWidgetItem *selected_item_parent =
                     static_cast<Typed_QTreeWidgetItem*>
                     (selected_item->parent());
-                for (int j = 0; j < playlist->get_playlist().values(
-                            selected_item_parent->get_playlist_name()).size();
-                        j++)
+				for(Playlist_Multimap::iterator it =
+					playlist->get_playlist()->begin();
+					it != playlist->get_playlist()->end(); it++)
                 {
-                    playlist->get_playlist().remove(
-                        selected_item_parent->get_playlist_name(),
-                        playlist->get_playlist().values(
-                            selected_item_parent->get_playlist_name()).
-                        at(j));
+					playlist->remove_filename_from_playlist(
+						selected_item->get_playlist_name().toStdString(),
+						selected_item->get_filename().toStdString());
                 }
             }
             else if (selected_item->get_type() == "PLAYLIST")
@@ -159,7 +157,8 @@ void Edit_Playlist::remove_playlist_slot()
 #ifdef _DEBUG
             std::cout << " - Removing Playlist" << std::endl;
 #endif // _DEBUG
-            playlist->remove_playlist(selected_item->get_playlist_name());
+            playlist->remove_playlist(
+				selected_item->get_playlist_name().toStdString());
             /* Repopulate widget to reflect changes */
             repopulate_widget();
         }
@@ -198,6 +197,7 @@ void Edit_Playlist::add_file_slot()
 void Edit_Playlist::ok_clicked()
 {
     emit playlist_changed();
+	delete original_playlist;
     this->close();
 }
 
@@ -221,8 +221,7 @@ void Edit_Playlist::keyPressEvent(QKeyEvent *event)
 
 void Edit_Playlist::cancel_clicked()
 {
-    delete playlist;
-    playlist = original_playlist;
+    playlist.reset(original_playlist);
     this->close();
 }
 
@@ -232,33 +231,31 @@ void Edit_Playlist::repopulate_widget()
 #ifdef _DEBUG
     playlist->print_contents();
 #endif // _DEBUG
-    foreach(QString playlist_name, playlist->get_playlist().uniqueKeys())
+	Playlist_Multimap unique_map = playlist->get_unique_playlists();
+	for(Playlist_Multimap::iterator it = unique_map.begin();
+		it != unique_map.end(); it++)
     {
         Typed_QTreeWidgetItem *playlist_item = new Typed_QTreeWidgetItem();
-        playlist_item->setText(0, playlist_name);
+        playlist_item->setText(0, QString::fromStdString(it->first));
         playlist_item->set_type("PLAYLIST");
-        playlist_item->set_playlist_name(playlist_name);
+        playlist_item->set_playlist_name(QString::fromStdString(it->first));
         ui.playlist_tree_widget->addTopLevelItem(playlist_item);
-        for (int i = 0;
-                i < playlist->get_playlist().values(playlist_name).count();
-                i++)
+		Playlist_Range range = playlist->get_playlist()->equal_range(it->first);
+		for (Playlist_Multimap::iterator it2 = range.first;
+			it2 != range.second; ++it2)
         {
             Typed_QTreeWidgetItem *filename_item =
                 new Typed_QTreeWidgetItem();
             filename_item->setText(0,
-                                   playlist->get_playlist().values(playlist_name)
-                                   .at(i).first);
-            filename_item->setText(1, QString::number(
-                                       playlist->get_playlist().values(playlist_name)
-                                       .at(i).second));
+				QString::fromStdString(it2->second.first));
+            filename_item->setText(1,
+				QString::number(it2->second.second));
             filename_item->set_filename(
-                playlist->get_playlist().values(playlist_name)
-                .at(i).first);
-            filename_item->set_pause(
-                playlist->get_playlist().values(playlist_name)
-                .at(i).second);
+				QString::fromStdString(it2->second.first));
+            filename_item->set_pause(it2->second.second);
             filename_item->set_type("FILENAME");
-            filename_item->set_playlist_name(playlist_name);
+            filename_item->set_playlist_name(
+				QString::fromStdString(it2->first));
             playlist_item->addChild(filename_item);
         }
     }

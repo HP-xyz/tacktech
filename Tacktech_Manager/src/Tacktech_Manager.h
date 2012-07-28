@@ -13,9 +13,9 @@
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <pugixml.hpp>
-#include "Group_Container.h"
-#include "Playlist_Container.h"
-#include "Group_Playlist_Container.h"
+#include <Group_Container.h>
+#include <Playlist_Container.h>
+#include <Group_Playlist_Container.h>
 #include "Edit_Group.h"
 #include "Edit_Playlist.h"
 #include "Select_Playlist_Dialog.h"
@@ -59,13 +59,13 @@ protected:
     /* Variable for computer names and group names
      * Note: Format is groups_and_computers[group_index][computer_index]
      * Note: This can be hostnames or IP addresses */
-    Group_Container *groups_and_computers;
+	Group_Container_Ptr groups_and_computers;
 
     /* Variable for the playlist */
-    Playlist_Container *playlist;
+	Playlist_Container_Ptr playlist;
 
     /* Variable for the group_playlist container */
-    Group_Playlist_Container *group_playlist;
+	Group_Playlist_Container_Ptr group_playlist;
 
 	/* Variable for the upload_data container */
 	Upload_Data_Container *upload_data;

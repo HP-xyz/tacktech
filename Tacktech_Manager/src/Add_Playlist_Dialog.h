@@ -5,7 +5,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include "ui_Add_Playlist_Dialog.h"
-#include "Playlist_Container.h"
+#include <Playlist_Container.h>
 class Add_Playlist_Dialog : public QMainWindow
 {
     Q_OBJECT
@@ -13,10 +13,10 @@ class Add_Playlist_Dialog : public QMainWindow
 public:
     Add_Playlist_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~Add_Playlist_Dialog();
-    void set_playlist(Playlist_Container*);
+    void set_playlist(Playlist_Container_Ptr);
 private:
     Ui::Add_Playlist_DialogClass ui;
-    Playlist_Container *playlist;
+    Playlist_Container_Ptr playlist;
 
 	void keyPressEvent(QKeyEvent *event);
 private slots:
