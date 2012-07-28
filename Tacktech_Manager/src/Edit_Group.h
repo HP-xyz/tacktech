@@ -13,7 +13,7 @@
 #include "Typed_QTreeWidgetItem.h"
 #include "Add_Computer_Dialog.h"
 #include "Add_Group_Dialog.h"
-#include "Group_Container.h"
+#include <Group_Container.h>
 
 class Edit_Group : public QMainWindow
 {
@@ -22,7 +22,7 @@ class Edit_Group : public QMainWindow
 public:
     Edit_Group(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~Edit_Group();
-    void set_groups_and_computer_names(Group_Container*);
+    void set_groups_and_computer_names(Group_Container_Ptr);
 private:
     Ui::Edit_GroupClass *ui;
 
@@ -34,7 +34,7 @@ private:
     QAction *remove_group;
 
     /* Pointer to variable that have to be set by the calling class */
-    Group_Container *groups_and_computer_names;
+    Group_Container_Ptr groups_and_computer_names;
 
     /* Dialog variables */
     Add_Computer_Dialog *add_computer_dialog;

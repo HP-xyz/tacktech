@@ -9,7 +9,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include "ui_Add_Computer_Dialog.h"
-#include "Group_Container.h"
+#include <Group_Container.h>
 
 class Add_Computer_Dialog : public QMainWindow
 {
@@ -18,11 +18,11 @@ class Add_Computer_Dialog : public QMainWindow
 public:
     Add_Computer_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~Add_Computer_Dialog();
-    void set_groups_and_computer_names(Group_Container*);
+    void set_groups_and_computer_names(Group_Container_Ptr);
     void set_group_name(QString);
 private:
     Ui::Add_Computer_DialogClass ui;
-    Group_Container *groups_and_computer_names;
+    Group_Container_Ptr groups_and_computer_names;
     QString group_name;
 
 	void keyPressEvent(QKeyEvent *event);

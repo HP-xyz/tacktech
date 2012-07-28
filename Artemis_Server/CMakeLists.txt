@@ -35,18 +35,12 @@ set (ARTEMIS_SERVER_SRCS
 	${artemis_server_SOURCE_DIR}/src/Artemis_Server_Connection.cpp
 	${artemis_server_SOURCE_DIR}/src/Artemis_Request_Handler.cpp
 	${artemis_server_SOURCE_DIR}/src/Artemis_Network_Sender_Connection.cpp
-	${artemis_server_SOURCE_DIR}/src/Group_Container.cpp
-	${artemis_server_SOURCE_DIR}/src/Playlist_Container.cpp
-	${artemis_server_SOURCE_DIR}/src/Group_Playlist_Container.cpp
 	)
 set (ARTEMIS_SERVER_HDRS
 	${artemis_server_SOURCE_DIR}/src/Artemis_Server.h
 	${artemis_server_SOURCE_DIR}/src/Artemis_Server_Connection.h
 	${artemis_server_SOURCE_DIR}/src/Artemis_Request_Handler.h
 	${artemis_server_SOURCE_DIR}/src/Artemis_Network_Sender_Connection.h
-	${artemis_server_SOURCE_DIR}/src/Group_Container.h
-	${artemis_server_SOURCE_DIR}/src/Playlist_Container.h
-	${artemis_server_SOURCE_DIR}/src/Group_Playlist_Container.h
 	)
 
 message ("")
@@ -57,11 +51,13 @@ if (LOCAL_PUGIXML)
 	message (STATUS "	Pugixml include dir: ${PUGIXML_INCLUDE_DIR}")
 	message (STATUS "	Pugixml library: ${pugixml_LIBRARY}")
 endif (LOCAL_PUGIXML)
+message (STATUS "	Tacktech_Common_INCLUDE_DIR: ${Tacktech_Common_INCLUDE_DIR}")
 message ("")
 
 include_directories(
 		${Boost_INCLUDE_DIRS}
 		${PUGIXML_INCLUDE_DIR}
+		${Tacktech_Common_INCLUDE_DIR}
 		)
 
 add_executable(Artemis_Server 
@@ -69,6 +65,6 @@ add_executable(Artemis_Server
 		${ARTEMIS_SERVER_SRCS}
 		${ARTEMIS_SERVER_HDRS}
 		)
-target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} pugixml libb64)
+target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} pugixml libb64 Tacktech_Common)
 
 

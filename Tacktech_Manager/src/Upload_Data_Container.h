@@ -16,8 +16,8 @@
 #include <pugixml.hpp>
 #include <boost/lexical_cast.hpp>
 #include <b64/encode.h>
-#include "Playlist_Container.h"
-#include "Group_Container.h"
+#include <Playlist_Container.h>
+#include <Group_Container.h>
 
 class Upload_Data_Container : public QObject
 {
@@ -27,8 +27,8 @@ public:
     Upload_Data_Container();
     /** Default destructor */
     virtual ~Upload_Data_Container();
-    void set_playlist(Playlist_Container*);
-    void set_groups(Group_Container*);
+    void set_playlist(Playlist_Container_Ptr);
+    void set_groups(Group_Container_Ptr);
     void set_playlist_name(QString);
     void set_group_name(QString);
     void set_upload_time(QString);
@@ -36,8 +36,8 @@ public:
 protected:
 private:
 	std::string get_binary_file(QString);
-    Playlist_Container *playlist;
-    Group_Container *groups;
+    Playlist_Container_Ptr playlist;
+    Group_Container_Ptr groups;
     QString group_name;
     QString playlist_name;
     QString upload_time;

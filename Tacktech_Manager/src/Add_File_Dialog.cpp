@@ -76,7 +76,7 @@ Add_File_Dialog::~Add_File_Dialog()
 
 /** Sets the class playlist variable to that of the calling class.
  ** */
-void Add_File_Dialog::set_playlist( Playlist_Container *p_playlist )
+void Add_File_Dialog::set_playlist(Playlist_Container_Ptr p_playlist )
 {
 #ifdef _DEBUG
     std::cout << "= Add_File_Dialog::set_playlist()" << std::endl;
@@ -103,19 +103,20 @@ void Add_File_Dialog::repopulate_widget()
     playlist->print_contents();
 #endif // _DEBUG
     ui.filename_tree_widget->clear();
-    for(int i = 0;
-            i < playlist->get_playlist().values(playlist_name).size(); i++)
-    {
-        QString filename_temp =
-            playlist->get_playlist().values(playlist_name).at(i).first;
-        int pause_temp =
-            playlist->get_playlist().values(playlist_name).at(i).second;
 
+	Playlist_Range range = playlist->get_files_in_playlist(
+		playlist_name.toStdString());
+	Playlist_Multimap::iterator it = range.first;
+	for(it; it != range.second; ++it)
+    {
+#ifdef _DEBUG
+		std::cout << " - Adding: " << it->second.first << std::endl;
+#endif // _DEBUG
         Typed_QTreeWidgetItem *new_item = new Typed_QTreeWidgetItem();
-        new_item->set_filename(filename_temp);
-        new_item->set_pause(pause_temp);
-        new_item->setText(0, filename_temp);
-        new_item->setText(1, QString::number(pause_temp));
+        new_item->set_filename(QString::fromStdString(it->second.first));
+        new_item->set_pause(it->second.second);
+        new_item->setText(0, QString::fromStdString(it->second.first));
+        new_item->setText(1, QString::number(it->second.second));
         ui.filename_tree_widget->addTopLevelItem(new_item);
     }
 }
@@ -128,11 +129,11 @@ void Add_File_Dialog::remove_filename_slot()
         foreach(QTreeWidgetItem* item,
                 ui.filename_tree_widget->selectedItems())
         {
-            QPair<QString, int> pair_item;
-            pair_item.first = item->text(0);
-            pair_item.second = item->text(1).toInt();
-            playlist->get_playlist().remove(playlist_name, pair_item);
-            delete item;
+			Typed_QTreeWidgetItem typed_item = 
+				static_cast<Typed_QTreeWidgetItem>(item);
+            playlist->remove_filename_from_playlist(
+				typed_item.get_playlist_name().toStdString(),
+				typed_item.get_filename().toStdString());
         }
     }
     else
@@ -158,7 +159,8 @@ void Add_File_Dialog::add_filename_slot()
         std::cout << " - Adding " << qPrintable(playlist_name)
                   << qPrintable(filename) << 0 << std::endl;
 #endif // _DEBUG
-        if(!playlist->add_filename(playlist_name, filename, 0))
+        if(!playlist->add_filename(playlist_name.toStdString(),
+			filename.toStdString(), 0))
         {
             QMessageBox msgBox;
             msgBox.setText(filename + " is already in the playlist");
@@ -190,14 +192,25 @@ void Add_File_Dialog::add_pause_slot(QTreeWidgetItem *dud1, int dud2)
  ** values in both the tree widget and the global playlist variable */
 void Add_File_Dialog::pause_changed_slot( int new_pause)
 {
+#ifdef _DEBUG
+	std::cout << "=Add_File_Dialog::pause_changed_slot()" << std::endl;
+#endif // _DEBUG
     ui.filename_tree_widget->
     selectedItems().at(0)->setText(1, QString::number(new_pause));
-    QPair<QString, int> new_pair;
-    new_pair.first = ui.filename_tree_widget->
-                     selectedItems().at(0)->text(0);
-    new_pair.second = new_pause;
-    playlist->get_playlist().replace(ui.filename_tree_widget->
-                                     selectedItems().at(0)->text(0), new_pair);
+
+	/* Removing the old item from the playlist */
+	playlist->remove_filename_from_playlist(
+		playlist_name.toStdString(),
+		ui.filename_tree_widget->
+		selectedItems().at(0)->text(0).toStdString());
+	
+	/* Inserting the new item into the playlist */
+    playlist->add_filename(
+		playlist_name.toStdString(),
+		ui.filename_tree_widget->
+		selectedItems().at(0)->text(0).toStdString(),
+		new_pause);
+	repopulate_widget();
 }
 
 /** Slot fired when the pause value is unchanged.
@@ -213,13 +226,13 @@ void Add_File_Dialog::ok_clicked()
     std::cout << "= Add_File_Dialog::ok_clicked()" << std::endl;
 #endif // _DEBUG
     emit filelist_changed();
+	delete original_playlist;
     this->close();
 }
 
 void Add_File_Dialog::cancel_clicked()
 {
-    delete playlist;
-    playlist = original_playlist;
+    playlist.reset(original_playlist);
     this->close();
 }
 

@@ -17,7 +17,7 @@ Add_Group_Dialog::~Add_Group_Dialog()
 /** Function to set the group names to the value provided by the calling
  ** class */
 void Add_Group_Dialog::set_group_and_computer_names(
-    Group_Container *p_group_names )
+    Group_Container_Ptr p_group_names )
 {
 #ifdef _DEBUG
     p_group_names->print_contents();
@@ -29,7 +29,7 @@ void Add_Group_Dialog::set_group_and_computer_names(
 void Add_Group_Dialog::ok_clicked()
 {
     if(group_and_computer_names->
-            add_group_name(ui.group_name_line_edit->text()))
+            add_group_name(ui.group_name_line_edit->text().toStdString()))
     {
         /* Emitting the group_name_added signal that is to be caught by
          * the calling program */

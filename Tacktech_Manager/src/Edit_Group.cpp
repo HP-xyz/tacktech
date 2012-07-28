@@ -71,12 +71,12 @@ Edit_Group::~Edit_Group()
 /** Function to populate the global groups_and_computer_names variable with
  ** a pointer to the calling class' groups_and_computer_names variable */
 void Edit_Group::set_groups_and_computer_names(
-    Group_Container* p_groups_and_computer_names)
+    Group_Container_Ptr p_groups_and_computer_names)
 {
 #ifdef _DEBUG
     std::cout << "= set_groups_and_computer_names()" << std::endl;
 #endif // _DEBUG
-    groups_and_computer_names = p_groups_and_computer_names;
+    groups_and_computer_names.reset(new Group_Container(*p_groups_and_computer_names));
 #ifdef _DEBUG
     std::cout << " - Populate tree_widget" << std::endl;
 #endif // _DEBUG
@@ -133,10 +133,10 @@ void Edit_Group::remove_computer_slot()
             groups_and_computer_names->remove_computer_name(
                 static_cast<Typed_QTreeWidgetItem*>
                 (ui->main_tree_widget->selectedItems().at(0))->
-                get_group_name(),
+                get_group_name().toStdString(),
                 static_cast<Typed_QTreeWidgetItem*>
                 (ui->main_tree_widget->selectedItems().at(0))->
-                get_computer_name());
+                get_computer_name().toStdString());
 
             /* Deleting from the UI */
             QPair<QTreeWidgetItem*, int> pair_item;
@@ -185,7 +185,7 @@ void Edit_Group::remove_group_slot()
             groups_and_computer_names->remove_group_name(
                 static_cast<Typed_QTreeWidgetItem*>
                 (ui->main_tree_widget->selectedItems().at(0))->
-                get_group_name());
+                get_group_name().toStdString());
             ui->main_tree_widget->removeItemWidget(ui->main_tree_widget->
                                                    selectedItems().at(0), 0);
             delete ui->main_tree_widget->
@@ -220,32 +220,36 @@ void Edit_Group::repopulate_tree_widget()
 #ifdef _DEBUG
     std::cout << "  - Beginning population" << std::endl;
 #endif // _DEBUG
-    foreach(QString group_name,
-            groups_and_computer_names->
-            get_groups_and_computers().uniqueKeys())
+	for(Group_Multimap::iterator it 
+		= groups_and_computer_names->get_groups_and_computers()->begin();
+		it != groups_and_computer_names->get_groups_and_computers()->end();
+		it++)
     {
 #ifdef _DEBUG
-        std::cout << "   - Group Name: " << qPrintable(group_name) << std::endl;
+        std::cout << "   - Group Name: " << it->first << std::endl;
 #endif // _DEBUG
         group_item = new Typed_QTreeWidgetItem();
-        group_item->set_group_name(group_name);
+        group_item->set_group_name(QString::fromStdString(it->first));
         group_item->set_type("GROUP");
-        group_item->setText(0, group_name);
+        group_item->setText(0, QString::fromStdString(it->first));
         ui->main_tree_widget->addTopLevelItem(group_item);
-        foreach(QString computer_name,
-                groups_and_computer_names->
-                get_groups_and_computers().
-                values(group_name))
+		Group_Computer_Range range =
+			groups_and_computer_names->
+			get_groups_and_computers()->equal_range(it->first);
+		Group_Multimap::iterator it2 = range.first;
+		for (it2; it2 != range.second; ++it2)
         {
 #ifdef _DEBUG
             std::cout << "    - Computer Name: "
-                      << qPrintable(computer_name) << std::endl;
+                      << it2->second << std::endl;
 #endif // _DEBUG
             computer_item = new Typed_QTreeWidgetItem();
-            computer_item->set_computer_name(computer_name);
-            computer_item->set_group_name(group_name);
+            computer_item->set_computer_name(
+				QString::fromStdString(it2->second));
+            computer_item->set_group_name(
+				QString::fromStdString(it2->first));
             computer_item->set_type("COMPUTER");
-            computer_item->setText(0, computer_name);
+            computer_item->setText(0, QString::fromStdString(it2->second));
             group_item->addChild(computer_item);
         }
     }

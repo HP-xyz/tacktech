@@ -17,7 +17,7 @@ Add_Computer_Dialog::~Add_Computer_Dialog()
 /** Function will set the computer_names variable to the value the calling
  ** class provides */
 void Add_Computer_Dialog::set_groups_and_computer_names(
-    Group_Container *p_groups_and_computer_names)
+    Group_Container_Ptr p_groups_and_computer_names)
 {
 #ifdef _DEBUG
     p_groups_and_computer_names->print_contents();
@@ -31,8 +31,8 @@ void Add_Computer_Dialog::ok_clicked()
 #ifdef _DEBUG
     std::cout << "= Add_Computer_Dialog::ok_clicked()" << std::endl;
 #endif // _DEBUG
-    if (groups_and_computer_names->add_computer_name(group_name,
-            ui.computer_name_line_edit->text()))
+    if (groups_and_computer_names->add_computer_name(group_name.toStdString(),
+            ui.computer_name_line_edit->text().toStdString()))
     {
         emit computer_name_added();
         this->close();

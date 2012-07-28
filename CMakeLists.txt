@@ -34,6 +34,12 @@ if (LOCAL_PUGIXML)
 	set (PUGIXML_INCLUDE_DIR ${Tactek_SOURCE_DIR}/pugixml/src)
 endif (LOCAL_PUGIXML)
 add_subdirectory(${Tactek_SOURCE_DIR}/libb64)
+
+add_subdirectory(${Tactek_SOURCE_DIR}/Tacktech_Common)
+set(Tacktech_Common_INCLUDE_DIR
+	${Tactek_SOURCE_DIR}/Tacktech_Common/src
+	)
+
 set(LIBB64_INCLUDE_DIR ${Tactek_SOURCE_DIR}/libb64/include)
 
 #The display app can only be build and used in
