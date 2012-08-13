@@ -3,16 +3,19 @@
 
 #include <QThread>
 #include "Send_Data.h"
+#ifdef _DEBUG
+#include <iostream>
+#endif // _DEBUG
 
-class Start_Send_Data_Thread : public QThread
+class Start_Send_Data_Thread: public QThread
 {
 Q_OBJECT
 public:
-	Start_Send_Data_Thread (int socket_descriptor, std::string xml, QObject *parent);
+	Start_Send_Data_Thread(int socket_descriptor, std::string xml,
+			QObject *parent);
 	~Start_Send_Data_Thread();
 
-	void run();
-signals:
+	void run();signals:
 	void error(QTcpSocket::SocketError error);
 private:
 	int socket_descriptor;

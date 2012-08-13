@@ -1,24 +1,37 @@
 #include "Tacktech_Manager.h"
 
-Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
-    : QMainWindow(parent, flags)
+/** Struct to define a xml_writer to string.
+ ** Copied directly from the pugixml quickstart */
+struct xml_string_writer: pugi::xml_writer
+{
+	std::string result;
+
+	virtual void write(const void* data, size_t size)
+	{
+		result += std::string(static_cast<const char*>(data), size);
+	}
+};
+
+Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
+		QMainWindow(parent, flags)
 {
 #ifdef _DEBUG
-    std::cout << "= Setting up Tacktech Manager" << std::endl;
+	std::cout << "= Setting up Tacktech Manager" << std::endl;
 #endif // _DEBUG
-
-    edit_group_class = new Edit_Group();
-    edit_playlist_class = new Edit_Playlist();
-    select_playlist_dialog = new Select_Playlist_Dialog();
+	edit_group_class = new Edit_Group();
+	edit_playlist_class = new Edit_Playlist();
+	select_playlist_dialog = new Select_Playlist_Dialog();
 	upload_data_dialog = new Upload_Data();
 
 	groups_and_computers.reset(new Group_Container());
 	playlist.reset(new Playlist_Container());
 	group_playlist.reset(new Group_Playlist_Container());
-	upload_data = new Upload_Data_Container();
 
-    ui.setupUi(this);
+	ui.setupUi(this);
 	read_config();
+
+	recieve_data_ptr.reset(new Recieve_Data(parameters));
+
 	node_menu = new QMenu();
 	ui.centralwidget->setContextMenuPolicy(Qt::ActionsContextMenu);
 
@@ -28,39 +41,40 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags)
 	/* Adding actions to context_menu */
 	ui.centralwidget->addAction(schedule_upload);
 
-    QStringList manager_headers;
-    manager_headers << "Group" << "Playlist";
-    ui.management_tree_widget->setHeaderLabels(manager_headers);
+	QStringList manager_headers;
+	manager_headers << "Group" << "Playlist";
+	ui.management_tree_widget->setHeaderLabels(manager_headers);
 
-    /* Connect the main menu GUI signals */
-    connect(ui.actionEdit_Group, SIGNAL(triggered()),
-            this, SLOT(edit_group()));
-    connect(ui.actionCreate_Playlist, SIGNAL(triggered()),
-            this, SLOT(create_playlist()));
-    connect(ui.actionEdit_Playlist, SIGNAL(triggered()),
-            this, SLOT(edit_playlist()));
-    connect(ui.actionEdit_Preferences, SIGNAL(triggered()),
-            this, SLOT(edit_preferences()));
-    connect(ui.management_tree_widget,
-            SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
-            this, SLOT(show_playlist_selection(QTreeWidgetItem*, int)));
-	connect(schedule_upload, SIGNAL(triggered()),
-		this, SLOT(show_schedule_upload_dialog()));
+	/* Connect the main menu GUI signals */
+	connect(ui.actionEdit_Group, SIGNAL(triggered()), this, SLOT(edit_group()));
+	connect(ui.actionCreate_Playlist, SIGNAL(triggered()), this,
+			SLOT(create_playlist()));
+	connect(ui.actionEdit_Playlist, SIGNAL(triggered()), this,
+			SLOT(edit_playlist()));
+	connect(ui.actionEdit_Preferences, SIGNAL(triggered()), this,
+			SLOT(edit_preferences()));
+	connect(ui.management_tree_widget,
+			SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this,
+			SLOT(show_playlist_selection(QTreeWidgetItem*, int)));
+	connect(ui.actionRefresh_All, SIGNAL(triggered()), this,
+			SLOT(refresh_all_request()));
+	connect(schedule_upload, SIGNAL(triggered()), this,
+			SLOT(show_schedule_upload_dialog()));
+	connect(ui.actionSend_Data_to_Server, SIGNAL(triggered()), this,
+			SLOT(upload_new_variables_slot()));
 
-    /* Connecting secondary signals */
-    connect(edit_group_class,
-            SIGNAL(groups_changed()),
-            this, SLOT(group_editing_complete()));
-    connect(select_playlist_dialog,
-            SIGNAL(group_playlist_changed()),
-            this, SLOT(repopulate_widget()));
-	connect(upload_data_dialog, SIGNAL(scheduled_item_added(QDate)),
-		this, SLOT(scheduled_item_added(QDate)));
-	connect(upload_data, SIGNAL(xml_creation_complete(std::string)),
-		this, SLOT(start_upload(std::string)));
+	/* Connecting secondary signals */
+	connect(edit_group_class, SIGNAL(groups_changed()), this,
+			SLOT(group_editing_complete()));
+	connect(select_playlist_dialog, SIGNAL(group_playlist_changed()), this,
+			SLOT(repopulate_widget()));
+	connect(upload_data_dialog, SIGNAL(scheduled_item_added(QDate)), this,
+			SLOT(scheduled_item_added(QDate)));
+	connect(recieve_data_ptr.get(), SIGNAL(data_recieved(std::string)), this,
+			SLOT(data_recieved_slot(std::string)));
 
-    read_variables_from_xml();
-    repopulate_widget();
+	read_variables_from_xml();
+	repopulate_widget();
 }
 
 void Tacktech_Manager::read_config()
@@ -90,19 +104,18 @@ void Tacktech_Manager::read_config()
 	try
 	{
 #ifdef _DEBUG
-		std::cout << "Config file read: " << std::endl <<
-			"===================" << std::endl;
+		std::cout << "Config file read: " << std::endl << "==================="
+				<< std::endl;
 #endif
-		for (boost::program_options::detail::config_file_iterator
-			i(config, options), e; i != e; ++i)
+		for (boost::program_options::detail::config_file_iterator i(config,
+				options), e; i != e; ++i)
 		{
 #ifdef _DEBUG
 			std::cout << i->string_key << " " << i->value[0] << std::endl;
 #endif
 			parameters[i->string_key] = i->value[0];
 		}
-	}
-	catch (std::exception& e)
+	} catch (std::exception& e)
 	{
 		std::cerr << "Exception: " << e.what() << std::endl;
 		std::string error_msg;
@@ -114,19 +127,19 @@ void Tacktech_Manager::read_config()
 
 Tacktech_Manager::~Tacktech_Manager()
 {
-    save_variables_to_xml();
+	save_variables_to_xml();
 #ifdef _DEBUG
-    std::cout << "= ~Tacktech_Manager" << std::endl;
+	std::cout << "= ~Tacktech_Manager" << std::endl;
 #endif // _DEBUG
-    delete edit_group_class;
-    delete edit_playlist_class;
+	delete edit_group_class;
+	delete edit_playlist_class;
 	delete select_playlist_dialog;
 	delete upload_data_dialog;
 
 	delete schedule_upload;
 	delete node_menu;
 
-	delete upload_data;
+	recieve_data_ptr.reset();
 }
 
 /** Function will refresh all group statuses
@@ -141,10 +154,10 @@ void Tacktech_Manager::refresh_all_groups()
 void Tacktech_Manager::edit_group()
 {
 #ifdef _DEBUG
-    std::cout << " - Creating and showing Edit_Group GUI" << std::endl;
+	std::cout << " - Creating and showing Edit_Group GUI" << std::endl;
 #endif // _DEBUG
-    edit_group_class->set_groups_and_computer_names(groups_and_computers);
-    edit_group_class->show();
+	edit_group_class->set_groups_and_computer_names(groups_and_computers);
+	edit_group_class->show();
 }
 
 /** Function will open the create playlist GUI
@@ -152,7 +165,7 @@ void Tacktech_Manager::edit_group()
 void Tacktech_Manager::create_playlist()
 {
 #ifdef _DEBUG
-    std::cout << " - Creating and showing Create_Playlist GUI" << std::endl;
+	std::cout << " - Creating and showing Create_Playlist GUI" << std::endl;
 #endif // _DEBUG
 }
 
@@ -161,10 +174,10 @@ void Tacktech_Manager::create_playlist()
 void Tacktech_Manager::edit_playlist()
 {
 #ifdef _DEBUG
-    std::cout << " - Creating and showing Edit_Playlist GUI" << std::endl;
+	std::cout << " - Creating and showing Edit_Playlist GUI" << std::endl;
 #endif // _DEBUG
-    edit_playlist_class->set_playlist(playlist);
-    edit_playlist_class->show();
+	edit_playlist_class->set_playlist(playlist);
+	edit_playlist_class->show();
 }
 
 /** Function will open the edit preferences GUI
@@ -172,8 +185,7 @@ void Tacktech_Manager::edit_playlist()
 void Tacktech_Manager::edit_preferences()
 {
 #ifdef _DEBUG
-    std::cout << " - Creating and showing Edit_Preferences GUI"
-              << std::endl;
+	std::cout << " - Creating and showing Edit_Preferences GUI" << std::endl;
 #endif // _DEBUG
 }
 
@@ -182,23 +194,27 @@ void Tacktech_Manager::edit_preferences()
 void Tacktech_Manager::repopulate_widget()
 {
 #ifdef _DEBUG
-    std::cout << "= Tacktech_Manager::repopulate_widget()" << std::endl;
-    playlist->print_contents();
+	std::cout << "= Tacktech_Manager::repopulate_widget()" << std::endl;
+	playlist->print_contents();
 #endif // _DEBUG
-    ui.management_tree_widget->clear();
-    for(int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
-    {
-        Typed_QTreeWidgetItem *tree_item = new Typed_QTreeWidgetItem();
-        tree_item->set_group_name(QString::fromStdString(group_playlist->
-                           get_group_playlist()->at(i).first));
-        tree_item->set_playlist_name(QString::fromStdString(group_playlist->
-                           get_group_playlist()->at(i).second));
-        tree_item->setText(0, QString::fromStdString(group_playlist->
-                           get_group_playlist()->at(i).first));
-        tree_item->setText(1, QString::fromStdString(group_playlist->
-                           get_group_playlist()->at(i).second));
-        ui.management_tree_widget->addTopLevelItem(tree_item);
-    }
+	ui.management_tree_widget->clear();
+	for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	{
+		Typed_QTreeWidgetItem *tree_item = new Typed_QTreeWidgetItem();
+		tree_item->set_group_name(
+				QString::fromStdString(
+						group_playlist->get_group_playlist()->at(i).first));
+		tree_item->set_playlist_name(
+				QString::fromStdString(
+						group_playlist->get_group_playlist()->at(i).second));
+		tree_item->setText(0,
+				QString::fromStdString(
+						group_playlist->get_group_playlist()->at(i).first));
+		tree_item->setText(1,
+				QString::fromStdString(
+						group_playlist->get_group_playlist()->at(i).second));
+		ui.management_tree_widget->addTopLevelItem(tree_item);
+	}
 }
 /** Slot fired when the add_group_dialog sends its groups_changed()
  ** signal. Adds the groups that have been added to the group_playlist
@@ -208,48 +224,44 @@ void Tacktech_Manager::repopulate_widget()
 void Tacktech_Manager::group_editing_complete()
 {
 #ifdef _DEBUG
-    std::cout << "= Tacktech_Manager::group_editing_complete()"
-              << std::endl;
+	std::cout << "= Tacktech_Manager::group_editing_complete()" << std::endl;
 #endif // _DEBUG
-    for(int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
-    {
-        if(!groups_and_computers->contains_group_name(
-                    group_playlist->get_group_playlist()->at(i).first))
-        {
-            //Removing group name if needed
+	for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	{
+		if (!groups_and_computers->contains_group_name(
+				group_playlist->get_group_playlist()->at(i).first))
+		{
+			//Removing group name if needed
 			Group_Playlist_Vector::iterator it =
-				group_playlist->get_group_playlist()->begin() + i;
+					group_playlist->get_group_playlist()->begin() + i;
 			group_playlist->get_group_playlist()->erase(it);
-        }
-    }
+		}
+	}
 	Group_Multimap map = groups_and_computers->get_unique_groups();
-	for(Group_Multimap::iterator it 
-		= map.begin();
-		it != map.end(); it++)
-    {
-        if(!group_playlist->contains_group_name(it->first))
-        {
+	for (Group_Multimap::iterator it = map.begin(); it != map.end(); it++)
+	{
+		if (!group_playlist->contains_group_name(it->first))
+		{
 #ifdef _DEBUG
-            std::cout << " - Adding: " << it->first
-                      << std::endl;
+			std::cout << " - Adding: " << it->first << std::endl;
 #endif // _DEBUG
-            std::pair<std::string, std::string> pair_to_add;
-            pair_to_add.first = it->first;
-            pair_to_add.second = "ADD PLAYLIST HERE";
-            group_playlist->get_group_playlist()->push_back(pair_to_add);
-        }
-    }
-    repopulate_widget();
+			std::pair<std::string, std::string> pair_to_add;
+			pair_to_add.first = it->first;
+			pair_to_add.second = "ADD PLAYLIST HERE";
+			group_playlist->get_group_playlist()->push_back(pair_to_add);
+		}
+	}
+	repopulate_widget();
 }
 
 /** Slot to show the playlist selection GUI. */
-void Tacktech_Manager::show_playlist_selection(
-    QTreeWidgetItem* selected_item, int )
+void Tacktech_Manager::show_playlist_selection(QTreeWidgetItem* selected_item,
+		int)
 {
-    select_playlist_dialog->set_group_playlist(group_playlist);
-    select_playlist_dialog->set_selected_group(selected_item->text(0));
-    select_playlist_dialog->set_playlist(playlist);
-    select_playlist_dialog->show();
+	select_playlist_dialog->set_group_playlist(group_playlist);
+	select_playlist_dialog->set_selected_group(selected_item->text(0));
+	select_playlist_dialog->set_playlist(playlist);
+	select_playlist_dialog->show();
 }
 
 /** Saves the playlist, groups_and_computers and group_playlist variables
@@ -446,18 +458,22 @@ void Tacktech_Manager::read_variables_from_xml()
 //    }
 }
 
-void Tacktech_Manager::scheduled_item_added( QDate date)
+void Tacktech_Manager::scheduled_item_added(QDate date)
 {
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::scheduled_item_added()" << std::endl;
 #endif // _DEBUG
-
+	upload_data.reset(new Upload_Data_Container(parameters));
+	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+			SLOT(start_upload(std::string)));
 	Typed_QTreeWidgetItem *selected_item =
-		static_cast<Typed_QTreeWidgetItem*>
-		(ui.management_tree_widget->selectedItems().at(0));
+			static_cast<Typed_QTreeWidgetItem*>(ui.management_tree_widget->selectedItems().at(
+					0));
+	upload_data->set_command("UPLOAD");
 	upload_data->set_group_name(selected_item->get_group_name());
-	upload_data->set_groups(groups_and_computers);
 	upload_data->set_playlist(playlist);
+	upload_data->set_groups(groups_and_computers);
+	upload_data->set_group_playlist(group_playlist);
 	upload_data->set_playlist_name(selected_item->get_playlist_name());
 	upload_data->set_upload_time(date.toString(Qt::ISODate));
 	upload_data->get_xml_upload();
@@ -470,7 +486,7 @@ void Tacktech_Manager::show_schedule_upload_dialog()
 
 //TODO
 //CHECK PARAMETER COPY/POINTER etc
-void Tacktech_Manager::start_upload( std::string xml_string)
+void Tacktech_Manager::start_upload(std::string xml_string)
 {
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
@@ -482,12 +498,80 @@ void Tacktech_Manager::start_upload( std::string xml_string)
 	status_msg += parameters["general.server_port"];
 	ui.statusbar->showMessage(status_msg.c_str());
 
-	Send_Data *send_data = new Send_Data(parameters["general.server_ip"].c_str(),
-		boost::lexical_cast<int>(parameters["general.server_port"]),
-		xml_string);
+	Send_Data *send_data =
+			new Send_Data(parameters["general.server_ip"].c_str(),
+					boost::lexical_cast<int>(parameters["general.server_port"]),
+					xml_string);
 #ifdef _DEBUG
 	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
+}
 
+void Tacktech_Manager::refresh_all_request()
+{
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::refresh_all_request()" << std::endl;
+#endif // _DEBUG
+	upload_data.reset(new Upload_Data_Container(parameters));
+	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+			SLOT(start_upload(std::string)));
+	upload_data->set_playlist(playlist);
+	upload_data->set_groups(groups_and_computers);
+	upload_data->set_group_playlist(group_playlist);
+	upload_data->set_command("GET_VARIABLES");
+	upload_data->get_xml_upload();
+}
+
+void Tacktech_Manager::data_recieved_slot(std::string data_recieved)
+{
+#ifdef _DEBUG
+	std::cout << "=Tacktech_Manager::data_recieved_slot()" << std::endl;
+	std::cout << data_recieved << std::endl;
+#endif // _DEBUG
+	pugi::xml_document document;
+	document.load(data_recieved.c_str());
+	pugi::xml_node tacktech = document.child("Tacktech");
+	std::string type_string =
+			tacktech.child("Type").attribute("TYPE").as_string();
+	if (type_string == "SET_VARIABLES")
+	{
+#ifdef _DEBUG
+		std::cout << " - Received SET_VARIABLES command" << std::endl;
+#endif // _DEBUG
+		tacktech.print(std::cout);
+		xml_string_writer playlist_writer;
+		tacktech.child("Variables").child("Playlist").print(playlist_writer);
+		playlist->reset_container();
+		playlist->construct_playlist(playlist_writer.result);
+
+		xml_string_writer groups_and_computers_writer;
+		tacktech.child("Variables").child("Groups_And_Computers").print(
+				groups_and_computers_writer);
+		groups_and_computers->reset_container();
+		groups_and_computers->construct_groups_and_computers(
+				groups_and_computers_writer.result);
+
+		xml_string_writer group_playlist_writer;
+		tacktech.child("Variables").child("Group_Playlist").print(
+				group_playlist_writer);
+		group_playlist->reset_container();
+		group_playlist->construct_group_playlist(group_playlist_writer.result);
+	}
+	repopulate_widget();
+}
+
+void Tacktech_Manager::upload_new_variables_slot()
+{
+#ifdef _DEBUG
+	std::cout << "=Tacktech_Manager::upload_new_variables_slot()" << std::endl;
+#endif // _DEBUG
+	upload_data.reset(new Upload_Data_Container(parameters));
+	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+			SLOT(start_upload(std::string)));
+	upload_data->set_playlist(playlist);
+	upload_data->set_groups(groups_and_computers);
+	upload_data->set_group_playlist(group_playlist);
+	upload_data->set_command("SET_VARIABLES");
+	upload_data->get_xml_upload();
 }
 
