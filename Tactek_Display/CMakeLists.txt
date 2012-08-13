@@ -49,6 +49,7 @@ include_directories (
 					${QT_QTGUI_INCLUDE_DIR} 
 					${QT_QTNETWORK_INCLUDE_DIR} 
 					${QT_INCLUDE_DIR}
+					${QT_INCLUDES}
 					${LIBVLCQT_INCLUDE_DIR}
 					${LIBB64_INCLUDE_DIR}
 					${PUGIXML_INCLUDE_DIR}
@@ -58,12 +59,14 @@ set ( Tacktech_Display_SRCS
 		${Tacktech_Display_SOURCE_DIR}/src/Tactek_Display.cpp
         ${Tacktech_Display_SOURCE_DIR}/src/Playlist.cpp
         ${Tacktech_Display_SOURCE_DIR}/src/Send_Data.cpp
+        ${Tacktech_Display_SOURCE_DIR}/src/Start_Send_Data_Thread.cpp
         ${Tacktech_Display_SOURCE_DIR}/src/Recieve_Data.cpp
 	)
 set ( Tacktech_Display_HDRS
 		${Tacktech_Display_SOURCE_DIR}/src/Tactek_Display.h
         ${Tacktech_Display_SOURCE_DIR}/src/Playlist.h
         ${Tacktech_Display_SOURCE_DIR}/src/Send_Data.h
+        ${Tacktech_Display_SOURCE_DIR}/src/Start_Send_Data_Thread.h
         ${Tacktech_Display_SOURCE_DIR}/src/Recieve_Data.h
 	)
 set ( Tacktech_Display_RSCS

@@ -1,10 +1,8 @@
 #include "Start_Send_Data_Thread.h"
 
-Start_Send_Data_Thread::Start_Send_Data_Thread 
-	(int p_socket_descriptor, 
-	 std::string xml, 
-	 QObject *parent)
-	 : QThread(parent)
+Start_Send_Data_Thread::Start_Send_Data_Thread(int p_socket_descriptor,
+		std::string xml, QObject *parent) :
+		QThread(parent)
 {
 	socket_descriptor = p_socket_descriptor;
 	xml_string = xml;
@@ -14,7 +12,7 @@ Start_Send_Data_Thread::~Start_Send_Data_Thread()
 {
 #ifdef _DEBUG
 	std::cout << "=Start_Send_Data_Thread::~Start_Send_Data_Thread()"
-		<< std::endl;
+			<< std::endl;
 #endif // _DEBUG
 }
 
@@ -24,8 +22,8 @@ void Start_Send_Data_Thread::run()
 	std::cout << "= Start_Send_Data_Thread::run()" << std::endl;
 #endif // _DEBUG
 	QTcpSocket socket;
-	connect(&socket, SIGNAL(bytesWritten(qint64)),
-		this , SLOT(bytes_written(qint64)));
+	connect(&socket, SIGNAL(bytesWritten(qint64)), this,
+			SLOT(bytes_written(qint64)));
 	if (!socket.setSocketDescriptor(socket_descriptor))
 	{
 #ifdef _DEBUG
@@ -39,13 +37,9 @@ void Start_Send_Data_Thread::run()
 #ifdef _DEBUG
 	std::cout << " - Sending data " << std::endl;
 	std::cout << " - Filesize: " << xml_string.size() << std::endl;
-#endif // _DEBUG
-	std::cout << " - Bytes Written: " 
+	std::cout << " - Bytes Written: "
 		<< socket.write(xml_string.c_str(), xml_string.size()) << std::endl;
-#ifdef _DEBUG
 	std::cout << " - Bytes to write: " << socket.bytesToWrite() << std::endl;
-#endif // _DEBUG
-#ifdef _DEBUG
 	std::cout << " - Waiting for bytes written" << std::endl;
 #endif // _DEBUG
 	socket.waitForBytesWritten();
@@ -62,7 +56,7 @@ void Start_Send_Data_Thread::run()
 #endif // _DEBUG
 }
 
-void Start_Send_Data_Thread::bytes_written( qint64 bytes)
+void Start_Send_Data_Thread::bytes_written(qint64 bytes)
 {
 #ifdef _DEBUG
 	std::cout << "Bytes written: " << bytes << std::endl;

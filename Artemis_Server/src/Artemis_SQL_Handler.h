@@ -22,9 +22,9 @@ class Artemis_SQL_Handler
 public:
 	/** Constructor, creates the connection to the mysql database.
 	 ** Receives a parameter map from the calling program*/
-    Artemis_SQL_Handler(std::map<std::string, std::string>&);
-    Artemis_SQL_Handler(const Artemis_SQL_Handler& orig);
-    virtual ~Artemis_SQL_Handler();
+	Artemis_SQL_Handler(std::map<std::string, std::string>&);
+	Artemis_SQL_Handler(const Artemis_SQL_Handler& orig);
+	virtual ~Artemis_SQL_Handler();
 
 	/** Runs the actual query and creates the resultset XML */
 	void run_query(const std::string&);

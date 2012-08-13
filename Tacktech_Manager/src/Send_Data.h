@@ -8,19 +8,19 @@
 #ifdef _DEBUG
 #include <iostream>
 #endif // _DEBUG
-
-class Send_Data : public QTcpSocket
+class Send_Data: public QTcpSocket
 {
 Q_OBJECT
-    public:
-        Send_Data(const QString&, quint16, std::string&);
-        ~Send_Data();
+public:
+	Send_Data(const QString&, quint16, std::string&);
+	~Send_Data();
 
-    private:
-		QTcpSocket *socket;
-        std::string xml_string;
-	private slots:
-		void send_data_to_server();
+private:
+	QTcpSocket *socket;
+	std::string xml_string;
+private slots:
+	void
+	send_data_to_server();
 };
 
 #endif // SEND_DATA_H
