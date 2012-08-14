@@ -19,7 +19,7 @@ Send_Data::Send_Data(const QString &p_host_name, quint16 p_port,
  */
 Send_Data::~Send_Data()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "destructor of send data" << std::endl;
 #endif // _DEBUG
 	socket->close();
@@ -33,7 +33,7 @@ Send_Data::~Send_Data()
  */
 void Send_Data::send_data_to_server()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Send_Data::send_data_to_server()" << std::endl;
 	std::cout << " - Sending file of size: " << xml_string.size() << std::endl;
 #endif // _DEBUG

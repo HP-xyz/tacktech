@@ -1,7 +1,7 @@
 #ifndef UPLOAD_DATA_CONTAINER_H
 #define UPLOAD_DATA_CONTAINER_H
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 #include <QString>

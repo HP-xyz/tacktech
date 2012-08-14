@@ -15,7 +15,7 @@ struct xml_string_writer: pugi::xml_writer
 Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 		QMainWindow(parent, flags)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Setting up Tacktech Manager" << std::endl;
 #endif // _DEBUG
 	edit_group_class = new Edit_Group();
@@ -79,11 +79,11 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 
 void Tacktech_Manager::read_config()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::read_config()" << std::endl;
 #endif // _DEBUG
 	std::ifstream config("config.ini");
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Created config ifstream" << std::endl;
 #endif // _DEBUG
 	if (!config)
@@ -96,21 +96,21 @@ void Tacktech_Manager::read_config()
 		ui.statusbar->showMessage("Config file 'config.ini' found");
 	}
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating options.insert" << std::endl;
 #endif // _DEBUG
 	options.insert("*");
 
 	try
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "Config file read: " << std::endl << "==================="
 				<< std::endl;
 #endif
 		for (boost::program_options::detail::config_file_iterator i(config,
 				options), e; i != e; ++i)
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << i->string_key << " " << i->value[0] << std::endl;
 #endif
 			parameters[i->string_key] = i->value[0];
@@ -128,7 +128,7 @@ void Tacktech_Manager::read_config()
 Tacktech_Manager::~Tacktech_Manager()
 {
 	save_variables_to_xml();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= ~Tacktech_Manager" << std::endl;
 #endif // _DEBUG
 	delete edit_group_class;
@@ -153,7 +153,7 @@ void Tacktech_Manager::refresh_all_groups()
  ** */
 void Tacktech_Manager::edit_group()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating and showing Edit_Group GUI" << std::endl;
 #endif // _DEBUG
 	edit_group_class->set_groups_and_computer_names(groups_and_computers);
@@ -164,7 +164,7 @@ void Tacktech_Manager::edit_group()
  ** */
 void Tacktech_Manager::create_playlist()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating and showing Create_Playlist GUI" << std::endl;
 #endif // _DEBUG
 }
@@ -173,7 +173,7 @@ void Tacktech_Manager::create_playlist()
  ** */
 void Tacktech_Manager::edit_playlist()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating and showing Edit_Playlist GUI" << std::endl;
 #endif // _DEBUG
 	edit_playlist_class->set_playlist(playlist);
@@ -184,7 +184,7 @@ void Tacktech_Manager::edit_playlist()
  ** */
 void Tacktech_Manager::edit_preferences()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating and showing Edit_Preferences GUI" << std::endl;
 #endif // _DEBUG
 }
@@ -193,7 +193,7 @@ void Tacktech_Manager::edit_preferences()
  ** NOTE: Takes linear time to complete */
 void Tacktech_Manager::repopulate_widget()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::repopulate_widget()" << std::endl;
 	playlist->print_contents();
 #endif // _DEBUG
@@ -223,7 +223,7 @@ void Tacktech_Manager::repopulate_widget()
  **		and may take up to n^2 time to complete */
 void Tacktech_Manager::group_editing_complete()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::group_editing_complete()" << std::endl;
 #endif // _DEBUG
 	for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
@@ -242,7 +242,7 @@ void Tacktech_Manager::group_editing_complete()
 	{
 		if (!group_playlist->contains_group_name(it->first))
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - Adding: " << it->first << std::endl;
 #endif // _DEBUG
 			std::pair<std::string, std::string> pair_to_add;
@@ -269,7 +269,7 @@ void Tacktech_Manager::show_playlist_selection(QTreeWidgetItem* selected_item,
  ** NOTE: This function takes n^2 time to complete */
 void Tacktech_Manager::save_variables_to_xml()
 {
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //    std::cout << "= Tacktech_Manager::save_variables_to_xml()"
 //              << std::endl;
 //#endif // _DEBUG
@@ -372,7 +372,7 @@ void Tacktech_Manager::save_variables_to_xml()
  ** group playlist from file, XML encoded */
 void Tacktech_Manager::read_variables_from_xml()
 {
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //    std::cout << "= Tacktech_Manager::read_variables_from_xml()"
 //              << std::endl;
 //#endif // _DEBUG
@@ -380,7 +380,7 @@ void Tacktech_Manager::read_variables_from_xml()
 //    pugi::xml_document playlist_document;
 //    playlist_document.load_file("./playlist.xml");
 //    pugi::xml_node root_node = playlist_document.child("Playlist");
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //    std::cout << " - Root Item:" << std::endl;
 //    root_node.print(std::cout);
 //#endif // _DEBUG
@@ -388,7 +388,7 @@ void Tacktech_Manager::read_variables_from_xml()
 //            playlist_item;
 //            playlist_item = playlist_item.next_sibling("Playlist_Item"))
 //    {
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //        std::cout << " - Playlist Item:" << std::endl;
 //        playlist_item.print(std::cout);
 //#endif // _DEBUG
@@ -407,7 +407,7 @@ void Tacktech_Manager::read_variables_from_xml()
 //    pugi::xml_document groups_and_computers_document;
 //    groups_and_computers_document.load_file("./groups_and_computers.xml");
 //    root_node = groups_and_computers_document.child("Groups_And_Computers");
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //    std::cout << " - Root Item:" << std::endl;
 //    root_node.print(std::cout);
 //#endif // _DEBUG
@@ -415,7 +415,7 @@ void Tacktech_Manager::read_variables_from_xml()
 //            group_item;
 //            group_item = group_item.next_sibling("Group_Item"))
 //    {
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //// TODO (HP#1#):
 //        std::cout << " - Group Item:" << std::endl;
 //        group_item.print(std::cout);
@@ -438,7 +438,7 @@ void Tacktech_Manager::read_variables_from_xml()
 //    pugi::xml_document group_playlist_document;
 //    group_playlist_document.load_file("./group_playlist.xml");
 //    root_node = group_playlist_document.child("Group_Playlist");
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //    std::cout << " - Root Item:" << std::endl;
 //    root_node.print(std::cout);
 //#endif // _DEBUG
@@ -448,7 +448,7 @@ void Tacktech_Manager::read_variables_from_xml()
 //            group_playlist_item =
 //                group_playlist_item.next_sibling("Group_Playlist_Item"))
 //    {
-//#ifdef _DEBUG
+//#ifdef _SHOW_DEBUG_OUTPUT
 //        std::cout << " - Group_Playlist Item:" << std::endl;
 //        group_playlist_item.print(std::cout);
 //#endif // _DEBUG
@@ -460,7 +460,7 @@ void Tacktech_Manager::read_variables_from_xml()
 
 void Tacktech_Manager::scheduled_item_added(QDate date)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::scheduled_item_added()" << std::endl;
 #endif // _DEBUG
 	upload_data.reset(new Upload_Data_Container(parameters));
@@ -488,7 +488,7 @@ void Tacktech_Manager::show_schedule_upload_dialog()
 //CHECK PARAMETER COPY/POINTER etc
 void Tacktech_Manager::start_upload(std::string xml_string)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::start_upload()" << std::endl;
 #endif // _DEBUG
 	std::string status_msg;
@@ -502,14 +502,14 @@ void Tacktech_Manager::start_upload(std::string xml_string)
 			new Send_Data(parameters["general.server_ip"].c_str(),
 					boost::lexical_cast<int>(parameters["general.server_port"]),
 					xml_string);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
 }
 
 void Tacktech_Manager::refresh_all_request()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::refresh_all_request()" << std::endl;
 #endif // _DEBUG
 	upload_data.reset(new Upload_Data_Container(parameters));
@@ -524,7 +524,7 @@ void Tacktech_Manager::refresh_all_request()
 
 void Tacktech_Manager::data_recieved_slot(std::string data_recieved)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager::data_recieved_slot()" << std::endl;
 	std::cout << data_recieved << std::endl;
 #endif // _DEBUG
@@ -535,7 +535,7 @@ void Tacktech_Manager::data_recieved_slot(std::string data_recieved)
 			tacktech.child("Type").attribute("TYPE").as_string();
 	if (type_string == "SET_VARIABLES")
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
 #endif // _DEBUG
 		tacktech.print(std::cout);
@@ -562,7 +562,7 @@ void Tacktech_Manager::data_recieved_slot(std::string data_recieved)
 
 void Tacktech_Manager::upload_new_variables_slot()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager::upload_new_variables_slot()" << std::endl;
 #endif // _DEBUG
 	upload_data.reset(new Upload_Data_Container(parameters));

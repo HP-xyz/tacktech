@@ -24,7 +24,7 @@ struct xml_string_writer: pugi::xml_writer
 	std::string result;
 	virtual void write(const void* data, std::size_t size)
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - (XML_WRITER)write of size: " << size << std::endl;
 #endif // _DEBUG
 		result += static_cast<const char*>(data);
@@ -96,7 +96,7 @@ void Artemis_Server_Connection::start()
 void Artemis_Server_Connection::handle_read(
 		const boost::system::error_code& error, std::size_t bytes_transferred)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Handle Read" << std::endl << " =============="
 			<< std::endl << " - Bytes transferred before error check: "
 			<< bytes_transferred << std::endl;
@@ -106,7 +106,7 @@ void Artemis_Server_Connection::handle_read(
 		std::string remote_address =
 			m_socket.remote_endpoint().address().to_string();
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " --> Recieved from IP: " << remote_address << std::endl;
 #endif // _DEBUG
 		std::vector<char> xml;
@@ -133,7 +133,7 @@ void Artemis_Server_Connection::handle_read(
 		{
 			if (request_handler->result_status == NO_RESULT)
 			{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << "	Query generated no results" << std::endl;
 #endif // _DEBUG
 			}
@@ -154,7 +154,7 @@ void Artemis_Server_Connection::handle_read(
 			// I DONT THINK THIS CAN HAPPEN
 			/*else if (request_handler.result_status == MULTIPLE_RESULTS)
 			 {
-			 #ifdef _DEBUG
+			 #ifdef _SHOW_DEBUG_OUTPUT
 			 std::cout << "	Query generated MULTIPLE results" << std::endl;
 			 std::cout << "	 - Reply_XML: ";
 			 for (unsigned int i = 0; i < reply_xml.size(); i++)
@@ -203,7 +203,7 @@ void Artemis_Server_Connection::handle_read(
 	}
 	else
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Error encountered: " << error.message() << std::endl;
 #endif // _DEBUG
 	}
@@ -227,7 +227,7 @@ void Artemis_Server_Connection::handle_write(
 		const boost::system::error_code& error,
 		std::vector<std::vector<char> > &replies, std::size_t position)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Handle Write" << std::endl << " ==============="
 			<< std::endl << "  -- reply_count = " << position << std::endl;
 #endif
@@ -249,14 +249,14 @@ void Artemis_Server_Connection::handle_write(
 void Artemis_Server_Connection::handle_write(
 		const boost::system::error_code& error, std::size_t bytes_transferred)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Handle Write" << std::endl << " ==============="
 			<< std::endl;
 	std::cout << " - Bytes_Transferred: " << bytes_transferred << std::endl;
 #endif
 	if (!error)
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Closing connection " << bytes_transferred << std::endl;
 #endif
 		// Initiate graceful connection closure.
@@ -273,7 +273,7 @@ void Artemis_Server_Connection::handle_write(
 
 std::string Artemis_Server_Connection::get_binary_file(std::string filename)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Upload_Data_Container::get_binary_file()" << std::endl;
 #endif // _DEBUG
 	std::string file_encoded;
@@ -281,7 +281,7 @@ std::string Artemis_Server_Connection::get_binary_file(std::string filename)
 	std::ifstream file(filename.c_str(), std::ios::binary);
 	if (file.is_open())
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - File is open" << std::endl;
 		file.seekg(0, std::ios::end);
 		std::cout << " - Tellg(): " << file.tellg() << std::endl;
@@ -298,7 +298,7 @@ std::string Artemis_Server_Connection::get_binary_file(std::string filename)
 		file_out << std::ends;
 		std::cout << "file_out size: " << file_out.str().size() << std::endl;
 		file_encoded = file_out.str();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Encoded filesize: " << file_encoded.size()
 				<< std::endl;
 #endif // _DEBUG

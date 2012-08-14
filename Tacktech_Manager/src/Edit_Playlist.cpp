@@ -3,7 +3,7 @@
 Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags) :
 		QWidget(parent, flags)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Setting up Edit_Playlist GUI" << std::endl;
 #endif // _DEBUG
 	ui.setupUi(this);
@@ -11,16 +11,16 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags) :
 	headers << "Playlist";
 	ui.playlist_tree_widget->setHeaderLabels(headers);
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating add_playlist_dialog pointer" << std::endl;
 #endif // _DEBUG
 	add_playlist_dialog = new Add_Playlist_Dialog();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating add_file_dialog pointer" << std::endl;
 #endif // _DEBUG
 	add_file_dialog = new Add_File_Dialog();
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating node_menu pointer" << std::endl;
 #endif // _DEBUG
 	node_menu = new QMenu();
@@ -87,7 +87,7 @@ void Edit_Playlist::add_playlist_slot()
  ** Note: This function will take n^2 time to complete. */
 void Edit_Playlist::remove_file_slot()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Edit_Playlist::remove_file_slot()" << std::endl;
 #endif // _DEBUG
 	if (!ui.playlist_tree_widget->selectedItems().count() == 0)
@@ -100,7 +100,7 @@ void Edit_Playlist::remove_file_slot()
 							i));
 			if (selected_item->get_type() == "FILENAME")
 			{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << " - Removing filename: " 
 					<< selected_item->get_filename().toStdString() 
 					<< std::endl;
@@ -114,7 +114,7 @@ void Edit_Playlist::remove_file_slot()
 			}
 			else if (selected_item->get_type() == "PLAYLIST")
 			{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << " - Removing playlist" << std::endl;
 #endif // _DEBUG
 				remove_playlist_slot();
@@ -135,7 +135,7 @@ void Edit_Playlist::remove_file_slot()
  ** playlist global variable */
 void Edit_Playlist::remove_playlist_slot()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Edit_Playlist::remove_playlist_slot()" << std::endl;
 #endif // _DEBUG
 	if (ui.playlist_tree_widget->selectedItems().count() > 0
@@ -146,7 +146,7 @@ void Edit_Playlist::remove_playlist_slot()
 						0));
 		if (selected_item->get_type() == "PLAYLIST")
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - Removing Playlist" << std::endl;
 #endif // _DEBUG
 			playlist->remove_playlist(
@@ -221,7 +221,7 @@ void Edit_Playlist::cancel_clicked()
 void Edit_Playlist::repopulate_widget()
 {
 	ui.playlist_tree_widget->clear();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	playlist->print_contents();
 #endif // _DEBUG
 	Playlist_Multimap unique_map = playlist->get_unique_playlists();

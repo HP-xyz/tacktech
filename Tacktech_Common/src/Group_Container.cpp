@@ -23,7 +23,7 @@ Group_Container::~Group_Container()
 
 bool Group_Container::add_group_name(std::string new_group_name)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	print_contents();
 #endif // _DEBUG
 	if (Group_Container::contains_group_name(new_group_name))
@@ -56,13 +56,13 @@ bool Group_Container::add_computer_name(std::string group_name,
 
 	groups_and_computers->insert(
 			std::pair<std::string, std::string>(group_name, new_computer_name));
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	print_contents();
 #endif // _DEBUG
 	return true;
 }
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 void Group_Container::print_contents()
 {
 	std::cout << "= Group_Container::print_contents()" << std::endl;
@@ -106,7 +106,7 @@ bool Group_Container::contains_group_name(std::string p_group_name)
 
 void Group_Container::remove_group_name(std::string group_name_to_remove)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Group_Container::remove_group_name()" << std::endl;
 	std::cout << " - Removing: " << std::endl;
 #endif // _DEBUG
@@ -121,7 +121,7 @@ void Group_Container::remove_group_name(std::string group_name_to_remove)
 		{
 			if (it2->first == group_name_to_remove)
 			{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << "  - " << it2->first << std::endl;
 #endif // _DEBUG
 
@@ -130,7 +130,7 @@ void Group_Container::remove_group_name(std::string group_name_to_remove)
 			}
 		}
 	}
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Removed " << remove_count << " items" << std::endl;
 #endif // _DEBUG
 }
@@ -138,7 +138,7 @@ void Group_Container::remove_group_name(std::string group_name_to_remove)
 void Group_Container::remove_computer_name(std::string group_name,
 		std::string computer_name)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Group_Container::remove_computer_name()" << std::endl;
 	int remove_count = 0;
 #endif // _DEBUG
@@ -152,20 +152,20 @@ void Group_Container::remove_computer_name(std::string group_name,
 		{
 			if (it2->first == group_name && it2->second == computer_name)
 			{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 					std::cout << "  - " << it2->first << " : " << it2->second
 						<< std::endl;
 #endif // _DEBUG
 
 				groups_and_computers->erase(it2);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				remove_count += 1;
 #endif // _DEBUG
 
 			}
 		}
 	}
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Removed " << remove_count << " items" << std::endl;
 #endif // _DEBUG
 }
@@ -270,7 +270,7 @@ std::string Group_Container::get_groups_and_computers_xml()
 void Group_Container::construct_groups_and_computers(
 		std::string groups_and_computers)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Group_Container::construct_groups_and_computers()"
 			<< std::endl;
 	std::cout << groups_and_computers << std::endl;

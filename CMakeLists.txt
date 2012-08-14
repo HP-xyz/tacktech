@@ -1,7 +1,11 @@
 Project(Tactek)
 cmake_minimum_required(VERSION 2.8)
 
-OPTION (DEBUG_ALL "Displays all debug info" ON)
+OPTION (SHOW_DEBUG_OUTPUT "Displays all debug info" ON)
+
+if(SHOW_DEBUG_OUTPUT)
+	add_definitions(-D_SHOW_DEBUG_OUTPUT)
+endif(SHOW_DEBUG_OUTPUT)
 
 IF( NOT CMAKE_BUILD_TYPE )
   message (STATUS "###### WE ARE BUILD IN 'Debug' MODE")
@@ -47,15 +51,6 @@ endif (MSVC)
 include ( ${QT_USE_FILE} )
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-#If we're on MSVC and building in Release mode
-IF(CMAKE_BUILD_TYPE MATCHES Release)
-  if (MSVC)
-    message (STATUS "Setting GUI_TYPE to WIN32")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_ITERATOR_DEBUG_LEVEL=0" )
-	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /subsystem:windows")
-	set(GUI_TYPE WIN32)
-  endif(MSVC)
-endif(CMAKE_BUILD_TYPE MATCHES Release)
 #Needed for windows
 #Change this to your boost path
 

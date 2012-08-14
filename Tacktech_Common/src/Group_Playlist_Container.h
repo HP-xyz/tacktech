@@ -7,7 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <pugixml.hpp>
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 typedef boost::shared_ptr<std::vector<std::pair<std::string, std::string> > > Group_Playlist_Ptr;

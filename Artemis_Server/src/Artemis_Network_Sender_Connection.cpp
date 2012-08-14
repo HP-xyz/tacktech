@@ -14,7 +14,7 @@ Artemis_Network_Sender_Connection::Artemis_Network_Sender_Connection(
 
 Artemis_Network_Sender_Connection::~Artemis_Network_Sender_Connection()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Network_Sender_Connection::"
 			<< "~Artemis_Network_Sender_Connection()" << std::endl;
 #endif // _DEBUG
@@ -24,7 +24,7 @@ Artemis_Network_Sender_Connection::~Artemis_Network_Sender_Connection()
  */
 void Artemis_Network_Sender_Connection::start_write()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " =Artemis_Network_Sender_Connection::start_write()"
 			<< std::endl;
 #endif //_DEBUG
@@ -34,7 +34,7 @@ void Artemis_Network_Sender_Connection::start_write()
 }
 void Artemis_Network_Sender_Connection::do_write()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " =Artemis_Network_Sender_Connection::do_write()" << std::endl;
 	std::cout << " - Writing size: " << xml_string.size() << std::endl;
 #endif //_DEBUG
@@ -47,7 +47,7 @@ void Artemis_Network_Sender_Connection::do_write()
 void Artemis_Network_Sender_Connection::handle_write(
 		const boost::system::error_code& error, std::size_t bytes_transferred)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Handle Write" << std::endl << " ==============="
 			<< std::endl;
 	std::cout << " - Bytes_Transferred: " << bytes_transferred << std::endl;
@@ -56,7 +56,7 @@ void Artemis_Network_Sender_Connection::handle_write(
 	{
 		std::cerr << " - Error encountered: " << error.message() << std::endl;
 	}
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Closing" << std::endl;
 #endif // _DEBUG
 	//Initiate graceful connection closure.
@@ -72,21 +72,21 @@ void Artemis_Network_Sender_Connection::handle_write(
 void Artemis_Network_Sender_Connection::connect(std::string dest_ip,
 		std::string dest_port)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Network_Sender_Connection::connect()" << std::endl;
 	std::cout << " - Creating resolver" << std::endl;
 #endif // _DEBUG
 	boost::asio::ip::tcp::resolver resolver(m_socket.get_io_service());
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating query" << std::endl;
 #endif //_DEBUG
 	boost::asio::ip::tcp::resolver::query query(dest_ip, dest_port);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating endpoint_iterator" << std::endl;
 #endif //_DEBUG
 	boost::asio::ip::tcp::resolver::iterator endpoint_iterator =
 			resolver.resolve(query);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Calling async_connect" << std::endl;
 #endif //_DEBUG
 	m_socket.get_io_service().post(
@@ -97,7 +97,7 @@ void Artemis_Network_Sender_Connection::connect(std::string dest_ip,
 void Artemis_Network_Sender_Connection::do_connect(
 		boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Network_Sender_Connection::do_connect()"
 			<< std::endl;
 #endif // _DEBUG
@@ -108,13 +108,13 @@ void Artemis_Network_Sender_Connection::do_connect(
 void Artemis_Network_Sender_Connection::handle_connect(
 		const boost::system::error_code &error)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Network_Sender_Connection::handle_connect()"
 			<< std::endl;
 #endif // _DEBUG
 	if (!error)
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Connected without error" << std::endl;
 #endif //_DEBUG
 	}
@@ -125,7 +125,7 @@ void Artemis_Network_Sender_Connection::handle_connect(
 }
 void Artemis_Network_Sender_Connection::do_close()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Network_Sender_Connection::do_close()" << std::endl;
 #endif // _DEBUG
 	m_socket.close();

@@ -1,6 +1,16 @@
 project (Tacktech_Manager)
 cmake_minimum_required( VERSION 2.8 )
 
+#If we're on MSVC and building in Release mode
+IF(CMAKE_BUILD_TYPE MATCHES Release)
+  if (MSVC)
+    message (STATUS "Setting GUI_TYPE to WIN32")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_ITERATOR_DEBUG_LEVEL=0" )
+	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /subsystem:windows")
+	set(GUI_TYPE WIN32)
+  endif(MSVC)
+endif(CMAKE_BUILD_TYPE MATCHES Release)
+
 link_libraries(${QT_LIBRARIES}
 				${QT_QTMAIN_LIBRARY}
 				${QT_QTCORE_LIBRARY} 

@@ -19,7 +19,7 @@ Add_Group_Dialog::~Add_Group_Dialog()
 void Add_Group_Dialog::set_group_and_computer_names(
 		Group_Container_Ptr p_group_names)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	p_group_names->print_contents();
 #endif // _DEBUG
 	group_and_computer_names = p_group_names;
@@ -38,7 +38,7 @@ void Add_Group_Dialog::ok_clicked()
 	}
 	else
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Group names already contain provided value"
 				<< std::endl;
 #endif // _DEBUG

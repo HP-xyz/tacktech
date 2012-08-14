@@ -1,7 +1,7 @@
 #ifndef EDIT_GROUP_H
 #define EDIT_GROUP_H
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 #include <QtGui/QMainWindow>

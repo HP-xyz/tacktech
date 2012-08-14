@@ -3,12 +3,12 @@
 Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 		QMainWindow(parent, flags)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog()" << std::endl;
 	std::cout << " - Setting up ui" << std::endl;
 #endif // _DEBUG
 	ui.setupUi(this);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting header labels" << std::endl;
 #endif // _DEBUG
 	QStringList headers;
@@ -16,29 +16,29 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 	ui.filename_tree_widget->setColumnCount(2);
 	ui.filename_tree_widget->setHeaderLabels(headers);
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating node menu" << std::endl;
 #endif // _DEBUG
 	node_menu = new QMenu();
 	ui.filename_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating add_pause_dialog pointer" << std::endl;
 #endif // _DEBUG
 	add_pause_dialog = new Add_Pause_Dialog();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating remove_filename action" << std::endl;
 #endif // _DEBUG
 	/* Creating context menu actions */
 	remove_filename = new QAction(tr("Remove File"), node_menu);
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Adding actions to tree widget" << std::endl;
 #endif // _DEBUG
 	/* Adding action to context menu */
 	ui.filename_tree_widget->addAction(remove_filename);
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Connecting primary signals" << std::endl;
 #endif // _DEBUG
 	/* Connecting the main GUI signals for this class */
@@ -52,7 +52,7 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ok_clicked()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(cancel_clicked()));
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Connecting secondary signals" << std::endl;
 #endif // _DEBUG
 	/* Connecting secondary signals */
@@ -60,7 +60,7 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 			SLOT(pause_changed_slot(int)));
 	connect(add_pause_dialog, SIGNAL(pause_unchanged()), this,
 			SLOT(pause_unchanged_slot()));
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - GUI setup complete" << std::endl;
 #endif // _DEBUG
 }
@@ -76,7 +76,7 @@ Add_File_Dialog::~Add_File_Dialog()
  ** */
 void Add_File_Dialog::set_playlist(Playlist_Container_Ptr p_playlist)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog::set_playlist()" << std::endl;
 #endif // _DEBUG
 	playlist = p_playlist;
@@ -96,7 +96,7 @@ void Add_File_Dialog::set_playlist_name(QString p_playlist_name)
 /** Repopulates the tree widget */
 void Add_File_Dialog::repopulate_widget()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog::repopulate_widget()" << std::endl;
 	playlist->print_contents();
 #endif // _DEBUG
@@ -107,7 +107,7 @@ void Add_File_Dialog::repopulate_widget()
 	Playlist_Multimap::iterator it = range.first;
 	for (it; it != range.second; ++it)
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Adding: " << it->second.first << std::endl;
 #endif // _DEBUG
 		Typed_QTreeWidgetItem *new_item = new Typed_QTreeWidgetItem();
@@ -145,13 +145,13 @@ else
  ** playlist variable and the tree widget */
 void Add_File_Dialog::add_filename_slot()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog::add_filename_slot()" << std::endl;
 #endif // _DEBUG
 	QStringList filenames = QFileDialog::getOpenFileNames(this,
 			tr("Select file(s) to add to playlist"));
 	foreach(QString filename, filenames){
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Adding " << qPrintable(playlist_name)
 	<< qPrintable(filename) << 0 << std::endl;
 #endif // _DEBUG
@@ -188,7 +188,7 @@ void Add_File_Dialog::add_pause_slot(QTreeWidgetItem *dud1, int dud2)
  ** values in both the tree widget and the global playlist variable */
 void Add_File_Dialog::pause_changed_slot(int new_pause)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Add_File_Dialog::pause_changed_slot()" << std::endl;
 #endif // _DEBUG
 	ui.filename_tree_widget->selectedItems().at(0)->setText(1,
@@ -214,7 +214,7 @@ void Add_File_Dialog::pause_unchanged_slot()
 
 void Add_File_Dialog::ok_clicked()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog::ok_clicked()" << std::endl;
 #endif // _DEBUG
 	emit filelist_changed();
