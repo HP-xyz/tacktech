@@ -21,14 +21,14 @@ void Artemis_Server::read_config()
 
 	try
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "Config file read: " << std::endl << "==================="
 				<< std::endl;
 #endif
 		for (boost::program_options::detail::config_file_iterator i(config,
 				options), e; i != e; ++i)
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << i->string_key << " " << i->value[0] << std::endl;
 #endif
 			parameters[i->string_key] = i->value[0];
@@ -43,7 +43,7 @@ void Artemis_Server::read_config()
  ** computers_and_groups into the class variables from stored XML files */
 void Artemis_Server::initialize_variables()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Server::initialize_variables()" << std::endl;
 #endif // _DEBUG
 	playlist.reset(new Playlist_Container());
@@ -58,7 +58,7 @@ void Artemis_Server::initialize_variables()
 
 void Artemis_Server::store_variables()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Server::store_variables()" << std::endl;
 #endif // _DEBUG
 	/* Save playlist to file */
@@ -91,7 +91,7 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size) :
 		thread_pool_size(p_thread_pool_size), signals(io_service), acceptor(
 				io_service), new_connection()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Server::Artemis_Server()" << std::endl
 			<< "===================================================="
 			<< std::endl;
@@ -108,7 +108,7 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size) :
 	boost::asio::ip::tcp::resolver resolver(io_service);
 	boost::asio::ip::tcp::resolver::query query(parameters["general.server_ip"],
 			parameters["general.listen_port"]);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "Artemis Server" << std::endl << "==============" << std::endl
 			<< " -- Server IP:   " << parameters["general.server_ip"]
 			<< std::endl << " -- Server PORT: "
@@ -116,21 +116,21 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size) :
 			<< " -- Creating endpoint" << std::endl;
 #endif // _DEBUG
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " -- Opening acceptor" << std::endl;
 #endif // _DEBUG
 	acceptor.open(endpoint.protocol());
 	//acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " -- Binding to endpoint" << std::endl;
 #endif // _DEBUG
 	acceptor.bind(endpoint);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " -- Starting to listen" << std::endl;
 #endif // _DEBUG
 	acceptor.listen();
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " -- Calling start_accept()" << std::endl;
 #endif // _DEBUG
 	start_accept();
@@ -138,7 +138,7 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size) :
 
 Artemis_Server::~Artemis_Server()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Server::~Artemis_Server()" << std::endl;
 #endif //_DEBUG
 	store_variables();

@@ -15,7 +15,7 @@ struct xml_string_writer: pugi::xml_writer
 	std::string result;
 	virtual void write(const void* data, std::size_t size)
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - (XML_WRITER)write of size: " << size << std::endl;
 #endif // _DEBUG
 		result += static_cast<const char*>(data);
@@ -80,7 +80,7 @@ void Upload_Data_Container::set_playlist(
  */
 std::string Upload_Data_Container::get_binary_file(QString filename)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Upload_Data_Container::get_binary_file()" << std::endl;
 #endif // _DEBUG
 	std::string file_encoded;
@@ -88,7 +88,7 @@ std::string Upload_Data_Container::get_binary_file(QString filename)
 	std::ifstream file(filename.toStdString().c_str(), std::ios::binary);
 	if (file.is_open())
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - File is open" << std::endl;
 		file.seekg(0, std::ios::end);
 		std::cout << " - Tellg(): " << file.tellg() << std::endl;
@@ -105,7 +105,7 @@ std::string Upload_Data_Container::get_binary_file(QString filename)
 		file_out << std::ends;
 		std::cout << "file_out size: " << file_out.str().size() << std::endl;
 		file_encoded = file_out.str();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Encoded filesize: " << file_encoded.size()
 				<< std::endl;
 #endif // _DEBUG
@@ -182,7 +182,7 @@ void Upload_Data_Container::get_xml_upload()
  */
 std::string Upload_Data_Container::get_variables_request_xml()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= pload_Data_Container::get_variables_request_xml()"
 			<< std::endl;
 #endif // _DEBUG
@@ -197,7 +197,7 @@ std::string Upload_Data_Container::get_variables_request_xml()
 
 	xml_string_writer writer;
 	transmit_document.print(writer);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "  - Sending variable request:" << std::endl << writer.result
 			<< std::endl << "  - Variable request c_str():" << std::endl
 			<< writer.result.c_str() << std::endl;
@@ -227,7 +227,7 @@ std::string Upload_Data_Container::get_variables_request_xml()
  */
 std::string Upload_Data_Container::set_variable_command_xml()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Upload_Data_Container::set_variable_command_xml()"
 			<< std::endl;
 #endif // _DEBUG
@@ -240,7 +240,7 @@ std::string Upload_Data_Container::set_variable_command_xml()
 	return_str += group_playlist->get_group_playlist_xml();
 	return_str += "</Variables>";
 	return_str += "</Tacktech>";
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "  - Set variable command:" << std::endl << return_str
 			<< std::endl << "  - Set variable command c_str():" << std::endl
 			<< return_str.c_str() << std::endl;
@@ -278,7 +278,7 @@ void Upload_Data_Container::set_group_playlist(
 std::string Upload_Data_Container::upload_file()
 {
 	//TODO MOVE THIS TO ARTEMIS_SERVER
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Upload_Data_Container::get_xml_upload()" << std::endl;
 #endif // _DEBUG
 	pugi::xml_document transmit_document;

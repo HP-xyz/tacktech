@@ -3,7 +3,7 @@
 Edit_Group::Edit_Group(QWidget *parent, Qt::WFlags flags) :
 		QMainWindow(parent, flags)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Setting up Edit_Group GUI" << std::endl;
 #endif // _DEBUG
 	ui = new Ui::Edit_GroupClass();
@@ -49,7 +49,7 @@ Edit_Group::Edit_Group(QWidget *parent, Qt::WFlags flags) :
 
 Edit_Group::~Edit_Group()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= ~Edit_Group" << std::endl;
 #endif // _DEBUG
 	delete ui;
@@ -68,12 +68,12 @@ Edit_Group::~Edit_Group()
 void Edit_Group::set_groups_and_computer_names(
 		Group_Container_Ptr p_groups_and_computer_names)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= set_groups_and_computer_names()" << std::endl;
 #endif // _DEBUG
 	groups_and_computer_names.reset(
 			new Group_Container(*p_groups_and_computer_names));
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Populate tree_widget" << std::endl;
 #endif // _DEBUG
 	/* Populating the main_tree_widget */
@@ -116,7 +116,7 @@ void Edit_Group::add_computer_slot()
  ** is not selected, an info message will be displayed */
 void Edit_Group::remove_computer_slot()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= remove_computer_slot()" << std::endl;
 #endif // _DEBUG
 	if (ui->main_tree_widget->selectedItems().count() > 0)
@@ -166,7 +166,7 @@ void Edit_Group::add_group_slot()
  ** variable */
 void Edit_Group::remove_group_slot()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= remove_group_slot()" << std::endl;
 #endif // _DEBUG
 	if (ui->main_tree_widget->selectedItems().count() > 0)
@@ -200,14 +200,14 @@ void Edit_Group::remove_group_slot()
  ** sends its _added() signal */
 void Edit_Group::repopulate_tree_widget()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " = repopulate_tree_widget" << std::endl;
 	std::cout << "  - Clearing the main_tree_widget" << std::endl;
 #endif // _DEBUG
 	ui->main_tree_widget->clear();
 	Typed_QTreeWidgetItem *group_item;
 	Typed_QTreeWidgetItem *computer_item;
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "  - Beginning population" << std::endl;
 #endif // _DEBUG
 	for (Group_Multimap::iterator it =
@@ -215,7 +215,7 @@ void Edit_Group::repopulate_tree_widget()
 			it != groups_and_computer_names->get_groups_and_computers()->end();
 			it++)
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "   - Group Name: " << it->first << std::endl;
 #endif // _DEBUG
 		group_item = new Typed_QTreeWidgetItem();
@@ -229,7 +229,7 @@ void Edit_Group::repopulate_tree_widget()
 		Group_Multimap::iterator it2 = range.first;
 		for (it2; it2 != range.second; ++it2)
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "    - Computer Name: " << it2->second << std::endl;
 #endif // _DEBUG
 			computer_item = new Typed_QTreeWidgetItem();

@@ -19,7 +19,7 @@ Add_Computer_Dialog::~Add_Computer_Dialog()
 void Add_Computer_Dialog::set_groups_and_computer_names(
 		Group_Container_Ptr p_groups_and_computer_names)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	p_groups_and_computer_names->print_contents();
 #endif // _DEBUG
 	groups_and_computer_names = p_groups_and_computer_names;
@@ -28,7 +28,7 @@ void Add_Computer_Dialog::set_groups_and_computer_names(
 /** Function to handle the accepted() signal from the class buttonbox */
 void Add_Computer_Dialog::ok_clicked()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_Computer_Dialog::ok_clicked()" << std::endl;
 #endif // _DEBUG
 	if (groups_and_computer_names->add_computer_name(group_name.toStdString(),
@@ -39,7 +39,7 @@ void Add_Computer_Dialog::ok_clicked()
 	}
 	else
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Computer names already contain provided value"
 				<< std::endl;
 #endif // _DEBUG

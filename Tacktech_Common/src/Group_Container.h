@@ -6,7 +6,7 @@
 #include <iterator>
 #include <boost/shared_ptr.hpp>
 #include <pugixml.hpp>
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 typedef boost::shared_ptr<std::multimap<std::string, std::string> > Groups_And_Computers_Ptr;
@@ -72,7 +72,7 @@ public:
 
 	std::string get_groups_and_computers_xml();
 	void reset_container();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	/** Function to print the contents of the Group_Container. Only compiled
 	 ** in debug mode */
 	void print_contents();

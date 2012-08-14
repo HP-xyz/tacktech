@@ -1,7 +1,7 @@
 #ifndef EDIT_PLAYLIST_H
 #define EDIT_PLAYLIST_H
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 #include <QtGui/QWidget>

@@ -46,7 +46,7 @@ bool Playlist_Container::add_playlist_name(std::string playlist_name)
 bool Playlist_Container::add_filename(std::string playlist_name,
 		std::string filename, int pause)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Playlist_Container::add_filename()" << std::endl;
 #endif // _DEBUG
 	std::pair<std::string, int> item_pair;
@@ -56,14 +56,14 @@ bool Playlist_Container::add_filename(std::string playlist_name,
 	playlist->insert(
 			std::pair<std::string, std::pair<std::string, int> >(playlist_name,
 					item_pair));
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Function should now contain item with: " << std::endl;
 	std::cout << "  - Key: " << playlist_name << std::endl;
 	std::cout << "  - Filename: " << filename << std::endl;
 	std::cout << "  - Pause: " << pause << std::endl;
 #endif // _DEBUG
 	/** Removing temp item if found */
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Calling remove_filename_from_playlist" << std::endl;
 #endif // _DEBUG
 	Playlist_Container::remove_filename_from_playlist(playlist_name,
@@ -76,12 +76,12 @@ bool Playlist_Container::add_filename(std::string playlist_name,
  ** be a playlist name */
 void Playlist_Container::remove_playlist(std::string playlist_name)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::remove_playlist()" << std::endl;
 #endif // _DEBUG
 
 	int count = playlist->erase(playlist_name);
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Removed " << count << " items" << std::endl;
 #endif // _DEBUG
 
@@ -117,7 +117,7 @@ Playlist_Multimap::iterator Playlist_Container::contains_filename_in_all_playlis
 void Playlist_Container::remove_filename_from_playlist(
 		std::string playlist_name, std::string filename)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::remove_filename_from_playlist()"
 			<< std::endl;
 #endif // _DEBUG
@@ -127,7 +127,7 @@ void Playlist_Container::remove_filename_from_playlist(
 	{
 		if (playlist_name == it2->first && filename == it2->second.first)
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "  - Removing: " << filename << std::endl;
 #endif // _DEBUG
 
@@ -170,7 +170,7 @@ Playlist_Range Playlist_Container::get_files_in_playlist(
 	return playlist->equal_range(playlist_name);
 }
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 /** Function to print the contents of Playlist_Container. Only compiled
  ** in debug mode */
 void Playlist_Container::print_contents()
@@ -234,7 +234,7 @@ std::string Playlist_Container::get_playlists_xml()
 
 void Playlist_Container::construct_playlist(std::string playlist)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::construct_playlist()" << std::endl;
 	std::cout << playlist << std::endl;
 #endif // _DEBUG

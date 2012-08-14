@@ -5,7 +5,7 @@
 #include <string>
 #include "Start_Send_Data_Thread.h"
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 class Send_Data: public QTcpSocket

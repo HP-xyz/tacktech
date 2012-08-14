@@ -33,7 +33,7 @@ Artemis_Request_Handler::Artemis_Request_Handler(
 		boost::shared_ptr<Playlist_Container> p_playlist,
 		boost::shared_ptr<Group_Playlist_Container> p_group_playlist)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()"
 			<< std::endl;
 #endif //_DEBUG
@@ -44,7 +44,7 @@ Artemis_Request_Handler::Artemis_Request_Handler(
 
 Artemis_Request_Handler::~Artemis_Request_Handler()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::~Artemis_Request_Handler()"
 			<< std::endl;
 #endif //_DEBUG
@@ -65,7 +65,7 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 		std::string p_remote_adress,
 		std::map<std::string, std::string> &parms)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " = Handle Request " << std::endl;
 	//std::cout << "  - Request: " << request << std::endl;
 #endif
@@ -79,7 +79,7 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 		}
 		else
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - No request received " << std::endl;
 #endif
 			result_status = NO_RESULT;
@@ -100,7 +100,7 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 //************************************
 void Artemis_Request_Handler::generate_queries(const std::string &request)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Generate Queries " << std::endl;
 #endif // _DEBUG
 	document.load(request.c_str());
@@ -110,14 +110,14 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 	if (type_string == "UPLOAD")
 	{
 		//Handle uploads
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received UPLOAD command" << std::endl;
 #endif // _DEBUG
 		Artemis::Artemis_Request_Handler::save_uploaded_file(tacktech);
 	}
 	else if (type_string == "GET_VARIABLES")
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received GET_VARIABLES command" << std::endl;
 #endif // _DEBUG
 		std::string dest_ip =
@@ -143,7 +143,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 	}
 	else if (type_string == "SET_VARIABLES")
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
 #endif // _DEBUG
 		xml_string_writer playlist_writer;
@@ -166,20 +166,20 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 	}
 	else if (type_string == "GET_UPDATES")
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received GET_UPDATES command" << std::endl;
 #endif // _DEBUG
 		pugi::xml_node has_files_node = tacktech.child("Files");
 		pugi::xml_node playlist_node = tacktech.child("Playlist");
 		std::map<std::string, std::string> filemap;
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Remote has files: " << std::endl;
 #endif // _DEBUG
 		for (pugi::xml_attribute_iterator it =
 				has_files_node.attributes().begin();
 				it != has_files_node.attributes().end(); it++)
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "  - " << it->value() << std::endl;
 #endif // _DEBUG
 			filemap.insert(
@@ -204,7 +204,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 				temp_filename.find_last_of("/") + 1);
 			if (filemap.find(temp_filename) == filemap.end())
 			{ //Upload file here
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << " ++ " << temp_filename << std::endl;
 #endif // _DEBUG
 				pugi::xml_node item_node = computer_node.append_child("Item");
@@ -236,7 +236,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 			}
 			else
 			{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << " -- " << temp_filename << std::endl;
 #endif // _DEBUG
 			}
@@ -258,7 +258,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
  */
 std::string Artemis_Request_Handler::get_binary_file(std::string filename)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Request_Handler::get_binary_file()" << std::endl;
 	std::cout << " - Getting file: " << filename << std::endl;
 #endif // _DEBUG
@@ -267,7 +267,7 @@ std::string Artemis_Request_Handler::get_binary_file(std::string filename)
 	std::ifstream file(filename.c_str(), std::ios::binary);
 	if (file.is_open())
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - File is open" << std::endl;
 		file.seekg(0, std::ios::end);
 		std::cout << " - Tellg(): " << file.tellg() << std::endl;
@@ -284,7 +284,7 @@ std::string Artemis_Request_Handler::get_binary_file(std::string filename)
 		file_out << std::ends;
 		std::cout << "file_out size: " << file_out.str().size() << std::endl;
 		file_encoded = file_out.str();
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Encoded filesize: " << file_encoded.size()
 				<< std::endl;
 #endif // _DEBUG
@@ -299,7 +299,7 @@ std::string Artemis_Request_Handler::get_binary_file(std::string filename)
 void Artemis_Request_Handler::handle_upload(std::string upload_xml,
 		std::string dest_ip, std::string dest_port)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Request_Handler::handle_upload()" << std::endl;
 	std::cout << " ->>>> Dest_Ip: " << dest_ip << std::endl;
 	std::cout << " ->>>> Dest_Port: " << dest_port << std::endl;
@@ -319,14 +319,14 @@ void Artemis_Request_Handler::handle_upload(std::string upload_xml,
 
 void Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::save_uploaded_file()" << std::endl;
 #endif // _DEBUG
 	std::string playlist_name =
 			tacktech.child("Playlist").attribute("PLAYLIST").as_string();
 
 	pugi::xml_node item_node = tacktech.child("Playlist").child("Item");
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "  - Filename: " << item_node.child_value("Filename")
 			<< std::endl;
 	std::cout << "  - Pause: " << item_node.child_value("Pause") << std::endl;
@@ -341,25 +341,25 @@ void Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 	D.decode(encoded_stream, decoded_stream);
 	file_data = decoded_stream.str();
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "   - File_Data size: " << file_data.size() << std::endl;
 #endif
 	std::string out_filename = parameters["general.playlist_directory"];
 	out_filename += filename;
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "  - Saving to: " << out_filename.c_str() << std::endl;
 #endif // _DEBUG
 	std::ofstream out_file(out_filename.c_str(), std::ios::binary);
 	if (out_file.good())
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "   - Output file is good" << std::endl;
 #endif // _DEBUG
 	}
 	else
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cerr << "   - Output file not good!" << std::endl;
 #endif // _DEBUG
 	}

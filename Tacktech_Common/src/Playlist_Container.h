@@ -8,7 +8,7 @@
 #include <boost/lexical_cast.hpp>
 #include <pugixml.hpp>
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 typedef boost::shared_ptr<
@@ -50,7 +50,7 @@ public:
 
 	void reset_container();
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
 #endif // _DEBUG
 private:

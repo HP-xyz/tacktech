@@ -83,7 +83,7 @@ std::string Group_Playlist_Container::get_group_playlist_xml()
 void Group_Playlist_Container::construct_group_playlist(
 		std::string group_playlist)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Group_Playlist_Container::construct_group_playlist()"
 			<< std::endl;
 	std::cout << group_playlist << std::endl;

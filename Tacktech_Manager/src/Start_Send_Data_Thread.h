@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include "Send_Data.h"
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
 
