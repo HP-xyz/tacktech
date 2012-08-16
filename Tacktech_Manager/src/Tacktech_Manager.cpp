@@ -30,7 +30,11 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 	ui.setupUi(this);
 	read_config();
 
-	recieve_data_ptr.reset(new Recieve_Data(parameters));
+	//recieve_data_ptr.reset(new Recieve_Data(parameters));
+	//send_data_ptr.reset(new Send_Data());
+	io_service.reset(new boost::asio::io_service);
+	network_manager.reset(
+		new Tacktech_Network_Manager(*io_service, parameters));
 
 	node_menu = new QMenu();
 	ui.centralwidget->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -70,8 +74,8 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 			SLOT(repopulate_widget()));
 	connect(upload_data_dialog, SIGNAL(scheduled_item_added(QDate)), this,
 			SLOT(scheduled_item_added(QDate)));
-	connect(recieve_data_ptr.get(), SIGNAL(data_recieved(std::string)), this,
-			SLOT(data_recieved_slot(std::string)));
+	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+			SLOT(data_recieved_slot(QString)));
 
 	read_variables_from_xml();
 	repopulate_widget();
@@ -198,7 +202,7 @@ void Tacktech_Manager::repopulate_widget()
 	playlist->print_contents();
 #endif // _DEBUG
 	ui.management_tree_widget->clear();
-	for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	for (unsigned int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
 	{
 		Typed_QTreeWidgetItem *tree_item = new Typed_QTreeWidgetItem();
 		tree_item->set_group_name(
@@ -226,7 +230,7 @@ void Tacktech_Manager::group_editing_complete()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::group_editing_complete()" << std::endl;
 #endif // _DEBUG
-	for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
+	for (unsigned int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
 	{
 		if (!groups_and_computers->contains_group_name(
 				group_playlist->get_group_playlist()->at(i).first))
@@ -498,10 +502,19 @@ void Tacktech_Manager::start_upload(std::string xml_string)
 	status_msg += parameters["general.server_port"];
 	ui.statusbar->showMessage(status_msg.c_str());
 
-	Send_Data *send_data =
-			new Send_Data(parameters["general.server_ip"].c_str(),
-					boost::lexical_cast<int>(parameters["general.server_port"]),
-					xml_string);
+	boost::shared_ptr<std::string> string_to_send;
+	string_to_send.reset(new std::string(xml_string));
+
+	network_manager->connect(parameters["general.server_ip"],
+			parameters["general.server_port"]);
+	network_manager->start_write(string_to_send);
+	boost::thread t(
+		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+	t.join();
+
+	//send_data_ptr->send_new_data(parameters["general.server_ip"].c_str(),
+	//				boost::lexical_cast<int>(parameters["general.server_port"]),
+	//				xml_string);
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
@@ -522,14 +535,14 @@ void Tacktech_Manager::refresh_all_request()
 	upload_data->get_xml_upload();
 }
 
-void Tacktech_Manager::data_recieved_slot(std::string data_recieved)
+void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager::data_recieved_slot()" << std::endl;
-	std::cout << data_recieved << std::endl;
+	std::cout << data_recieved.toStdString() << std::endl;
 #endif // _DEBUG
 	pugi::xml_document document;
-	document.load(data_recieved.c_str());
+	document.load(data_recieved.toStdString().c_str());
 	pugi::xml_node tacktech = document.child("Tacktech");
 	std::string type_string =
 			tacktech.child("Type").attribute("TYPE").as_string();

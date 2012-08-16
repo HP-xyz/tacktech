@@ -48,8 +48,9 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 		boost::shared_ptr<Group_Container> p_groups_and_computers,
 		boost::shared_ptr<Playlist_Container> p_playlist,
 		boost::shared_ptr<Group_Playlist_Container> p_group_playlist) :
-		strand(io_service), m_socket(io_service)
+		strand(io_service)
 {
+	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));
 	Artemis_Server_Connection::parms = parameters;
 	Artemis_Server_Connection::groups_and_computers = p_groups_and_computers;
 	Artemis_Server_Connection::playlist = p_playlist;
@@ -66,7 +67,7 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 //************************************
 boost::asio::ip::tcp::socket& Artemis_Server_Connection::socket()
 {
-	return (Artemis_Server_Connection::m_socket);
+	return (*Artemis_Server_Connection::m_socket);
 }
 
 //************************************
@@ -78,7 +79,7 @@ boost::asio::ip::tcp::socket& Artemis_Server_Connection::socket()
 //************************************
 void Artemis_Server_Connection::start()
 {
-	boost::asio::async_read_until(m_socket, buffer, ';',
+	boost::asio::async_read_until(*m_socket, buffer, ';',
 			boost::bind(&Artemis_Server_Connection::handle_read,
 					shared_from_this(), boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));
@@ -103,11 +104,12 @@ void Artemis_Server_Connection::handle_read(
 #endif
 	if (!error)
 	{
-		std::string remote_address =
-			m_socket.remote_endpoint().address().to_string();
+		boost::shared_ptr<std::string> return_xml(new std::string);
 
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " --> Recieved from IP: " << remote_address << std::endl;
+		std::cout << " --> Recieved from IP: " 
+			<< m_socket->remote_endpoint().address().to_string() 
+			<< std::endl;
 #endif // _DEBUG
 		std::vector<char> xml;
 		xml.reserve(bytes_transferred + 1);
@@ -126,9 +128,8 @@ void Artemis_Server_Connection::handle_read(
 		boost::shared_ptr<Artemis_Request_Handler> request_handler(
 				new Artemis_Request_Handler(groups_and_computers, playlist,
 						group_playlist));
-		request_handler->handle_request(received_xml, remote_address,
+		request_handler->handle_request(received_xml, return_xml,
 				Artemis_Server_Connection::parms);
-
 		try
 		{
 			if (request_handler->result_status == NO_RESULT)
@@ -139,6 +140,30 @@ void Artemis_Server_Connection::handle_read(
 			}
 			else if (request_handler->result_status == SINGLE_RESULT)
 			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << "= Artemis_Server_Connection::handle_read()" 
+					<< std::endl;
+				std::cout << " ->>>> Dest_Ip: " 
+					<< m_socket->remote_endpoint().address().to_string() 
+					<< std::endl;
+				std::cout << " ->>> Socket is currently open: " 
+					<< m_socket->is_open() << std::endl;
+				std::cout << " - Sending file of size: " 
+					<< return_xml->size() << std::endl;
+#endif // _DEBUG
+				Artemis_Network_Sender_Connection_ptr network_send_connector(
+					new Artemis_Network_Sender_Connection(
+					m_socket,
+					parms,
+					return_xml));
+				network_send_connector->start_write();
+				boost::thread t(
+					boost::bind(&boost::asio::io_service::run,
+					boost::ref(m_socket->get_io_service())));
+				t.join();
+				/*boost::thread t(
+					boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+				t.join();*/
 				/*boost::asio::async_write(m_socket,
 						boost::asio::buffer(reply_xml[0].c_str(),
 								reply_xml[0].size()),
@@ -169,7 +194,7 @@ void Artemis_Server_Connection::handle_read(
 			 }*/
 		} catch (std::exception& e)
 		{
-			std::cerr << "Exception during query execution:" << std::endl
+			std::cerr << "Exception during return message:" << std::endl
 					<< e.what() << std::endl;
 		}
 		/*boost::logic::tribool result;
@@ -228,7 +253,8 @@ void Artemis_Server_Connection::handle_write(
 		std::vector<std::vector<char> > &replies, std::size_t position)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " == Handle Write" << std::endl << " ==============="
+	std::cout << " == Artemis_Server_Connection::Handle Write" 
+		<< std::endl << " ==============="
 			<< std::endl << "  -- reply_count = " << position << std::endl;
 #endif
 	replies.erase(replies.begin() + position);
@@ -236,7 +262,7 @@ void Artemis_Server_Connection::handle_write(
 	{
 		// Initiate graceful connection closure.
 		boost::system::error_code ignored_ec;
-		Artemis_Server_Connection::m_socket.shutdown(
+		Artemis_Server_Connection::m_socket->shutdown(
 				boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 	}
 
@@ -250,7 +276,8 @@ void Artemis_Server_Connection::handle_write(
 		const boost::system::error_code& error, std::size_t bytes_transferred)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " == Handle Write" << std::endl << " ==============="
+	std::cout << " == Artemis_Server_Connection::Handle Write" 
+		<< std::endl << " ==============="
 			<< std::endl;
 	std::cout << " - Bytes_Transferred: " << bytes_transferred << std::endl;
 #endif
@@ -261,7 +288,7 @@ void Artemis_Server_Connection::handle_write(
 #endif
 		// Initiate graceful connection closure.
 		boost::system::error_code ignored_ec;
-		Artemis_Server_Connection::m_socket.shutdown(
+		Artemis_Server_Connection::m_socket->shutdown(
 				boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 	}
 

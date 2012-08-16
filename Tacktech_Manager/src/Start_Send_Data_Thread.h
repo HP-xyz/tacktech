@@ -15,7 +15,8 @@ public:
 			QObject *parent);
 	~Start_Send_Data_Thread();
 
-	void run();signals:
+	void run();
+signals:
 	void error(QTcpSocket::SocketError error);
 private:
 	int socket_descriptor;
@@ -24,4 +25,4 @@ private slots:
 	void bytes_written(qint64);
 };
 
-#endif
+#endif //START_SEND_DATA_THREAD_H

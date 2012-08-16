@@ -26,7 +26,8 @@ private:
 	QTcpServer server;
 	QTcpSocket* client;
 	QString data;
-	std::map<std::string, std::string> parameters;signals:
+	std::map<std::string, std::string> parameters;
+signals:
 	void data_recieved(std::string xml_data);
 private slots:
 	void acceptConnection();

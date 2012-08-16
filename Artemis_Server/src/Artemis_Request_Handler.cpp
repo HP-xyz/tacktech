@@ -62,14 +62,14 @@ Artemis_Request_Handler::~Artemis_Request_Handler()
 // Parameter: std::string> & parms
 //************************************
 void Artemis_Request_Handler::handle_request(const std::string &request,
-		std::string p_remote_adress,
+		boost::shared_ptr<std::string> p_return_xml,
 		std::map<std::string, std::string> &parms)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " = Handle Request " << std::endl;
 	//std::cout << "  - Request: " << request << std::endl;
 #endif
-	remote_address = p_remote_adress;
+	return_xml = p_return_xml;
 	parameters = parms;
 	try
 	{
@@ -86,7 +86,7 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 		}
 	} catch (std::exception &e)
 	{
-		std::cerr << "EXCEPTION_SQL: " << e.what() << std::endl;
+		std::cerr << "Handle Request exception: " << e.what() << std::endl;
 	}
 }
 
@@ -136,10 +136,12 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 
 		std::cout << upload_xml << std::endl;
 
-		boost::thread upload_thread(
+		return_xml->append(upload_xml);
+		result_status = SINGLE_RESULT;
+		/*boost::thread upload_thread(
 				boost::bind(&Artemis::Artemis_Request_Handler::handle_upload,
 						this, upload_xml, dest_ip, dest_port));
-		upload_thread.join();
+		upload_thread.join();*/
 	}
 	else if (type_string == "SET_VARIABLES")
 	{
@@ -245,7 +247,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 		upload_document.print(writer);
 		boost::thread upload_thread(boost::bind(
 			&Artemis::Artemis_Request_Handler::handle_upload, this,
-			writer.result, remote_address,
+			writer.result, "",
 			parameters["general.display_port"]));
 		upload_thread.join();
 	}
@@ -307,14 +309,14 @@ void Artemis_Request_Handler::handle_upload(std::string upload_xml,
 #endif // _DEBUG
 	boost::shared_ptr<boost::asio::io_service> io_service(
 			new boost::asio::io_service);
-	Artemis_Network_Sender_Connection_ptr network_send_connector(
+	/*Artemis_Network_Sender_Connection_ptr network_send_connector(
 			new Artemis_Network_Sender_Connection(*io_service, parameters,
 					upload_xml));
 	network_send_connector->connect(dest_ip, dest_port);
 	network_send_connector->start_write();
 	boost::thread t(
 			boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
-	t.join();
+	t.join();*/
 }
 
 void Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)

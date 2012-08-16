@@ -34,26 +34,16 @@ void Start_Send_Data_Thread::run()
 	}
 	/** Here we add the delimiter for the end of the stream */
 	xml_string += ";";
+	/** The following line does the actual sending */
+	qint64  bytes_written_var =
+		socket.write(xml_string.c_str(), xml_string.size());
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Sending data " << std::endl;
 	std::cout << " - Filesize: " << xml_string.size() << std::endl;
-	std::cout << " - Bytes Written: "
-		<< socket.write(xml_string.c_str(), xml_string.size()) << std::endl;
 	std::cout << " - Bytes to write: " << socket.bytesToWrite() << std::endl;
 	std::cout << " - Waiting for bytes written" << std::endl;
 #endif // _DEBUG
 	socket.waitForBytesWritten();
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Disconnecting from host" << std::endl;
-#endif // _DEBUG
-	socket.disconnectFromHost();
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Waiting for disconnect" << std::endl;
-#endif // _DEBUG
-	socket.waitForDisconnected();
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Disconnected" << std::endl;
-#endif // _DEBUG
 }
 
 void Start_Send_Data_Thread::bytes_written(qint64 bytes)
