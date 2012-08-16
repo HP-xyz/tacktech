@@ -48,15 +48,16 @@ public:
 
 	/** Handle a request and produce a reply*/
 	void handle_request(const std::string&,
-			std::string p_remote_address,
+			boost::shared_ptr<std::string> return_xml,
 			std::map<std::string, std::string>&);
 
 	STATUS result_status;
 private:
 	/** Result xml document to be returned */
 	pugi::xml_document document;
+
 	/** Vector of SQL queries to be executed */
-	std::string remote_address;
+	boost::shared_ptr<std::string> return_xml;
 
 	void handle_upload(std::string upload_xml, std::string dest_ip,
 			std::string dest_port);

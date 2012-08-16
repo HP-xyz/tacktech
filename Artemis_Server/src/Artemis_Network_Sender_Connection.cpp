@@ -3,14 +3,30 @@ namespace Artemis
 {
 Artemis_Network_Sender_Connection::Artemis_Network_Sender_Connection(
 		boost::asio::io_service &io_service,
-		std::map<std::string, std::string>& parameters, std::string _xml_string) :
-		strand(io_service), m_socket(io_service)
+		std::map<std::string, std::string>& parameters,
+		boost::shared_ptr<std::string> _xml_string) :
+		strand(io_service)
 {
+	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));
 	xml_string = _xml_string;
 	sent_buffer_count = 0;
 	start_index = 0;
 	bytes_sent = 0;
 }
+
+Artemis_Network_Sender_Connection::Artemis_Network_Sender_Connection(
+	boost::shared_ptr<boost::asio::ip::tcp::socket> p_socket,
+	std::map<std::string, std::string>& parameters,
+	boost::shared_ptr<std::string> _xml_string ):
+	strand(p_socket->get_io_service())
+{
+	m_socket = p_socket;
+	xml_string = _xml_string;
+	sent_buffer_count = 0;
+	start_index = 0;
+	bytes_sent = 0;
+}
+
 
 Artemis_Network_Sender_Connection::~Artemis_Network_Sender_Connection()
 {
@@ -28,40 +44,49 @@ void Artemis_Network_Sender_Connection::start_write()
 	std::cout << " =Artemis_Network_Sender_Connection::start_write()"
 			<< std::endl;
 #endif //_DEBUG
-	m_socket.get_io_service().post(
-			boost::bind(&Artemis_Network_Sender_Connection::do_write, this));
+	m_socket->get_io_service().post(
+			boost::bind(&Artemis_Network_Sender_Connection::do_write,
+			this));
 	//m_socket.get_io_service().run();
 }
 void Artemis_Network_Sender_Connection::do_write()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " =Artemis_Network_Sender_Connection::do_write()" << std::endl;
-	std::cout << " - Writing size: " << xml_string.size() << std::endl;
+	std::cout << " =Artemis_Network_Sender_Connection::do_write()" 
+		<< std::endl;
+	std::cout << " ->>> Socket is currently open: " 
+		<< m_socket->is_open() << std::endl;
+	std::cout << " - Writing size: " << xml_string->size() << std::endl;
 #endif //_DEBUG
-	boost::asio::async_write(m_socket,
-			boost::asio::buffer(xml_string.c_str(), xml_string.size()),
-			boost::bind(&Artemis_Network_Sender_Connection::handle_write, this,
+	xml_string->append(";");
+	boost::asio::async_write(*m_socket,
+			boost::asio::buffer(xml_string->c_str(), xml_string->size()),
+			boost::bind(&Artemis_Network_Sender_Connection::handle_write,
+			this,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));
 }
 void Artemis_Network_Sender_Connection::handle_write(
-		const boost::system::error_code& error, std::size_t bytes_transferred)
+		const boost::system::error_code& error,
+		std::size_t bytes_transferred)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Handle Write" << std::endl << " ==============="
 			<< std::endl;
-	std::cout << " - Bytes_Transferred: " << bytes_transferred << std::endl;
+	std::cout << " - Bytes_Transferred: " << bytes_transferred 
+		<< std::endl;
 #endif
 	if (error)
 	{
-		std::cerr << " - Error encountered: " << error.message() << std::endl;
+		std::cerr << " - Error encountered: " << error.message() 
+			<< std::endl;
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Closing" << std::endl;
 #endif // _DEBUG
 	//Initiate graceful connection closure.
 	boost::system::error_code ignored_ec;
-	Artemis_Network_Sender_Connection::m_socket.shutdown(
+	Artemis_Network_Sender_Connection::m_socket->shutdown(
 			boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 
 	// No new asynchronous operations are started. This means that all shared_ptr
@@ -73,10 +98,11 @@ void Artemis_Network_Sender_Connection::connect(std::string dest_ip,
 		std::string dest_port)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Artemis_Network_Sender_Connection::connect()" << std::endl;
+	std::cout << "= Artemis_Network_Sender_Connection::connect()" 
+		<< std::endl;
 	std::cout << " - Creating resolver" << std::endl;
 #endif // _DEBUG
-	boost::asio::ip::tcp::resolver resolver(m_socket.get_io_service());
+	boost::asio::ip::tcp::resolver resolver(m_socket->get_io_service());
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating query" << std::endl;
 #endif //_DEBUG
@@ -89,8 +115,9 @@ void Artemis_Network_Sender_Connection::connect(std::string dest_ip,
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Calling async_connect" << std::endl;
 #endif //_DEBUG
-	m_socket.get_io_service().post(
-			boost::bind(&Artemis_Network_Sender_Connection::do_connect, this,
+	m_socket->get_io_service().post(
+			boost::bind(&Artemis_Network_Sender_Connection::do_connect,
+					this,
 					endpoint_iterator));
 	//m_socket.get_io_service().run();
 }
@@ -101,7 +128,7 @@ void Artemis_Network_Sender_Connection::do_connect(
 	std::cout << "= Artemis_Network_Sender_Connection::do_connect()"
 			<< std::endl;
 #endif // _DEBUG
-	boost::asio::async_connect(m_socket, endpoint_iterator,
+	boost::asio::async_connect(*m_socket, endpoint_iterator,
 			boost::bind(&Artemis_Network_Sender_Connection::handle_connect,
 					this, boost::asio::placeholders::error));
 }
@@ -126,8 +153,9 @@ void Artemis_Network_Sender_Connection::handle_connect(
 void Artemis_Network_Sender_Connection::do_close()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Artemis_Network_Sender_Connection::do_close()" << std::endl;
+	std::cout << "= Artemis_Network_Sender_Connection::do_close()" 
+		<< std::endl;
 #endif // _DEBUG
-	m_socket.close();
+	m_socket->close();
 }
 }

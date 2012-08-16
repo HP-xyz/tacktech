@@ -68,7 +68,7 @@ private:
 	/** Strand to ensure the connections handlers are not called concurrently */
 	boost::asio::io_service::strand strand;
 	/** Socket for the connection */
-	boost::asio::ip::tcp::socket m_socket;
+	boost::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 	/** Buffer for incoming data */
 	boost::asio::streambuf buffer;
 

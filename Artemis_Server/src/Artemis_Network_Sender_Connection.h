@@ -26,7 +26,12 @@ class Artemis_Network_Sender_Connection: public boost::enable_shared_from_this<
 public:
 	explicit Artemis_Network_Sender_Connection(
 			boost::asio::io_service &io_service,
-			std::map<std::string, std::string>&, std::string _xml_string);
+			std::map<std::string, std::string>&,
+			boost::shared_ptr<std::string> _xml_string);
+	explicit Artemis_Network_Sender_Connection(
+			boost::shared_ptr<boost::asio::ip::tcp::socket> p_socket,
+			std::map<std::string, std::string>&,
+			boost::shared_ptr<std::string> _xml_string);
 	virtual ~Artemis_Network_Sender_Connection();
 
 	void connect(std::string dest_ip, std::string dest_port);
@@ -39,10 +44,10 @@ private:
 	/** Strand to ensure the connections handlers are not called concurrently */
 	boost::asio::io_service::strand strand;
 	/** Socket for the connection */
-	boost::asio::ip::tcp::socket m_socket;
+	boost::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 
 	std::map<std::string, std::string> parms;
-	std::string xml_string;
+	boost::shared_ptr<std::string> xml_string;
 	unsigned long long sent_buffer_count;
 	unsigned long long start_index;
 	unsigned long long bytes_sent;

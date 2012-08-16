@@ -1,6 +1,5 @@
 #ifndef TACKTECH_MANAGER_H
 #define TACKTECH_MANAGER_H
-
 #include <QtGui/QMainWindow>
 #include <QMap>
 #include <QDate>
@@ -13,6 +12,7 @@
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <pugixml.hpp>
 #include <Group_Container.h>
 #include <Playlist_Container.h>
@@ -26,12 +26,12 @@
 #include "Recieve_Data.h"
 #include "ui_Tacktech_Manager.h"
 #include "Start_Send_Data_Thread.h"
+#include "Tacktech_Network_Manager.h"
 
 typedef boost::shared_ptr<Upload_Data_Container> Upload_Data_Container_Ptr;
 class Tacktech_Manager: public QMainWindow
 {
 Q_OBJECT
-
 public:
 	Tacktech_Manager(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Tacktech_Manager();
@@ -49,6 +49,9 @@ private:
 	Upload_Data *upload_data_dialog;
 
 	boost::shared_ptr<Recieve_Data> recieve_data_ptr;
+	boost::shared_ptr<Send_Data> send_data_ptr;
+	Tacktech_Network_Manager_Ptr network_manager;
+	boost::shared_ptr<boost::asio::io_service> io_service;
 
 	/** Variables for the config file */
 	std::map<std::string, std::string> parameters;
@@ -89,7 +92,7 @@ private slots:
 	void start_upload(std::string);
 	//void refresh_all_reply();
 	void refresh_all_request();
-	void data_recieved_slot(std::string data_recieved);
+	void data_recieved_slot(QString data_recieved);
 	void upload_new_variables_slot();
 
 	void group_editing_complete();

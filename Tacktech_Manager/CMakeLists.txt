@@ -31,7 +31,6 @@ include_directories (
 					${Tacktech_Common_INCLUDE_DIR}
 					)
 	
-message(STATUS "Tacktech_Manager boost link: " ${Boost_PROGRAM_OPTIONS_LIBRARY})	
 set (Tacktech_Manager_Non_MOC_HDRS
 	${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.h
 	)
@@ -53,6 +52,7 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Send_Data.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Start_Send_Data_Thread.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Recieve_Data.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Network_Manager.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
@@ -69,6 +69,7 @@ set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Send_Data.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Start_Send_Data_Thread.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Recieve_Data.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Network_Manager.h
 	)
 #FOR NOW, THERE ARE NO RESOURCES
 set ( Tacktech_Manager_RSCS
@@ -117,5 +118,5 @@ target_link_libraries ( Tacktech_Manager
 					${QT_QTGUI_LIBRARIES} 
 					${QT_QTNETWORK_LIBRARIES} 
 					${CMAKE_THREAD_LIBS_INIT}
-					${Boost_PROGRAM_OPTIONS_LIBRARY}
+					${Boost_LIBRARIES}
 					)
