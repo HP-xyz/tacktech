@@ -65,7 +65,7 @@ private:
 	/** Function to parse received XML to find queries to be run */
 	void generate_queries(const std::string&);
 
-	void save_uploaded_file(pugi::xml_node tacktech);
+	bool save_uploaded_file(pugi::xml_node tacktech);
 	std::string get_binary_file(std::string filename);
 
 	std::map<std::string, std::string> parameters;

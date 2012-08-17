@@ -30,8 +30,6 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 	ui.setupUi(this);
 	read_config();
 
-	//recieve_data_ptr.reset(new Recieve_Data(parameters));
-	//send_data_ptr.reset(new Send_Data());
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
 		new Tacktech_Network_Manager(*io_service, parameters));
@@ -77,7 +75,6 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
 			SLOT(data_recieved_slot(QString)));
 
-	read_variables_from_xml();
 	repopulate_widget();
 }
 
@@ -131,7 +128,6 @@ void Tacktech_Manager::read_config()
 
 Tacktech_Manager::~Tacktech_Manager()
 {
-	save_variables_to_xml();
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= ~Tacktech_Manager" << std::endl;
 #endif // _DEBUG
@@ -142,8 +138,6 @@ Tacktech_Manager::~Tacktech_Manager()
 
 	delete schedule_upload;
 	delete node_menu;
-
-	recieve_data_ptr.reset();
 }
 
 /** Function will refresh all group statuses
@@ -268,200 +262,6 @@ void Tacktech_Manager::show_playlist_selection(QTreeWidgetItem* selected_item,
 	select_playlist_dialog->show();
 }
 
-/** Saves the playlist, groups_and_computers and group_playlist variables
- ** to file, XML encoded.
- ** NOTE: This function takes n^2 time to complete */
-void Tacktech_Manager::save_variables_to_xml()
-{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//    std::cout << "= Tacktech_Manager::save_variables_to_xml()"
-//              << std::endl;
-//#endif // _DEBUG
-//    /* Save playlist to file */
-//    pugi::xml_document playlist_document;
-//    pugi::xml_node root_node_playlist =
-//        playlist_document.append_child("Playlist");
-//    for (int i = 0; i < playlist->get_playlist().uniqueKeys().size(); i++)
-//    {
-//        pugi::xml_node playlist_node =
-//            root_node_playlist.append_child("Playlist_Item");
-//        playlist_node.append_attribute("Playlist_Name") =
-//            playlist->get_playlist().uniqueKeys().at(i).toStdString()
-//            .c_str();
-//        for (int j = 0; j < playlist->get_playlist().values(
-//                    playlist->get_playlist().uniqueKeys().at(i)).size(); j++)
-//        {
-//            pugi::xml_node item_node = playlist_node.append_child("Item");
-//            pugi::xml_node filename_node = item_node.append_child(
-//                                               "Filename");
-//            pugi::xml_node pause_node = item_node.append_child(
-//                                            "Pause");
-//            pugi::xml_node filename_pcdata =
-//                filename_node.append_child(pugi::node_pcdata);
-//            pugi::xml_node pause_pcdata =
-//                pause_node.append_child(pugi::node_pcdata);
-//
-//            filename_pcdata.set_value(playlist->get_playlist().values(
-//                                          playlist->get_playlist().uniqueKeys().at(i))
-//                                      .at(j).first.toStdString().c_str());
-//            pause_pcdata.set_value(boost::lexical_cast<std::string>(
-//                                       playlist->get_playlist().values(
-//                                           playlist->get_playlist().uniqueKeys().at(i))
-//                                       .at(j).second).c_str());
-//        }
-//    }
-//    playlist_document.save_file("./playlist.xml");
-//
-//    /* Save groups_and_computers to file */
-//    pugi::xml_document groups_and_computers_document;
-//    pugi::xml_node root_node_groups_and_computers =
-//        groups_and_computers_document.append_child("Groups_And_Computers");
-//
-//    for (int i = 0;
-//            i < groups_and_computers->
-//            get_groups_and_computers().uniqueKeys().size(); i++)
-//    {
-//        pugi::xml_node group_node = root_node_groups_and_computers
-//                                    .append_child("Group_Item");
-//        group_node.append_attribute("Group_Name") =
-//            groups_and_computers->get_groups_and_computers().uniqueKeys()
-//            .at(i).toStdString().c_str();
-//        for (int j = 0;
-//                j < groups_and_computers->
-//                get_groups_and_computers().values(
-//                    groups_and_computers->get_groups_and_computers()
-//                    .uniqueKeys().at(i)).size(); j++)
-//        {
-//            pugi::xml_node computer_item_node = group_node.append_child("Computer_Item");
-//            pugi::xml_node computer_node = computer_item_node.append_child(
-//                                               "Computer");
-//            pugi::xml_node computer_pcdata =
-//                computer_node.append_child(pugi::node_pcdata);
-//            computer_pcdata.set_value(
-//                groups_and_computers->get_groups_and_computers().values(
-//                    groups_and_computers->get_groups_and_computers()
-//                    .uniqueKeys().at(i)).at(j).toStdString().c_str());
-//        }
-//    }
-//    groups_and_computers_document.save_file("./groups_and_computers.xml");
-//
-//    /* Save group_playlist to file */
-//    pugi::xml_document group_playlist_document;
-//    pugi::xml_node root_node_group_playlist =
-//        group_playlist_document.append_child("Group_Playlist");
-//
-//    for (int i = 0; i < group_playlist->get_group_playlist()->size(); i++)
-//    {
-//        pugi::xml_node group_playlist_node =
-//            root_node_group_playlist.append_child("Group_Playlist_Item");
-//        pugi::xml_node group_name_node =
-//            group_playlist_node.append_child("Group_Name");
-//        pugi::xml_node playlist_name_node =
-//            group_playlist_node.append_child("Playlist_Name");
-//        pugi::xml_node group_name_pcdata =
-//            group_name_node.append_child(pugi::node_pcdata);
-//        pugi::xml_node playlist_name_pcdata =
-//            playlist_name_node.append_child(pugi::node_pcdata);
-//        group_name_pcdata.set_value(
-//            group_playlist->get_group_playlist()->
-//            at(i).first.toStdString().c_str());
-//        playlist_name_pcdata.set_value(
-//            group_playlist->get_group_playlist()->
-//            at(i).second.toStdString().c_str());
-//    }
-//    group_playlist_document.save_file("./group_playlist.xml");
-}
-
-/** Read the values for variables groups_and_computers, playlists and
- ** group playlist from file, XML encoded */
-void Tacktech_Manager::read_variables_from_xml()
-{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//    std::cout << "= Tacktech_Manager::read_variables_from_xml()"
-//              << std::endl;
-//#endif // _DEBUG
-//    /* Read playlist from file */
-//    pugi::xml_document playlist_document;
-//    playlist_document.load_file("./playlist.xml");
-//    pugi::xml_node root_node = playlist_document.child("Playlist");
-//#ifdef _SHOW_DEBUG_OUTPUT
-//    std::cout << " - Root Item:" << std::endl;
-//    root_node.print(std::cout);
-//#endif // _DEBUG
-//    for (pugi::xml_node playlist_item = root_node.child("Playlist_Item");
-//            playlist_item;
-//            playlist_item = playlist_item.next_sibling("Playlist_Item"))
-//    {
-//#ifdef _SHOW_DEBUG_OUTPUT
-//        std::cout << " - Playlist Item:" << std::endl;
-//        playlist_item.print(std::cout);
-//#endif // _DEBUG
-//        for(pugi::xml_node item_node = playlist_item.child("Item");
-//                item_node;
-//                item_node = item_node.next_sibling("Item"))
-//        {
-//            playlist->add_filename(
-//                playlist_item.attribute("Playlist_Name").as_string(),
-//                item_node.child_value("Filename"),
-//                boost::lexical_cast<int>(item_node.child_value("Pause")));
-//        }
-//    }
-//
-//    /* Read groups_and_computers from file */
-//    pugi::xml_document groups_and_computers_document;
-//    groups_and_computers_document.load_file("./groups_and_computers.xml");
-//    root_node = groups_and_computers_document.child("Groups_And_Computers");
-//#ifdef _SHOW_DEBUG_OUTPUT
-//    std::cout << " - Root Item:" << std::endl;
-//    root_node.print(std::cout);
-//#endif // _DEBUG
-//    for (pugi::xml_node group_item = root_node.child("Group_Item");
-//            group_item;
-//            group_item = group_item.next_sibling("Group_Item"))
-//    {
-//#ifdef _SHOW_DEBUG_OUTPUT
-//// TODO (HP#1#):
-//        std::cout << " - Group Item:" << std::endl;
-//        group_item.print(std::cout);
-//#endif // _DEBUG
-//        for (pugi::xml_node computer_item = group_item.child("Computer_Item");
-//                computer_item;
-//                computer_item = computer_item.next_sibling("Computer_Item"))
-//        {
-//            groups_and_computers->add_computer_name(
-//                group_item.attribute("Group_Name").as_string(),
-//                computer_item.child_value("Computer"));
-//        }
-//    }
-//
-//    /* Now we have to tell the class to repopulate the group_playlist.
-//     * This is done by calling the group_editing_complete slot. */
-//    group_editing_complete();
-//
-//    /* Read group_playlist from file */
-//    pugi::xml_document group_playlist_document;
-//    group_playlist_document.load_file("./group_playlist.xml");
-//    root_node = group_playlist_document.child("Group_Playlist");
-//#ifdef _SHOW_DEBUG_OUTPUT
-//    std::cout << " - Root Item:" << std::endl;
-//    root_node.print(std::cout);
-//#endif // _DEBUG
-//    for (pugi::xml_node group_playlist_item =
-//                root_node.child("Group_Playlist_Item");
-//            group_playlist_item;
-//            group_playlist_item =
-//                group_playlist_item.next_sibling("Group_Playlist_Item"))
-//    {
-//#ifdef _SHOW_DEBUG_OUTPUT
-//        std::cout << " - Group_Playlist Item:" << std::endl;
-//        group_playlist_item.print(std::cout);
-//#endif // _DEBUG
-//        group_playlist->connect_group_to_playlist(
-//            group_playlist_item.child_value("Group_Name"),
-//            group_playlist_item.child_value("Playlist_Name"));
-//    }
-}
-
 void Tacktech_Manager::scheduled_item_added(QDate date)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -511,10 +311,6 @@ void Tacktech_Manager::start_upload(std::string xml_string)
 	boost::thread t(
 		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
 	t.join();
-
-	//send_data_ptr->send_new_data(parameters["general.server_ip"].c_str(),
-	//				boost::lexical_cast<int>(parameters["general.server_port"]),
-	//				xml_string);
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Upload thread execution started" << std::endl;
 #endif // _DEBUG
@@ -539,8 +335,10 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager::data_recieved_slot()" << std::endl;
-	std::cout << data_recieved.toStdString() << std::endl;
+	std::cout << " - Data Received: " << 
+		data_recieved.toStdString() << std::endl;
 #endif // _DEBUG
+	std::string status_msg;
 	pugi::xml_document document;
 	document.load(data_recieved.toStdString().c_str());
 	pugi::xml_node tacktech = document.child("Tacktech");
@@ -553,7 +351,8 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 #endif // _DEBUG
 		tacktech.print(std::cout);
 		xml_string_writer playlist_writer;
-		tacktech.child("Variables").child("Playlist").print(playlist_writer);
+		tacktech.child("Variables").
+			child("Playlist").print(playlist_writer);
 		playlist->reset_container();
 		playlist->construct_playlist(playlist_writer.result);
 
@@ -568,8 +367,24 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 		tacktech.child("Variables").child("Group_Playlist").print(
 				group_playlist_writer);
 		group_playlist->reset_container();
-		group_playlist->construct_group_playlist(group_playlist_writer.result);
+		group_playlist->construct_group_playlist(
+			group_playlist_writer.result);
+		status_msg += "Received variables successfully";
 	}
+	else if(type_string == "UPLOAD_RESULT")
+	{
+		std::string succes_string =
+			tacktech.child("Success").attribute("SUCCESS").as_string();
+		if (succes_string == "TRUE")
+		{
+			status_msg += "Uploaded successfully to server";
+		}
+		else
+		{
+			status_msg += "Uploaded failed to server";
+		}
+	}
+	ui.statusbar->showMessage(status_msg.c_str());
 	repopulate_widget();
 }
 

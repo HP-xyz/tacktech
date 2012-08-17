@@ -22,12 +22,9 @@
 #include "Select_Playlist_Dialog.h"
 #include "Upload_Data.h"
 #include "Upload_Data_Container.h"
-#include "Send_Data.h"
-#include "Recieve_Data.h"
 #include "ui_Tacktech_Manager.h"
 #include "Start_Send_Data_Thread.h"
 #include "Tacktech_Network_Manager.h"
-
 typedef boost::shared_ptr<Upload_Data_Container> Upload_Data_Container_Ptr;
 class Tacktech_Manager: public QMainWindow
 {
@@ -48,8 +45,6 @@ private:
 	Select_Playlist_Dialog *select_playlist_dialog;
 	Upload_Data *upload_data_dialog;
 
-	boost::shared_ptr<Recieve_Data> recieve_data_ptr;
-	boost::shared_ptr<Send_Data> send_data_ptr;
 	Tacktech_Network_Manager_Ptr network_manager;
 	boost::shared_ptr<boost::asio::io_service> io_service;
 
@@ -59,9 +54,6 @@ private:
 
 	/** Reads a config file*/
 	void read_config();
-
-	void save_variables_to_xml();
-	void read_variables_from_xml();
 
 protected:
 	/* Variable for computer names and group names
@@ -90,7 +82,6 @@ private slots:
 	void show_schedule_upload_dialog();
 	void scheduled_item_added(QDate);
 	void start_upload(std::string);
-	//void refresh_all_reply();
 	void refresh_all_request();
 	void data_recieved_slot(QString data_recieved);
 	void upload_new_variables_slot();
