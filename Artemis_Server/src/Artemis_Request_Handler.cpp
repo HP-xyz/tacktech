@@ -113,7 +113,23 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received UPLOAD command" << std::endl;
 #endif // _DEBUG
-		Artemis::Artemis_Request_Handler::save_uploaded_file(tacktech);
+		std::string upload_xml;
+		if(Artemis::Artemis_Request_Handler::save_uploaded_file(tacktech))
+		{
+			upload_xml += "<Tacktech>";
+			upload_xml += "<Type TYPE=\"UPLOAD_RESULT\" />";
+			upload_xml += "<Success SUCCESS=\"TRUE\" />";
+			upload_xml += "</Tacktech>";
+		}
+		else
+		{
+			upload_xml += "<Tacktech>";
+			upload_xml += "<Type TYPE=\"UPLOAD_RESULT\" />";
+			upload_xml += "<Success SUCCESS=\"FALSE\" />";
+			upload_xml += "</Tacktech>";
+		}
+		return_xml->append(upload_xml);
+		result_status = SINGLE_RESULT;
 	}
 	else if (type_string == "GET_VARIABLES")
 	{
@@ -134,14 +150,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 		upload_xml += "</Variables>";
 		upload_xml += "</Tacktech>";
 
-		std::cout << upload_xml << std::endl;
-
 		return_xml->append(upload_xml);
 		result_status = SINGLE_RESULT;
-		/*boost::thread upload_thread(
-				boost::bind(&Artemis::Artemis_Request_Handler::handle_upload,
-						this, upload_xml, dest_ip, dest_port));
-		upload_thread.join();*/
 	}
 	else if (type_string == "SET_VARIABLES")
 	{
@@ -149,7 +159,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
 #endif // _DEBUG
 		xml_string_writer playlist_writer;
-		tacktech.child("Variables").child("Playlist").print(playlist_writer);
+		tacktech.child("Variables").
+			child("Playlist").print(playlist_writer);
 		playlist->reset_container();
 		playlist->construct_playlist(playlist_writer.result);
 
@@ -245,11 +256,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 		}
 		xml_string_writer writer;
 		upload_document.print(writer);
-		boost::thread upload_thread(boost::bind(
-			&Artemis::Artemis_Request_Handler::handle_upload, this,
-			writer.result, "",
-			parameters["general.display_port"]));
-		upload_thread.join();
+		return_xml->append(writer.result);
+		result_status = SINGLE_RESULT;
 	}
 }
 
@@ -319,54 +327,63 @@ void Artemis_Request_Handler::handle_upload(std::string upload_xml,
 	t.join();*/
 }
 
-void Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
+bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::save_uploaded_file()" << std::endl;
 #endif // _DEBUG
+	bool successfull_save = false;
 	std::string playlist_name =
 			tacktech.child("Playlist").attribute("PLAYLIST").as_string();
 
-	pugi::xml_node item_node = tacktech.child("Playlist").child("Item");
+	for (pugi::xml_node item_node =
+		tacktech.child("Playlist").child("Item");
+		item_node;
+		item_node = item_node.next_sibling("Item"))
+	{
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "  - Filename: " << item_node.child_value("Filename")
+		std::cout << "  - Filename: " << item_node.child_value("Filename")
+				<< std::endl;
+		std::cout << "  - Pause: " << item_node.child_value("Pause") 
 			<< std::endl;
-	std::cout << "  - Pause: " << item_node.child_value("Pause") << std::endl;
 #endif //_DEBUG
-	std::string filename = item_node.child_value("Filename");
-	std::string file_data = item_node.child_value("File_Data");
-	std::stringstream encoded_stream;
-	std::stringstream decoded_stream;
+		std::string filename = item_node.child_value("Filename");
+		std::string file_data = item_node.child_value("File_Data");
+		std::stringstream encoded_stream;
+		std::stringstream decoded_stream;
 
-	encoded_stream << file_data;
-	base64::decoder D;
-	D.decode(encoded_stream, decoded_stream);
-	file_data = decoded_stream.str();
+		encoded_stream << file_data;
+		base64::decoder D;
+		D.decode(encoded_stream, decoded_stream);
+		file_data = decoded_stream.str();
 
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "   - File_Data size: " << file_data.size() << std::endl;
+		std::cout << "   - File_Data size: " << file_data.size() << std::endl;
 #endif
-	std::string out_filename = parameters["general.playlist_directory"];
-	out_filename += filename;
+		std::string out_filename = parameters["general.playlist_directory"];
+		out_filename += filename;
 
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "  - Saving to: " << out_filename.c_str() << std::endl;
+		std::cout << "  - Saving to: " << out_filename.c_str() << std::endl;
 #endif // _DEBUG
-	std::ofstream out_file(out_filename.c_str(), std::ios::binary);
-	if (out_file.good())
-	{
+		std::ofstream out_file(out_filename.c_str(), std::ios::binary);
+		if (out_file.good())
+		{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "   - Output file is good" << std::endl;
+			std::cout << "   - Output file is good" << std::endl;
 #endif // _DEBUG
-	}
-	else
-	{
+			successfull_save = true;
+		}
+		else
+		{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cerr << "   - Output file not good!" << std::endl;
+			std::cerr << "   - Output file not good!" << std::endl;
 #endif // _DEBUG
+		}
+		out_file << file_data;
+		out_file.close();
 	}
-	out_file << file_data;
-	out_file.close();
+	return successfull_save;
 }
 
 }
