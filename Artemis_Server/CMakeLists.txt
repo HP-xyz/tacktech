@@ -29,13 +29,22 @@ add_executable(Artemis_Server
 		${ARTEMIS_SERVER_HDRS}
 		)
 if(MINGW AND __COMPILER_GNU)
-  target_link_libraries(Artemis_Server ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ws2_32 wsock32 pugixml libb64 Tacktech_Common)
+  target_link_libraries(Artemis_Server
+			${Boost_LIBRARIES}
+			${CMAKE_THREAD_LIBS_INIT}
+			ws2_32 
+			wsock32 
+			pugixml 
+			libb64 
+			Tacktech_Common
+			)
 else(MINGW AND __COMPILER_GNU)
 	target_link_libraries(Artemis_Server
-						${Boost_LIBRARIES}
-						pugixml
-						libb64
-						Tacktech_Common)
+			      ${Boost_LIBRARIES}
+			      ${CMAKE_THREAD_LIBS_INIT}
+			      pugixml
+			      libb64
+			      Tacktech_Common)
 endif(MINGW AND __COMPILER_GNU)
 
 

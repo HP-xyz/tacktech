@@ -42,7 +42,6 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	Tactek_Display::update_timer = new QTimer(this);
 	Tactek_Display::check_update_timer = new QTimer(this);
 	Tactek_Display::playlist = new Playlist();
-	server = new Recieve_Data();
 
 	m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
 	m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
@@ -54,8 +53,6 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	connect(check_update_timer, SIGNAL(timeout()), this, SLOT(check_for_updates()));
 	connect(this, SIGNAL(start_next_media()), this,
 			SLOT(play_next_media_in_queue()));
-	connect(server, SIGNAL(data_recieved(std::string)), this,
-			SLOT(handle_recieved_data(std::string)));
 	connect(this, SIGNAL(new_file_added(QString, int)), this,
 			SLOT(handle_new_file_added(QString, int)));
 
@@ -71,7 +68,6 @@ Tactek_Display::~Tactek_Display()
 	delete m_vlc_instance;
 	delete update_timer;
 	delete check_update_timer;
-	delete server;
 }
 
 void Tactek_Display::read_config()
@@ -135,9 +131,18 @@ void Tactek_Display::check_for_updates()
 	xml_string_writer writer;
 	document.save(writer);
 	document.print(std::cout);
-	Send_Data *send_data = new Send_Data(parameters["general.server_ip"].c_str(),
-					boost::lexical_cast<int>(parameters["general.server_port"]),
-					writer.result);
+
+	boost::shared_ptr<std::string> string_to_send;
+	string_to_send.reset(new std::string(writer.result));
+
+	network_manager->connect(parameters["general.server_ip"],
+			parameters["general.server_port"]);
+	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+				SLOT(handle_recieved_data(QString)));
+	network_manager->start_write(string_to_send);
+	boost::thread t(
+		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+	t.join();
 }
 
 /**
@@ -195,16 +200,16 @@ void Tactek_Display::play_next_media_in_queue()
 }
 
 /** Slots gets called by the data_recieved() signal of the
- ** recieve_data class object. Parses the data recieved into
+ ** recieve_data class object. Parses the data received into
  ** xml format, and calls the appropriate functions to handle
  ** the commands specified in the xml */
-void Tactek_Display::handle_recieved_data(std::string data)
+void Tactek_Display::handle_recieved_data(QString data)
 {
 #ifdef _DEBUG
 	std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
 #endif //_DEBUG
 	pugi::xml_document tacktech;
-	tacktech.load(data.c_str());
+	tacktech.load(data.toStdString().c_str());
 	pugi::xml_node computer_node = tacktech.child("Computer");
 	for (pugi::xml_node file_data_node = computer_node.child("Item");
 			file_data_node;
