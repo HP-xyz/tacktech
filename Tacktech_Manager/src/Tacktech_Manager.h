@@ -17,14 +17,13 @@
 #include <Group_Container.h>
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
+#include <Tacktech_Network_Manager.h>
 #include "Edit_Group.h"
 #include "Edit_Playlist.h"
 #include "Select_Playlist_Dialog.h"
 #include "Upload_Data.h"
 #include "Upload_Data_Container.h"
 #include "ui_Tacktech_Manager.h"
-#include "Start_Send_Data_Thread.h"
-#include "Tacktech_Network_Manager.h"
 typedef boost::shared_ptr<Upload_Data_Container> Upload_Data_Container_Ptr;
 class Tacktech_Manager: public QMainWindow
 {

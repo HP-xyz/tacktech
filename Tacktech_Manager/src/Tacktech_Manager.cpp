@@ -18,6 +18,7 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Setting up Tacktech Manager" << std::endl;
 #endif // _DEBUG
+
 	edit_group_class = new Edit_Group();
 	edit_playlist_class = new Edit_Playlist();
 	select_playlist_dialog = new Select_Playlist_Dialog();
@@ -72,8 +73,6 @@ Tacktech_Manager::Tacktech_Manager(QWidget *parent, Qt::WFlags flags) :
 			SLOT(repopulate_widget()));
 	connect(upload_data_dialog, SIGNAL(scheduled_item_added(QDate)), this,
 			SLOT(scheduled_item_added(QDate)));
-	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-			SLOT(data_recieved_slot(QString)));
 
 	repopulate_widget();
 }
@@ -307,6 +306,8 @@ void Tacktech_Manager::start_upload(std::string xml_string)
 
 	network_manager->connect(parameters["general.server_ip"],
 			parameters["general.server_port"]);
+	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+				SLOT(data_recieved_slot(QString)));
 	network_manager->start_write(string_to_send);
 	boost::thread t(
 		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));

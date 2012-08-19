@@ -34,13 +34,12 @@
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <b64/decode.h>
 #include <pugixml.hpp>
+#include <Tacktech_Network_Manager.h>
 
 #include "Playlist.h"
-#include "Recieve_Data.h"
-#include "Send_Data.h"
-#include "Start_Send_Data_Thread.h"
 #include "ui_Tactek_Display.h"
 
 namespace Ui
@@ -66,7 +65,7 @@ private slots:
 	void check_for_updates();
 	void play_next_media_in_queue();
 	void open_and_play(QString);
-	void handle_recieved_data(std::string data);
+	void handle_recieved_data(QString data);
 	void handle_new_file_added(QString, int);
 private:
 	Ui::Tactek_Display *ui;
@@ -76,7 +75,8 @@ private:
 	VlcInstance *m_vlc_instance;
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
-	Recieve_Data *server;
+	Tacktech_Network_Manager_Ptr network_manager;
+	boost::shared_ptr<boost::asio::io_service> io_service;
 	QString playlist_name;
 
 	/** Variables for the config file */

@@ -49,10 +49,6 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data_Container.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Send_Data.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Start_Send_Data_Thread.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Recieve_Data.cpp
-		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Network_Manager.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
@@ -66,10 +62,6 @@ set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data_Container.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Send_Data.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Start_Send_Data_Thread.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Recieve_Data.h
-		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Network_Manager.h
 	)
 #FOR NOW, THERE ARE NO RESOURCES
 set ( Tacktech_Manager_RSCS

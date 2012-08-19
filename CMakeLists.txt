@@ -126,7 +126,7 @@ endif (MINGW AND __COMPILER_GNU)
 OPTION (LOCAL_PUGIXML "Use local pugixml library (RECOMMENDED)" ON)
 
 if (LOCAL_PUGIXML)
-	#lets include pugixml
+	message(STATUS "**** USING LOCAL PUGIXML ****")
 	add_subdirectory (${Tactek_SOURCE_DIR}/pugixml/scripts)
 	set (PUGIXML_INCLUDE_DIR ${Tactek_SOURCE_DIR}/pugixml/src)
 endif (LOCAL_PUGIXML)
