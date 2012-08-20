@@ -45,7 +45,7 @@ private:
 	boost::asio::io_service::strand strand;
 	/** Socket for the connection */
 	boost::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
-
+	std::string *return_xml;
 	std::map<std::string, std::string> parms;
 	boost::shared_ptr<std::string> xml_string;
 	unsigned long long sent_buffer_count;

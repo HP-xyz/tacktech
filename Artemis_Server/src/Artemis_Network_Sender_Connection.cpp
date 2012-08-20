@@ -84,10 +84,7 @@ void Artemis_Network_Sender_Connection::handle_write(
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Closing" << std::endl;
 #endif // _DEBUG
-	//Initiate graceful connection closure.
-	boost::system::error_code ignored_ec;
-	Artemis_Network_Sender_Connection::m_socket->shutdown(
-			boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+	do_close();
 
 	// No new asynchronous operations are started. This means that all shared_ptr
 	// references to the connection object will disappear and the object will be
@@ -156,6 +153,9 @@ void Artemis_Network_Sender_Connection::do_close()
 	std::cout << "= Artemis_Network_Sender_Connection::do_close()" 
 		<< std::endl;
 #endif // _DEBUG
-	m_socket->close();
+	//Initiate graceful connection closure.
+	boost::system::error_code ignored_ec;
+	Artemis_Network_Sender_Connection::m_socket->shutdown(
+			boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 }
 }

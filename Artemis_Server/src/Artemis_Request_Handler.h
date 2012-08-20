@@ -26,10 +26,11 @@
 #include <pugixml.hpp>
 #include <b64/decode.h>
 #include <b64/encode.h>
+#include <Group_Container.h>
+#include <Playlist_Container.h>
+#include <Group_Playlist_Container.h>
+#include <Organization_Computer_Container.h>
 #include "Artemis_Network_Sender_Connection.h"
-#include "Group_Container.h"
-#include "Playlist_Container.h"
-#include "Group_Playlist_Container.h"
 namespace Artemis
 {
 enum STATUS
@@ -41,9 +42,10 @@ class Artemis_Request_Handler: private boost::noncopyable
 public:
 	/** Construct Artemis_Request_Handler object */
 	explicit Artemis_Request_Handler(
-			boost::shared_ptr<Group_Container> p_groups_and_computers,
-			boost::shared_ptr<Playlist_Container> p_playlist,
-			boost::shared_ptr<Group_Playlist_Container> p_group_playlist);
+			Group_Container_Ptr p_groups_and_computers,
+			Playlist_Container_Ptr p_playlist,
+			Group_Playlist_Container_Ptr p_group_playlist,
+			Organization_Computer_Container_Ptr p_organization_computer);
 	~Artemis_Request_Handler();
 
 	/** Handle a request and produce a reply*/
@@ -56,14 +58,11 @@ private:
 	/** Result xml document to be returned */
 	pugi::xml_document document;
 
-	/** Vector of SQL queries to be executed */
-	boost::shared_ptr<std::string> return_xml;
-
 	void handle_upload(std::string upload_xml, std::string dest_ip,
 			std::string dest_port);
 
 	/** Function to parse received XML to find queries to be run */
-	void generate_queries(const std::string&);
+	void generate_queries(const std::string&, boost::shared_ptr<std::string> return_xml);
 
 	bool save_uploaded_file(pugi::xml_node tacktech);
 	std::string get_binary_file(std::string filename);
@@ -73,13 +72,15 @@ private:
 	/* Variable for computer names and group names
 	 * Note: Format is groups_and_computers[group_index][computer_index]
 	 * Note: This can be hostnames or IP addresses */
-	boost::shared_ptr<Group_Container> groups_and_computers;
+	Group_Container_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	boost::shared_ptr<Playlist_Container> playlist;
+	Playlist_Container_Ptr playlist;
 
 	/* Variable for the group_playlist container */
-	boost::shared_ptr<Group_Playlist_Container> group_playlist;
+	Group_Playlist_Container_Ptr group_playlist;
+
+	Organization_Computer_Container_Ptr organization_computer;
 };
 }
 #endif	/* ARTEMIS_REQUEST_HANDLER_H */

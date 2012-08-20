@@ -29,7 +29,7 @@ Group_Playlist_Ptr Group_Playlist_Container::get_group_playlist()
  ** NOTE: This function may take up to linear time to complete */
 bool Group_Playlist_Container::contains_group_name(std::string group_to_find)
 {
-	for (int i = 0; i < group_playlist->size(); i++)
+	for (unsigned int i = 0; i < group_playlist->size(); i++)
 	{
 		if (group_playlist->at(i).first == group_to_find)
 			return true;
@@ -124,7 +124,7 @@ Group_Playlist_Vector::iterator Group_Playlist_Container::contains_group(
 		std::string group_name)
 {
 	Group_Playlist_Vector::iterator it = group_playlist->end();
-	for (int i = 0; i < group_playlist->size(); i++)
+	for (unsigned int i = 0; i < group_playlist->size(); i++)
 	{
 		if (group_playlist->at(i).first == group_name)
 		{

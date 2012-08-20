@@ -92,7 +92,6 @@ void Tacktech_Network_Manager::connect(std::string dest_ip,
 			boost::bind(&Tacktech_Network_Manager::do_connect,
 					this,
 					endpoint_iterator));
-	//m_socket.get_io_service().run();
 }
 void Tacktech_Network_Manager::do_connect(
 		boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
