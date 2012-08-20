@@ -304,13 +304,14 @@ void Tacktech_Manager::start_upload(std::string xml_string)
 	boost::shared_ptr<std::string> string_to_send;
 	string_to_send.reset(new std::string(xml_string));
 
+	io_service->reset();
 	network_manager->connect(parameters["general.server_ip"],
 			parameters["general.server_port"]);
 	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
 				SLOT(data_recieved_slot(QString)));
 	network_manager->start_write(string_to_send);
 	boost::thread t(
-		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+			boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
 	t.join();
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Upload thread execution started" << std::endl;

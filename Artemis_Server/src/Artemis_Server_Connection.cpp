@@ -45,9 +45,10 @@ struct xml_string_writer: pugi::xml_writer
 Artemis_Server_Connection::Artemis_Server_Connection(
 		boost::asio::io_service& io_service,
 		std::map<std::string, std::string>& parameters,
-		boost::shared_ptr<Group_Container> p_groups_and_computers,
-		boost::shared_ptr<Playlist_Container> p_playlist,
-		boost::shared_ptr<Group_Playlist_Container> p_group_playlist) :
+		Group_Container_Ptr p_groups_and_computers,
+		Playlist_Container_Ptr p_playlist,
+		Group_Playlist_Container_Ptr p_group_playlist,
+		Organization_Computer_Container_Ptr p_organization_computer) :
 		strand(io_service)
 {
 	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));
@@ -55,7 +56,9 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 	Artemis_Server_Connection::groups_and_computers = p_groups_and_computers;
 	Artemis_Server_Connection::playlist = p_playlist;
 	Artemis_Server_Connection::group_playlist = p_group_playlist;
+	Artemis_Server_Connection::organization_computer = p_organization_computer;
 	received_size = 0;
+	return_xml.reset(new std::string());
 }
 
 //************************************
@@ -104,8 +107,6 @@ void Artemis_Server_Connection::handle_read(
 #endif
 	if (!error)
 	{
-		boost::shared_ptr<std::string> return_xml(new std::string);
-
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " --> Recieved from IP: " 
 			<< m_socket->remote_endpoint().address().to_string() 
@@ -113,23 +114,20 @@ void Artemis_Server_Connection::handle_read(
 #endif // _DEBUG
 		std::vector<char> xml;
 		xml.reserve(bytes_transferred + 1);
-		for (int i = 0; i < bytes_transferred; i++)
+		for (unsigned int i = 0; i < bytes_transferred; i++)
 		{
 			xml.push_back('5');
 		}
-		xml.push_back(NULL);
+		xml.push_back('\0');
 		buffer.sgetn(&xml[0], bytes_transferred);
 		std::string received_xml;
-		for (int i = 0; i < bytes_transferred; i++)
+		for (unsigned int i = 0; i < bytes_transferred; i++)
 		{
 			received_xml += xml[i];
 		}
 
-		boost::shared_ptr<Artemis_Request_Handler> request_handler(
-				new Artemis_Request_Handler(groups_and_computers, playlist,
-						group_playlist));
-		request_handler->handle_request(received_xml, return_xml,
-				Artemis_Server_Connection::parms);
+		boost::shared_ptr<Artemis_Request_Handler> request_handler(new Artemis_Request_Handler(groups_and_computers, playlist,	group_playlist, organization_computer));
+		request_handler->handle_request(received_xml, return_xml, Artemis_Server_Connection::parms);
 		try
 		{
 			if (request_handler->result_status == NO_RESULT)
@@ -151,16 +149,14 @@ void Artemis_Server_Connection::handle_read(
 				std::cout << " - Sending file of size: " 
 					<< return_xml->size() << std::endl;
 #endif // _DEBUG
-				Artemis_Network_Sender_Connection_ptr network_send_connector(
-					new Artemis_Network_Sender_Connection(
-					m_socket,
-					parms,
-					return_xml));
-				network_send_connector->start_write();
-				boost::thread t(
-					boost::bind(&boost::asio::io_service::run,
-					boost::ref(m_socket->get_io_service())));
-				t.join();
+				return_xml->append(";");
+				boost::asio::async_write(*m_socket,
+						boost::asio::buffer(return_xml->c_str(), return_xml->size()),
+						strand.wrap(
+						boost::bind(&Artemis_Server_Connection::handle_write,
+								shared_from_this(),
+								boost::asio::placeholders::error,
+								boost::asio::placeholders::bytes_transferred)));
 				/*boost::thread t(
 					boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
 				t.join();*/
@@ -192,7 +188,8 @@ void Artemis_Server_Connection::handle_read(
 			 shared_from_this(),
 			 boost::asio::placeholders::error)));
 			 }*/
-		} catch (std::exception& e)
+		} 
+		catch (std::exception& e)
 		{
 			std::cerr << "Exception during return message:" << std::endl
 					<< e.what() << std::endl;

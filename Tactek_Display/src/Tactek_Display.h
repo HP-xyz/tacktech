@@ -63,6 +63,7 @@ public:
 private slots:
 	void check_media_state();
 	void check_for_updates();
+	void send_identity_to_server();
 	void play_next_media_in_queue();
 	void open_and_play(QString);
 	void handle_recieved_data(QString data);
@@ -72,11 +73,14 @@ private:
 	Playlist *playlist;
 	QTimer *update_timer;
 	QTimer *check_update_timer;
+	QTimer *identify_timer;
 	VlcInstance *m_vlc_instance;
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
+
 	Tacktech_Network_Manager_Ptr network_manager;
 	boost::shared_ptr<boost::asio::io_service> io_service;
+
 	QString playlist_name;
 
 	/** Variables for the config file */

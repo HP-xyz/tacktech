@@ -29,9 +29,10 @@ struct xml_string_writer: pugi::xml_writer
 // Qualifier:
 //************************************
 Artemis_Request_Handler::Artemis_Request_Handler(
-		boost::shared_ptr<Group_Container> p_groups_and_computers,
-		boost::shared_ptr<Playlist_Container> p_playlist,
-		boost::shared_ptr<Group_Playlist_Container> p_group_playlist)
+		Group_Container_Ptr p_groups_and_computers,
+		Playlist_Container_Ptr p_playlist,
+		Group_Playlist_Container_Ptr p_group_playlist,
+		Organization_Computer_Container_Ptr p_organization_computer)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()"
@@ -40,6 +41,7 @@ Artemis_Request_Handler::Artemis_Request_Handler(
 	groups_and_computers = p_groups_and_computers;
 	playlist = p_playlist;
 	group_playlist = p_group_playlist;
+	organization_computer = p_organization_computer;
 }
 
 Artemis_Request_Handler::~Artemis_Request_Handler()
@@ -62,20 +64,19 @@ Artemis_Request_Handler::~Artemis_Request_Handler()
 // Parameter: std::string> & parms
 //************************************
 void Artemis_Request_Handler::handle_request(const std::string &request,
-		boost::shared_ptr<std::string> p_return_xml,
+		boost::shared_ptr<std::string> return_xml,
 		std::map<std::string, std::string> &parms)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " = Handle Request " << std::endl;
 	//std::cout << "  - Request: " << request << std::endl;
 #endif
-	return_xml = p_return_xml;
 	parameters = parms;
 	try
 	{
 		if (request.size() > 0)
 		{
-			Artemis_Request_Handler::generate_queries(request);
+			Artemis_Request_Handler::generate_queries(request, return_xml);
 		}
 		else
 		{
@@ -98,7 +99,7 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 // Qualifier:
 // Parameter: const std::string & request
 //************************************
-void Artemis_Request_Handler::generate_queries(const std::string &request)
+void Artemis_Request_Handler::generate_queries(const std::string &request, boost::shared_ptr<std::string> return_xml)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Generate Queries " << std::endl;
@@ -203,7 +204,11 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 				playlist_node.attribute("PLAYLIST").as_string());
 		Playlist_Multimap::iterator it = range.first;
 		pugi::xml_document upload_document;
-		pugi::xml_node computer_node = upload_document.append_child("Computer");
+		pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
+		pugi::xml_node type_node = tacktech_node.append_child("Type");
+		type_node.append_attribute("TYPE") = "UPLOAD";
+		upload_document.print(std::cout);
+		pugi::xml_node computer_node = tacktech_node.append_child("Computer");
 		for (it; it != range.second; ++it)
 		{
 			std::string temp_filename = it->second.first;
@@ -257,6 +262,29 @@ void Artemis_Request_Handler::generate_queries(const std::string &request)
 		xml_string_writer writer;
 		upload_document.print(writer);
 		return_xml->append(writer.result);
+		result_status = SINGLE_RESULT;
+	}
+	else if (type_string == "IDENTIFY")
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received IDENTIFY command" << std::endl;
+#endif // _DEBUG
+		pugi::xml_node indentification_node = tacktech.child("Identity");
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  - IDENTITY_RECIEVED" << std::endl;
+		indentification_node.print(std::cout);
+#endif
+		organization_computer->add_computer_in_organization(
+			indentification_node.attribute("Organization_Name").as_string(),
+			indentification_node.attribute("Computer_Name").as_string());
+
+		std::string upload_xml;
+		upload_xml += "<Tacktech>";
+		upload_xml += "<Type TYPE=\"IDENTIFY\" />";
+		upload_xml += "<Success SUCCESS=\"TRUE\">";
+		upload_xml += "</Tacktech>";
+
+		return_xml->append(upload_xml);
 		result_status = SINGLE_RESULT;
 	}
 }

@@ -20,12 +20,16 @@ set(TACKTECH_COMMON_HDRS
 	${Tacktech_Common_SOURCE_DIR}/src/Group_Container.h
 	${Tacktech_Common_SOURCE_DIR}/src/Group_Playlist_Container.h
 	${Tacktech_Common_SOURCE_DIR}/src/Playlist_Container.h
+	${Tacktech_Common_SOURCE_DIR}/src/Computer_Container.h
+	${Tacktech_Common_SOURCE_DIR}/src/Organization_Computer_Container.h
 	)
 set(TACKTECH_COMMON_SRCS
 	${Tacktech_Common_SOURCE_DIR}/src/Group_Container.cpp
 	${Tacktech_Common_SOURCE_DIR}/src/Group_Playlist_Container.cpp
 	${Tacktech_Common_SOURCE_DIR}/src/Playlist_Container.cpp
 	${Tacktech_Common_SOURCE_DIR}/src/Tacktech_Network_Manager.cpp
+	${Tacktech_Common_SOURCE_DIR}/src/Computer_Container.cpp
+	${Tacktech_Common_SOURCE_DIR}/src/Organization_Computer_Container.cpp
 	)
 
 QT4_WRAP_CPP(MOCS ${TACKTECH_COMMON_MOC_HDRS})

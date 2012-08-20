@@ -41,7 +41,12 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	read_config();
 	Tactek_Display::update_timer = new QTimer(this);
 	Tactek_Display::check_update_timer = new QTimer(this);
+	Tactek_Display::identify_timer = new QTimer(this);
 	Tactek_Display::playlist = new Playlist();
+
+	io_service.reset(new boost::asio::io_service);
+	network_manager.reset(
+		new Tacktech_Network_Manager(*io_service, parameters));
 
 	m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
 	m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
@@ -51,13 +56,16 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 
 	connect(update_timer, SIGNAL(timeout()), this, SLOT(check_media_state()));
 	connect(check_update_timer, SIGNAL(timeout()), this, SLOT(check_for_updates()));
+	connect(identify_timer, SIGNAL(timeout()), this, SLOT(send_identity_to_server()));
 	connect(this, SIGNAL(start_next_media()), this,
 			SLOT(play_next_media_in_queue()));
 	connect(this, SIGNAL(new_file_added(QString, int)), this,
 			SLOT(handle_new_file_added(QString, int)));
 
 	update_timer->start(1000);
-	check_update_timer->start(30000);
+	check_update_timer->start(1800000);
+	identify_timer->start(30000);
+	check_for_updates();
 }
 
 Tactek_Display::~Tactek_Display()
@@ -68,6 +76,7 @@ Tactek_Display::~Tactek_Display()
 	delete m_vlc_instance;
 	delete update_timer;
 	delete check_update_timer;
+	delete identify_timer;
 }
 
 void Tactek_Display::read_config()
@@ -115,6 +124,9 @@ void Tactek_Display::read_config()
 
 void Tactek_Display::check_for_updates()
 {
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::check_for_updates()" << std::endl;
+#endif // _DEBUG
 	pugi::xml_document document;
 	pugi::xml_node tacktech_node = document.append_child("Tacktech");
 	pugi::xml_node type_node = tacktech_node.append_child("Type");
@@ -135,6 +147,41 @@ void Tactek_Display::check_for_updates()
 	boost::shared_ptr<std::string> string_to_send;
 	string_to_send.reset(new std::string(writer.result));
 
+	io_service->reset();
+	network_manager.reset(
+			new Tacktech_Network_Manager(*io_service, parameters));
+	network_manager->connect(parameters["general.server_ip"],
+			parameters["general.server_port"]);
+	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+				SLOT(handle_recieved_data(QString)));
+	network_manager->start_write(string_to_send);
+	boost::thread t(
+		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+	t.join();
+}
+void Tactek_Display::send_identity_to_server()
+{
+#ifdef _DEBUG
+	std::cout << "= Tacktech_Manager::send_identity_to_server()" << std::endl;
+#endif // _DEBUG
+	pugi::xml_document document;
+	pugi::xml_node tacktech_node = document.append_child("Tacktech");
+	pugi::xml_node type_node = tacktech_node.append_child("Type");
+		type_node.append_attribute("TYPE") = "IDENTIFY";
+	pugi::xml_node identity_node = tacktech_node.append_child("Identity");
+	identity_node.append_attribute("Organization_Name") = parameters["general.organization_name"].c_str();
+	identity_node.append_attribute("Computer_Name") = parameters["general.computer_name"].c_str();
+
+	xml_string_writer writer;
+	document.save(writer);
+	document.print(std::cout);
+
+	boost::shared_ptr<std::string> string_to_send;
+	string_to_send.reset(new std::string(writer.result));
+
+	io_service->reset();
+	network_manager.reset(
+				new Tacktech_Network_Manager(*io_service, parameters));
 	network_manager->connect(parameters["general.server_ip"],
 			parameters["general.server_port"]);
 	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
@@ -207,44 +254,67 @@ void Tactek_Display::handle_recieved_data(QString data)
 {
 #ifdef _DEBUG
 	std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
+	std::cout << " - Received data size: " << data.size() << std::endl;
 #endif //_DEBUG
+	/** Disconnect allows the network_manager smart pointer to be deleted
+	 *  as no further reference to it exists */
+	disconnect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+					SLOT(handle_recieved_data(QString)));
 	pugi::xml_document tacktech;
 	tacktech.load(data.toStdString().c_str());
-	pugi::xml_node computer_node = tacktech.child("Computer");
-	for (pugi::xml_node file_data_node = computer_node.child("Item");
-			file_data_node;
-			file_data_node = file_data_node.next_sibling("Item"))
+	pugi::xml_node tacktech_node = tacktech.child("Tacktech");
+	std::string type_string = tacktech_node.child("Type").attribute("TYPE").as_string();
+	if (type_string == "UPLOAD")
 	{
 #ifdef _DEBUG
-		std::cout << "Filename: " << file_data_node.child_value("Filename")
-				<< std::endl;
-		std::cout << "Pause: " << file_data_node.child_value("Pause")
-				<< std::endl;
+	std::cout << " - Recieved UPLOAD command" << std::endl;
 #endif //_DEBUG
-		std::string filename = file_data_node.child_value("Filename");
-		std::string file_data = file_data_node.child_value("File_Data");
-		std::stringstream encoded_stream;
-		std::stringstream decoded_stream;
+		pugi::xml_node computer_node = tacktech_node.child("Computer");
+		for (pugi::xml_node file_data_node = computer_node.child("Item");
+				file_data_node;
+				file_data_node = file_data_node.next_sibling("Item"))
+		{
+#ifdef _DEBUG
+			std::cout << "Filename: " << file_data_node.child_value("Filename")
+					<< std::endl;
+			std::cout << "Pause: " << file_data_node.child_value("Pause")
+					<< std::endl;
+#endif //_DEBUG
+			std::string filename = file_data_node.child_value("Filename");
+			std::string file_data = file_data_node.child_value("File_Data");
+			std::stringstream encoded_stream;
+			std::stringstream decoded_stream;
 
-		encoded_stream << file_data;
-		base64::decoder D;
-		D.decode(encoded_stream, decoded_stream);
-		file_data = decoded_stream.str();
+			encoded_stream << file_data;
+			base64::decoder D;
+			D.decode(encoded_stream, decoded_stream);
+			file_data = decoded_stream.str();
 
 #ifdef _DEBUG
-		std::cout << "File_Data size: " << file_data.size() << std::endl;
+			std::cout << "File_Data size: " << file_data.size() << std::endl;
 #endif
 
-		std::ofstream out_file(filename.c_str(), std::ios::binary);
-		out_file << file_data;
-		out_file.close();
+			std::ofstream out_file(filename.c_str(), std::ios::binary);
+			out_file << file_data;
+			out_file.close();
 
-		std::string pause = file_data_node.child_value("Pause");
-		if (pause == "")
-			pause = "0";
+			std::string pause = file_data_node.child_value("Pause");
+			if (pause == "")
+				pause = "0";
 
-		emit new_file_added(QString::fromStdString(filename),
-				boost::lexical_cast<int>(pause));
+			emit new_file_added(QString::fromStdString(filename),
+					boost::lexical_cast<int>(pause));
+		}
+	}
+	else if(type_string == "IDENTIFY")
+	{
+		/** This return is just to notify the display that its
+		 *  identity has been sent to the server. It does nothing
+		 *  more at this moment.
+		 */
+#ifdef _DEBUG
+	std::cout << " - Recieved IDENTIFY command" << std::endl;
+#endif //_DEBUG
 	}
 	//tacktech.print(std::cout);
 }

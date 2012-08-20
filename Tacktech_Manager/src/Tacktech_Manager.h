@@ -24,6 +24,7 @@
 #include "Upload_Data.h"
 #include "Upload_Data_Container.h"
 #include "ui_Tacktech_Manager.h"
+
 typedef boost::shared_ptr<Upload_Data_Container> Upload_Data_Container_Ptr;
 class Tacktech_Manager: public QMainWindow
 {
