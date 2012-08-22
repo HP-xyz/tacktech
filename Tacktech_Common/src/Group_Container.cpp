@@ -30,9 +30,11 @@ bool Group_Container::add_group_name(std::string new_group_name)
 		return false;
 	else
 	{
+		Computer_Item item("TEMP_ITEM",
+			boost::posix_time::second_clock::universal_time());
 		groups_and_computers->insert(
-				std::pair<std::string, std::string>(new_group_name,
-						"TEMP_ITEM"));
+				std::pair<std::string, Computer_Item>(new_group_name,
+						item));
 		return true;
 	}
 }
@@ -54,21 +56,42 @@ bool Group_Container::add_computer_name(std::string group_name,
 		groups_and_computers->erase(it);
 	}
 
+	Computer_Item item(new_computer_name,
+		boost::posix_time::second_clock::universal_time());
 	groups_and_computers->insert(
-			std::pair<std::string, std::string>(group_name, new_computer_name));
+			std::pair<std::string, Computer_Item>(group_name, item));
 #ifdef _SHOW_DEBUG_OUTPUT
 	print_contents();
 #endif // _DEBUG
 	return true;
 }
 
+bool Group_Container::add_computer_name( std::string computer_name )
+{
+	Group_Multimap::iterator it =
+		contains_computer_in_all_groups(computer_name);
+	if (it == groups_and_computers->end())
+	{
+		/* There exists no computer identified by computer_name in the
+		 * entire container */
+		Computer_Item item(computer_name,
+			boost::posix_time::second_clock::universal_time());
+		groups_and_computers->insert(Group_Item("NONE", item));
+		return true;
+	}
+	else
+		return false;
+}
+
+
 #ifdef _SHOW_DEBUG_OUTPUT
 void Group_Container::print_contents()
 {
 	std::cout << "= Group_Container::print_contents()" << std::endl;
 	Group_Multimap::iterator it = groups_and_computers->end();
-	for (it = groups_and_computers->begin(); it != groups_and_computers->end();
-			it++)
+	for (it = groups_and_computers->begin();
+		it != groups_and_computers->end();
+		it++)
 	{
 		std::string out_string;
 		out_string += " - ";
@@ -79,7 +102,7 @@ void Group_Container::print_contents()
 		Group_Multimap::iterator it2 = range.first;
 		for (it2; it2 != range.second; ++it2)
 		{
-			out_string += it2->second;
+			out_string += it2->second.first;
 			out_string += ", ";
 		}
 		out_string = out_string.substr(0, out_string.length() - 2);
@@ -95,8 +118,9 @@ Groups_And_Computers_Ptr Group_Container::get_groups_and_computers()
 bool Group_Container::contains_group_name(std::string p_group_name)
 {
 	Group_Multimap::iterator it = groups_and_computers->end();
-	for (it = groups_and_computers->begin(); it != groups_and_computers->end();
-			it++)
+	for (it = groups_and_computers->begin();
+		it != groups_and_computers->end();
+		it++)
 	{
 		if (it->first == p_group_name)
 			return true;
@@ -150,13 +174,14 @@ void Group_Container::remove_computer_name(std::string group_name,
 		Group_Multimap::iterator it2 = range.first;
 		for (it2; it2 != range.second; ++it2)
 		{
-			if (it2->first == group_name && it2->second == computer_name)
+			if (it2->first == group_name 
+				&& it2->second.first == computer_name)
 			{
 #ifdef _SHOW_DEBUG_OUTPUT
-					std::cout << "  - " << it2->first << " : " << it2->second
+					std::cout << "  - " << it2->first 
+						<< " : " << it2->second.first
 						<< std::endl;
 #endif // _DEBUG
-
 				groups_and_computers->erase(it2);
 #ifdef _SHOW_DEBUG_OUTPUT
 				remove_count += 1;
@@ -181,7 +206,8 @@ Group_Multimap::iterator Group_Container::contains_computer_in_group(
 		Group_Multimap::iterator it2 = range.first;
 		for (it2; it2 != range.second; ++it2)
 		{
-			if (it2->first == group_name && it2->second == computer_name)
+			if (it2->first == group_name 
+				&& it2->second.first == computer_name)
 			{
 				return it2;
 			}
@@ -196,19 +222,13 @@ Group_Multimap::iterator Group_Container::contains_computer_in_all_groups(
 	for (Group_Multimap::iterator it = groups_and_computers->begin();
 			it != groups_and_computers->end(); it++)
 	{
-		if (it->second == computer_name)
+		if (it->second.first == computer_name)
 		{
 			return it;
 		}
 	}
 	return groups_and_computers->end();
 }
-
-/*bool compare_keys(std::pair<std::string,std::string> pair1,
- std::pair<std::string, std::string> pair2)
- {
- return pair1.first == pair2.first;
- }*/
 
 Group_Multimap Group_Container::get_unique_groups()
 {
@@ -228,7 +248,7 @@ Group_Multimap Group_Container::get_unique_groups()
 		if (!playlist_duplicate)
 		{
 			out_map.insert(
-					std::pair<std::string, std::string>(it1->first,
+					std::pair<std::string, Computer_Item>(it1->first,
 							it1->second));
 		}
 	}
@@ -259,7 +279,7 @@ std::string Group_Container::get_groups_and_computers_xml()
 					"Computer");
 			pugi::xml_node computer_pcdata = computer_node.append_child(
 					pugi::node_pcdata);
-			computer_pcdata.set_value(it2->second.c_str());
+			computer_pcdata.set_value(it2->second.first.c_str());
 		}
 	}
 	xml_string_writer writer;

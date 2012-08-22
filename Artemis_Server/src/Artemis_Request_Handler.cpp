@@ -29,10 +29,9 @@ struct xml_string_writer: pugi::xml_writer
 // Qualifier:
 //************************************
 Artemis_Request_Handler::Artemis_Request_Handler(
-		Group_Container_Ptr p_groups_and_computers,
+		Group_Container_Server_Ptr p_groups_and_computers,
 		Playlist_Container_Ptr p_playlist,
-		Group_Playlist_Container_Ptr p_group_playlist,
-		Organization_Computer_Container_Ptr p_organization_computer)
+		Group_Playlist_Container_Ptr p_group_playlist)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()"
@@ -41,7 +40,6 @@ Artemis_Request_Handler::Artemis_Request_Handler(
 	groups_and_computers = p_groups_and_computers;
 	playlist = p_playlist;
 	group_playlist = p_group_playlist;
-	organization_computer = p_organization_computer;
 }
 
 Artemis_Request_Handler::~Artemis_Request_Handler()
@@ -142,11 +140,16 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::string dest_port =
 				tacktech.child("Return_IP").attribute("PORT").as_string();
 		std::string upload_xml;
+		std::string organization_name =
+				tacktech.child("Organization")
+				.attribute("ORGANIZATION_NAME").as_string();
 		upload_xml += "<Tacktech>";
 		upload_xml += "<Type TYPE=\"SET_VARIABLES\" />";
 		upload_xml += "<Variables>";
 		upload_xml += playlist->get_playlists_xml();
-		upload_xml += groups_and_computers->get_groups_and_computers_xml();
+		upload_xml += groups_and_computers->
+			get_organization_map()[organization_name]
+			.get_groups_and_computers_xml();
 		upload_xml += group_playlist->get_group_playlist_xml();
 		upload_xml += "</Variables>";
 		upload_xml += "</Tacktech>";
@@ -160,6 +163,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
 #endif // _DEBUG
 		xml_string_writer playlist_writer;
+		std::string organization_name =
+			tacktech.child("Organization")
+			.attribute("ORGANIZATION_NAME").as_string();
 		tacktech.child("Variables").
 			child("Playlist").print(playlist_writer);
 		playlist->reset_container();
@@ -168,9 +174,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		xml_string_writer groups_and_computers_writer;
 		tacktech.child("Variables").child("Groups_And_Computers").print(
 				groups_and_computers_writer);
-		groups_and_computers->reset_container();
 		groups_and_computers->construct_groups_and_computers(
-				groups_and_computers_writer.result);
+			organization_name, groups_and_computers_writer.result);
 
 		xml_string_writer group_playlist_writer;
 		tacktech.child("Variables").child("Group_Playlist").print(
@@ -274,8 +279,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << "  - IDENTITY_RECIEVED" << std::endl;
 		indentification_node.print(std::cout);
 #endif
-		organization_computer->add_computer_in_organization(
-			indentification_node.attribute("Organization_Name").as_string(),
+		groups_and_computers->get_organization_map()
+			[indentification_node.attribute("Organization_Name").as_string()]
+			.add_computer_name(
 			indentification_node.attribute("Computer_Name").as_string());
 
 		std::string upload_xml;

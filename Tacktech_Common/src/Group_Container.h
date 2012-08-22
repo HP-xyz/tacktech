@@ -5,15 +5,18 @@
 #include <algorithm>
 #include <iterator>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <pugixml.hpp>
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
-typedef boost::shared_ptr<std::multimap<std::string, std::string> > Groups_And_Computers_Ptr;
-typedef std::multimap<std::string, std::string> Group_Multimap;
-typedef std::map<std::string, std::string> Group_Map;
-typedef std::pair<std::multimap<std::string, std::string>::iterator,
-		std::multimap<std::string, std::string>::iterator> Group_Computer_Range;
+typedef std::pair<std::string, boost::posix_time::ptime> Computer_Item;
+typedef std::pair<std::string, Computer_Item> Group_Item;
+typedef boost::shared_ptr<std::multimap<std::string, Computer_Item> > Groups_And_Computers_Ptr;
+typedef std::multimap<std::string, Computer_Item> Group_Multimap;
+typedef std::map<std::string, Computer_Item> Group_Map;
+typedef std::pair<std::multimap<std::string, Computer_Item>::iterator,
+		std::multimap<std::string, Computer_Item>::iterator> Group_Computer_Range;
 class Group_Container
 {
 public:
@@ -28,6 +31,10 @@ public:
 	 ** if the computer name is already in another group.
 	 ** NOTE: This function takes n^2 time */
 	bool add_computer_name(std::string, std::string);
+
+	/** Adds only a computer name, without a group. The group_name of the
+	 ** computer item will be set to 'NONE'. */
+	bool add_computer_name(std::string computer_name);
 
 	/** Removes the group name provided in the parameter from the
 	 ** groups_and_computers variable */
@@ -70,6 +77,14 @@ public:
 	void construct_groups_and_computers(
 			const char* groups_and_computers_filename);
 
+	/** Returns a string representation of the Group_Container. The string
+	 ** is in XML format.
+	 ** XML format:
+	 ** <Groups_And_Computers>
+	 **		<Group_Item Group_Name=GROUP_NAME_HERE>
+	 **			<Computer_Item>COMPUTER_NAME_HERE</Computer_Item>
+	 **		</Group_Item>
+	 **	</Groups_And_Computers>*/
 	std::string get_groups_and_computers_xml();
 	void reset_container();
 #ifdef _SHOW_DEBUG_OUTPUT

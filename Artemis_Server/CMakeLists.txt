@@ -8,12 +8,14 @@ set (ARTEMIS_SERVER_SRCS
 	${artemis_server_SOURCE_DIR}/src/Artemis_Server_Connection.cpp
 	${artemis_server_SOURCE_DIR}/src/Artemis_Request_Handler.cpp
 	${artemis_server_SOURCE_DIR}/src/Artemis_Network_Sender_Connection.cpp
+	${artemis_server_SOURCE_DIR}/src/Group_Container_Server.cpp
 	)
 set (ARTEMIS_SERVER_HDRS
 	${artemis_server_SOURCE_DIR}/src/Artemis_Server.h
 	${artemis_server_SOURCE_DIR}/src/Artemis_Server_Connection.h
 	${artemis_server_SOURCE_DIR}/src/Artemis_Request_Handler.h
 	${artemis_server_SOURCE_DIR}/src/Artemis_Network_Sender_Connection.h
+	${artemis_server_SOURCE_DIR}/src/Group_Container_Server.h
 	)
 
 include_directories(

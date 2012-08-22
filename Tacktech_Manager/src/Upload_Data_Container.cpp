@@ -62,6 +62,11 @@ void Upload_Data_Container::set_groups(Group_Container_Ptr p_group_container)
 	groups = p_group_container;
 }
 
+void Upload_Data_Container::set_organization_name( QString p_org_name)
+{
+	organization_name = p_org_name;
+}
+
 /** @brief set_playlist
  *
  * Sets the playlist variable to that provided in the
@@ -194,6 +199,9 @@ std::string Upload_Data_Container::get_variables_request_xml()
 	ip_node.append_attribute("IP") = parameters["general.manager_ip"].c_str();
 	ip_node.append_attribute("PORT") =
 			parameters["general.manager_port"].c_str();
+	pugi::xml_node organization_node = root_node.append_child("Organization");
+	organization_node.append_attribute("ORGANIZATION_NAME") =
+		organization_name.toStdString().c_str();
 
 	xml_string_writer writer;
 	transmit_document.print(writer);
@@ -234,6 +242,9 @@ std::string Upload_Data_Container::set_variable_command_xml()
 	std::string return_str;
 	return_str += "<Tacktech>";
 	return_str += "<Type TYPE=\"SET_VARIABLES\" />";
+	return_str += "<Organization ORGANIZATION=\"";
+	return_str += organization_name.toStdString();
+	return_str += "\"/>";
 	return_str += "<Variables>";
 	return_str += playlist->get_playlists_xml();
 	return_str += groups->get_groups_and_computers_xml();
@@ -332,4 +343,3 @@ std::string Upload_Data_Container::upload_file()
 	transmit_document.print(upload_writer);
 	return upload_writer.result;
 }
-

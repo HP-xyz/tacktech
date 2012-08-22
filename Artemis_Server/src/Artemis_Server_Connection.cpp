@@ -45,10 +45,9 @@ struct xml_string_writer: pugi::xml_writer
 Artemis_Server_Connection::Artemis_Server_Connection(
 		boost::asio::io_service& io_service,
 		std::map<std::string, std::string>& parameters,
-		Group_Container_Ptr p_groups_and_computers,
+		Group_Container_Server_Ptr p_groups_and_computers,
 		Playlist_Container_Ptr p_playlist,
-		Group_Playlist_Container_Ptr p_group_playlist,
-		Organization_Computer_Container_Ptr p_organization_computer) :
+		Group_Playlist_Container_Ptr p_group_playlist) :
 		strand(io_service)
 {
 	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));
@@ -56,7 +55,6 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 	Artemis_Server_Connection::groups_and_computers = p_groups_and_computers;
 	Artemis_Server_Connection::playlist = p_playlist;
 	Artemis_Server_Connection::group_playlist = p_group_playlist;
-	Artemis_Server_Connection::organization_computer = p_organization_computer;
 	received_size = 0;
 	return_xml.reset(new std::string());
 }
@@ -126,7 +124,7 @@ void Artemis_Server_Connection::handle_read(
 			received_xml += xml[i];
 		}
 
-		boost::shared_ptr<Artemis_Request_Handler> request_handler(new Artemis_Request_Handler(groups_and_computers, playlist,	group_playlist, organization_computer));
+		boost::shared_ptr<Artemis_Request_Handler> request_handler(new Artemis_Request_Handler(groups_and_computers, playlist,	group_playlist));
 		request_handler->handle_request(received_xml, return_xml, Artemis_Server_Connection::parms);
 		try
 		{
