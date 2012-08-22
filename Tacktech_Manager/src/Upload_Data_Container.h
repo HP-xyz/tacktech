@@ -28,22 +28,15 @@ public:
 	/** Default destructor */
 	virtual
 	~Upload_Data_Container();
-	void
-	set_playlist(Playlist_Container_Ptr);
-	void
-	set_groups(Group_Container_Ptr);
-	void
-	set_group_playlist(Group_Playlist_Container_Ptr);
-	void
-	set_playlist_name(QString);
-	void
-	set_group_name(QString);
-	void
-	set_upload_time(QString);
-	void
-	set_command(QString);
-	void
-	get_xml_upload();
+	void set_playlist(Playlist_Container_Ptr);
+	void set_groups(Group_Container_Ptr);
+	void set_group_playlist(Group_Playlist_Container_Ptr);
+	void set_playlist_name(QString);
+	void set_group_name(QString);
+	void set_upload_time(QString);
+	void set_command(QString);
+	void set_organization_name(QString);
+	void get_xml_upload();
 protected:
 private:
 	std::string
@@ -55,17 +48,14 @@ private:
 	QString playlist_name;
 	QString upload_time;
 	QString command;
+	QString organization_name;
 	std::ifstream::pos_type m_size;
 	std::map<std::string, std::string> parameters;
 
-	std::string
-	get_variables_request_xml();
-	std::string
-	set_variable_command_xml();
-	std::string
-	upload_file();signals:
-	void
-	xml_creation_complete(std::string);
+	std::string get_variables_request_xml();
+	std::string	set_variable_command_xml();
+	std::string	upload_file();signals:
+	void xml_creation_complete(std::string);
 };
 
 #endif // UPLOAD_DATA_CONTAINER_H

@@ -230,14 +230,14 @@ void Edit_Group::repopulate_tree_widget()
 		for (it2; it2 != range.second; ++it2)
 		{
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "    - Computer Name: " << it2->second << std::endl;
+			std::cout << "    - Computer Name: " << it2->second.first << std::endl;
 #endif // _DEBUG
 			computer_item = new Typed_QTreeWidgetItem();
 			computer_item->set_computer_name(
-					QString::fromStdString(it2->second));
+					QString::fromStdString(it2->second.first));
 			computer_item->set_group_name(QString::fromStdString(it2->first));
 			computer_item->set_type("COMPUTER");
-			computer_item->setText(0, QString::fromStdString(it2->second));
+			computer_item->setText(0, QString::fromStdString(it2->second.first));
 			group_item->addChild(computer_item);
 		}
 	}

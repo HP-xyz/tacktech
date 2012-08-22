@@ -47,15 +47,13 @@ void Artemis_Server::initialize_variables()
 	std::cout << "= Artemis_Server::initialize_variables()" << std::endl;
 #endif // _DEBUG
 	playlist.reset(new Playlist_Container());
-	groups_and_computers.reset(new Group_Container());
+	groups_and_computers.reset(new Group_Container_Server());
 	group_playlist.reset(new Group_Playlist_Container());
-	organization_computer.reset(new Organization_Computer_Container());
 
 	playlist->construct_playlist("./playlist.xml");
 	groups_and_computers->construct_groups_and_computers(
 			"./groups_and_computers.xml");
 	group_playlist->construct_group_playlist("./group_playlist.xml");
-	organization_computer->construct_organization_computer("./organization_computer.xml");
 }
 
 void Artemis_Server::store_variables()
@@ -87,15 +85,6 @@ void Artemis_Server::store_variables()
 	group_playlist_document.save_file("./group_playlist.xml");
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Group Playlist stored successfully" << std::endl;
-#endif // _DEBUG
-
-	/* Save organization_computer to file */
-	pugi::xml_document organization_computer_document;
-	organization_computer_document.load(
-			organization_computer->get_organization_computer_xml().c_str());
-	organization_computer_document.save_file("./organization_computer");
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Organization Computer stored successfully" << std::endl;
 #endif // _DEBUG
 }
 
@@ -202,8 +191,7 @@ void Artemis_Server::start_accept()
 {
 	new_connection.reset(
 			new Artemis_Server_Connection(io_service, parameters,
-					groups_and_computers, playlist, group_playlist,
-					organization_computer));
+					groups_and_computers, playlist, group_playlist));
 	acceptor.async_accept(new_connection->socket(),
 			boost::bind(&Artemis_Server::handle_accept, this,
 					boost::asio::placeholders::error));
