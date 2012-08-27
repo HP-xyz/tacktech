@@ -21,6 +21,8 @@
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
 #include "Group_Container_Server.h"
+#include "Playlist_Container_Server.h"
+#include "Group_Playlist_Container_Server.h"
 #include "Artemis_Server_Connection.h"
 #include "Artemis_Request_Handler.h"
 
@@ -75,10 +77,10 @@ private:
 	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	Playlist_Container_Ptr playlist;
+	Playlist_Container_Server_Ptr playlist;
 
 	/* Variable for the group_playlist container */
-	Group_Playlist_Container_Ptr group_playlist;
+	Group_Playlist_Container_Server_Ptr group_playlist;
 };
 }
 #endif //ARTEMIS_SERVER_H

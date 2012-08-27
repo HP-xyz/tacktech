@@ -241,6 +241,20 @@ void Edit_Group::repopulate_tree_widget()
 			group_item->addChild(computer_item);
 		}
 	}
+	Group_Multimap no_group_map =
+		groups_and_computer_names->get_computers_no_in_groups();
+	for (Group_Multimap::iterator it = no_group_map.end();
+		it != no_group_map.end();
+		it++)
+	{
+		computer_item = new Typed_QTreeWidgetItem();
+		computer_item->set_computer_name(
+			QString::fromStdString(it->second.first));
+		computer_item->set_group_name(QString::fromStdString(it->first));
+		computer_item->set_type("COMPUTER");
+		computer_item->setText(0, QString::fromStdString(it->second.first));
+		ui->all_computers_tree_widget->addTopLevelItem(computer_item);
+	}
 }
 
 /** Slot gets fired if the accept signal is received from the class

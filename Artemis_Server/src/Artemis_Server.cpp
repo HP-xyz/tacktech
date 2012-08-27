@@ -46,9 +46,9 @@ void Artemis_Server::initialize_variables()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Server::initialize_variables()" << std::endl;
 #endif // _DEBUG
-	playlist.reset(new Playlist_Container());
+	playlist.reset(new Playlist_Container_Server());
 	groups_and_computers.reset(new Group_Container_Server());
-	group_playlist.reset(new Group_Playlist_Container());
+	group_playlist.reset(new Group_Playlist_Container_Server());
 
 	playlist->construct_playlist("./playlist.xml");
 	groups_and_computers->construct_groups_and_computers(

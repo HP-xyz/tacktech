@@ -46,8 +46,8 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 		boost::asio::io_service& io_service,
 		std::map<std::string, std::string>& parameters,
 		Group_Container_Server_Ptr p_groups_and_computers,
-		Playlist_Container_Ptr p_playlist,
-		Group_Playlist_Container_Ptr p_group_playlist) :
+		Playlist_Container_Server_Ptr p_playlist,
+		Group_Playlist_Container_Server_Ptr p_group_playlist) :
 		strand(io_service)
 {
 	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));

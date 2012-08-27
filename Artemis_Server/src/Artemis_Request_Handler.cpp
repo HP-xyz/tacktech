@@ -30,8 +30,8 @@ struct xml_string_writer: pugi::xml_writer
 //************************************
 Artemis_Request_Handler::Artemis_Request_Handler(
 		Group_Container_Server_Ptr p_groups_and_computers,
-		Playlist_Container_Ptr p_playlist,
-		Group_Playlist_Container_Ptr p_group_playlist)
+		Playlist_Container_Server_Ptr p_playlist,
+		Group_Playlist_Container_Server_Ptr p_group_playlist)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()"
@@ -168,8 +168,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			.attribute("ORGANIZATION_NAME").as_string();
 		tacktech.child("Variables").
 			child("Playlist").print(playlist_writer);
-		playlist->reset_container();
-		playlist->construct_playlist(playlist_writer.result);
+		playlist->construct_playlist(organization_name,
+			playlist_writer.result);
 
 		xml_string_writer groups_and_computers_writer;
 		tacktech.child("Variables").child("Groups_And_Computers").print(
@@ -180,14 +180,16 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		xml_string_writer group_playlist_writer;
 		tacktech.child("Variables").child("Group_Playlist").print(
 				group_playlist_writer);
-		group_playlist->reset_container();
-		group_playlist->construct_group_playlist(group_playlist_writer.result);
+		group_playlist->construct_group_playlist(organization_name,
+			group_playlist_writer.result);
 	}
 	else if (type_string == "GET_UPDATES")
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received GET_UPDATES command" << std::endl;
 #endif // _DEBUG
+		std::string organization_name =
+			tacktech.child("Organization").attribute("Organization_Name").as_string();
 		pugi::xml_node has_files_node = tacktech.child("Files");
 		pugi::xml_node playlist_node = tacktech.child("Playlist");
 		std::map<std::string, std::string> filemap;
@@ -205,8 +207,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 					std::pair<std::string, std::string>(it->value(),
 							"FILE"));
 		}
-		Playlist_Range range = playlist->get_files_in_playlist(
-				playlist_node.attribute("PLAYLIST").as_string());
+		Playlist_Range range = playlist->get_organization_map()
+			[organization_name]	.get_files_in_playlist(
+			playlist_node.attribute("PLAYLIST").as_string());
 		Playlist_Multimap::iterator it = range.first;
 		pugi::xml_document upload_document;
 		pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
