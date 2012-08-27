@@ -35,6 +35,16 @@ public:
 	void remove_filename_from_playlist(std::string playlist_name,
 			std::string filename);
 
+	/** Returns a string representation of the playlist in XML format.
+	 ** The XML format used is:
+	 ** <Playlist>
+	 **		<Playlist_Item Playlist_Name=PLAYLIST_NAME_HERE>
+	 **			<Item>
+	 **				<Filename>FILENAME_HERE</Filename>
+	 **				<Pause>PAUSE_HERE</Pause>
+	 **			</Item>
+	 **		</Playlist_Item>
+	 **	</Playlist> */
 	std::string get_playlists_xml();
 	void construct_playlist(std::string playlist);
 	void construct_playlist(const char *playlist_filename);

@@ -59,6 +59,10 @@ public:
 	 ** TODO OPTIMIZE FUNCTION */
 	Group_Multimap get_unique_groups();
 
+	/** Function returns a group multimap of computers that have their
+	 ** group_name set to NONE */
+	Group_Multimap get_computers_no_in_groups();
+
 	/** Checks to see if a item with group_name and computer_name already 
 	 ** exists in the Group_Container. Returns an iterator to 
 	 ** groups_and_computers.end() if the Group_Container DOES NOT contain

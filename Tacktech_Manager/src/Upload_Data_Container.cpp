@@ -221,6 +221,7 @@ std::string Upload_Data_Container::get_variables_request_xml()
  *
  * Tacktech
  *     Type TYPE=SET_VARIABLES
+ *     Organization ORGANIZATION=ORGANGIZATION_NAME_HERE
  *     Type
  *     Variables
  *			Playlist

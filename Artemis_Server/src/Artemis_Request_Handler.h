@@ -30,6 +30,8 @@
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
 #include "Group_Container_Server.h"
+#include "Playlist_Container_Server.h"
+#include "Group_Playlist_Container_Server.h"
 #include "Artemis_Network_Sender_Connection.h"
 namespace Artemis
 {
@@ -43,8 +45,8 @@ public:
 	/** Construct Artemis_Request_Handler object */
 	explicit Artemis_Request_Handler(
 			Group_Container_Server_Ptr p_groups_and_computers,
-			Playlist_Container_Ptr p_playlist,
-			Group_Playlist_Container_Ptr p_group_playlist);
+			Playlist_Container_Server_Ptr p_playlist,
+			Group_Playlist_Container_Server_Ptr p_group_playlist);
 	~Artemis_Request_Handler();
 
 	/** Handle a request and produce a reply*/
@@ -74,10 +76,10 @@ private:
 	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	Playlist_Container_Ptr playlist;
+	Playlist_Container_Server_Ptr playlist;
 
 	/* Variable for the group_playlist container */
-	Group_Playlist_Container_Ptr group_playlist;
+	Group_Playlist_Container_Server_Ptr group_playlist;
 
 };
 }

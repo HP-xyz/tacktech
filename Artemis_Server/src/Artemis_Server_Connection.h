@@ -29,6 +29,8 @@
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
 #include "Group_Container_Server.h"
+#include "Playlist_Container_Server.h"
+#include "Group_Playlist_Container_Server.h"
 #include "Artemis_Request_Handler.h"
 
 namespace Artemis
@@ -44,8 +46,8 @@ public:
 	explicit Artemis_Server_Connection(boost::asio::io_service& io_service,
 			std::map<std::string, std::string>&,
 			Group_Container_Server_Ptr p_groups_and_computers,
-			Playlist_Container_Ptr p_playlist,
-			Group_Playlist_Container_Ptr p_group_playlist);
+			Playlist_Container_Server_Ptr p_playlist,
+			Group_Playlist_Container_Server_Ptr p_group_playlist);
 
 	/** Get the socket associated with the connection*/
 	boost::asio::ip::tcp::socket&
@@ -77,10 +79,10 @@ private:
 	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	Playlist_Container_Ptr playlist;
+	Playlist_Container_Server_Ptr playlist;
 
 	/* Variable for the group_playlist container */
-	Group_Playlist_Container_Ptr group_playlist;
+	Group_Playlist_Container_Server_Ptr group_playlist;
 
 	std::string	get_binary_file(std::string filename);
 };
