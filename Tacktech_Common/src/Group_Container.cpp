@@ -338,7 +338,7 @@ void Group_Container::reset_container()
 	groups_and_computers.reset(new Group_Multimap());
 }
 
-Group_Multimap Group_Container::get_computers_no_in_groups()
+Group_Multimap Group_Container::get_computers_not_in_groups()
 {
 	Group_Multimap out_map;
 	for(Group_Multimap::iterator it = groups_and_computers->begin();
@@ -347,7 +347,7 @@ Group_Multimap Group_Container::get_computers_no_in_groups()
 	{
 		if (it->first == "NONE")
 		{
-			out_map.insert(it);
+			out_map.insert(*it);
 		}
 	}
 	return out_map;

@@ -242,7 +242,7 @@ void Edit_Group::repopulate_tree_widget()
 		}
 	}
 	Group_Multimap no_group_map =
-		groups_and_computer_names->get_computers_no_in_groups();
+		groups_and_computer_names->get_computers_not_in_groups();
 	for (Group_Multimap::iterator it = no_group_map.end();
 		it != no_group_map.end();
 		it++)
