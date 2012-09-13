@@ -63,7 +63,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 			SLOT(handle_new_file_added(QString, int)));
 
 	update_timer->start(1000);
-	check_update_timer->start(1800000);
+	check_update_timer->start(180000);
 	identify_timer->start(30000);
 	check_for_updates();
 }
