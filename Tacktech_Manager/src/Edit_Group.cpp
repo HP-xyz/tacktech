@@ -241,12 +241,20 @@ void Edit_Group::repopulate_tree_widget()
 			group_item->addChild(computer_item);
 		}
 	}
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Clearing the all_computers_tree_widget" 
+				<< std::endl;
+#endif // _DEBUG
 	Group_Multimap no_group_map =
 		groups_and_computer_names->get_computers_not_in_groups();
 	for (Group_Multimap::iterator it = no_group_map.end();
 		it != no_group_map.end();
 		it++)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "   - Adding name: " << it->second.first 
+			<< std::endl;
+#endif // _DEBUG
 		computer_item = new Typed_QTreeWidgetItem();
 		computer_item->set_computer_name(
 			QString::fromStdString(it->second.first));

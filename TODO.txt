@@ -16,5 +16,5 @@ ISSUES:
 	  removed on the server side.
 	- After Manager refresh groups are not refreshed in
 	  the main window
-	- Identified computers do not show in the Edit_Group
+	- Identified computers do not show in the Edit_Group	= UNTESTED
 	  GUI
