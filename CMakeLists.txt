@@ -159,6 +159,8 @@ message (STATUS "CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG} ")
 message("")
 
 option (BUILD_MANAGER "Build Tacktech_Manager" ON)
+option (BUILD_DISPLAY "Build Tacktech_Display" ON)
+option (BUILD_SERVER "Build Artemis_Server" OFF)
 
 #The display app can only be build and used in
 #nix for the time being. I suppose it could be
@@ -166,9 +168,13 @@ option (BUILD_MANAGER "Build Tacktech_Manager" ON)
 #adding this if statement to not build it in
 #win32
 if(BUILD_MANAGER)
-add_subdirectory(Tacktech_Manager)
+	add_subdirectory(Tacktech_Manager)
 endif(BUILD_MANAGER)
 if (NOT WIN32)
-	add_subdirectory(Tactek_Display)
+	if(BUILD_DISPLAY)
+		add_subdirectory(Tactek_Display)
+	endif(BUILD_DISPLAY)
 endif (NOT WIN32)
-add_subdirectory(Artemis_Server)
+if(BUILD_SERVER)
+	add_subdirectory(Artemis_Server)
+endif(BUILD_SERVER)
