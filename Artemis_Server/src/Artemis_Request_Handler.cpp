@@ -143,17 +143,20 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::string organization_name =
 				tacktech.child("Organization")
 				.attribute("ORGANIZATION_NAME").as_string();
-		upload_xml += "<Tacktech>";
-		upload_xml += "<Type TYPE=\"SET_VARIABLES\" />";
-		upload_xml += "<Variables>";
+		upload_xml += "<Tacktech>\n";
+		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
+		upload_xml += "</Tacktech>";
+		upload_xml += "    <PLAYLIST_NODE>\n";
 		upload_xml += playlist->get_playlists_xml();
+		upload_xml += "    </PLAYLIST_NODE>\n";
+		upload_xml += "    <GROUPS_AND_COMPUTERS_NODE>\n";
 		upload_xml += groups_and_computers->
 			get_organization_map()[organization_name]
 			.get_groups_and_computers_xml();
+		upload_xml += "    </GROUPS_AND_COMPUTERS_NODE>\n";
+		upload_xml += "    <GROUPS_PLAYLIST_NODE>\n";
 		upload_xml += group_playlist->get_group_playlist_xml();
-		upload_xml += "</Variables>";
-		upload_xml += "</Tacktech>";
-
+		upload_xml += "    </GROUPS_PLAYLIST_NODE>\n";
 		return_xml->append(upload_xml);
 		result_status = SINGLE_RESULT;
 	}
@@ -286,6 +289,13 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			[indentification_node.attribute("Organization_Name").as_string()]
 			.add_computer_name(
 			indentification_node.attribute("Computer_Name").as_string());
+
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "Print of groups_and_computers:" << std::endl;
+		groups_and_computers->get_organization_map()
+				[indentification_node.attribute("Organization_Name").as_string()]
+				 .print_contents();
+#endif
 
 		std::string upload_xml;
 		upload_xml += "<Tacktech>";

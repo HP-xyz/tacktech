@@ -34,6 +34,17 @@ void Add_Computer_Dialog::ok_clicked()
 	if (groups_and_computer_names->add_computer_name(group_name.toStdString(),
 			ui.computer_name_line_edit->text().toStdString()))
 	{
+		Group_Multimap::iterator it =
+				groups_and_computer_names->contains_computer_in_group("NONE",
+				ui.computer_name_line_edit->text().toStdString());
+		if (it != groups_and_computer_names->get_groups_and_computers()->end())
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Removing '"<< ui.computer_name_line_edit->text().toStdString()
+			<< "' from NONE group" << std::endl;
+#endif // _DEBUG
+			groups_and_computer_names->get_groups_and_computers()->erase(it);
+		}
 		emit computer_name_added();
 		this->close();
 	}

@@ -35,12 +35,6 @@ public:
 
 	/** Returns a reference to the organization map */
 	Group_Container_Server_Map& get_organization_map();
-
-#ifdef _SHOW_DEBUG_OUTPUT
-	/** Function to print the contents of the Group_Container. Only compiled
-	 ** in debug mode */
-	void print_contents();
-#endif // _DEBUG
 private:
 	Group_Container_Server_Map organization_map;
 };

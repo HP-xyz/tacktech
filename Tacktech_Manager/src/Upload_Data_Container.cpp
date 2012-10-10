@@ -201,7 +201,7 @@ std::string Upload_Data_Container::get_variables_request_xml()
 			parameters["general.manager_port"].c_str();
 	pugi::xml_node organization_node = root_node.append_child("Organization");
 	organization_node.append_attribute("ORGANIZATION_NAME") =
-		organization_name.toStdString().c_str();
+		parameters["general.organization_name"].c_str();
 
 	xml_string_writer writer;
 	transmit_document.print(writer);

@@ -96,7 +96,8 @@ void Artemis_Server_Connection::start()
 // Parameter: std::size_t bytes_transferred
 //************************************
 void Artemis_Server_Connection::handle_read(
-		const boost::system::error_code& error, std::size_t bytes_transferred)
+		const boost::system::error_code& error,
+		std::size_t bytes_transferred)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " == Handle Read" << std::endl << " =============="
@@ -124,8 +125,11 @@ void Artemis_Server_Connection::handle_read(
 			received_xml += xml[i];
 		}
 
-		boost::shared_ptr<Artemis_Request_Handler> request_handler(new Artemis_Request_Handler(groups_and_computers, playlist,	group_playlist));
-		request_handler->handle_request(received_xml, return_xml, Artemis_Server_Connection::parms);
+		boost::shared_ptr<Artemis_Request_Handler> request_handler(
+			new Artemis_Request_Handler(groups_and_computers, playlist,
+			group_playlist));
+		request_handler->handle_request(received_xml, return_xml,
+			Artemis_Server_Connection::parms);
 		try
 		{
 			if (request_handler->result_status == NO_RESULT)
@@ -259,6 +263,8 @@ void Artemis_Server_Connection::handle_write(
 		boost::system::error_code ignored_ec;
 		Artemis_Server_Connection::m_socket->shutdown(
 				boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+		return_xml.reset(new std::string());
+		m_socket.reset();
 	}
 
 	// No new asynchronous operations are started. This means that all shared_ptr
@@ -285,8 +291,12 @@ void Artemis_Server_Connection::handle_write(
 		boost::system::error_code ignored_ec;
 		Artemis_Server_Connection::m_socket->shutdown(
 				boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+		m_socket->close();
 	}
-
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Connection Closed " << bytes_transferred << std::endl;
+#endif
+	return_xml.reset(new std::string());
 	// No new asynchronous operations are started. This means that all shared_ptr
 	// references to the connection object will disappear and the object will be
 	// destroyed automatically after this handler returns. The connection class's

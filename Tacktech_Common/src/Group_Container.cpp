@@ -42,7 +42,7 @@ bool Group_Container::add_group_name(std::string new_group_name)
 bool Group_Container::add_computer_name(std::string group_name,
 		std::string new_computer_name)
 {
-	if (Group_Container::contains_computer_in_all_groups(new_computer_name)
+	if (Group_Container::contains_computer_in_all_groups_but_NONE(new_computer_name)
 			!= groups_and_computers->end())
 	{
 		return false;
@@ -68,6 +68,9 @@ bool Group_Container::add_computer_name(std::string group_name,
 
 bool Group_Container::add_computer_name( std::string computer_name )
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "" << std::endl;
+#endif
 	Group_Multimap::iterator it =
 		contains_computer_in_all_groups(computer_name);
 	if (it == groups_and_computers->end())
@@ -80,7 +83,11 @@ bool Group_Container::add_computer_name( std::string computer_name )
 		return true;
 	}
 	else
-		return false;
+	{
+		/* We only update the time of the PC's last ping */
+		it->second.second = boost::posix_time::second_clock::universal_time();
+		return true;
+	}
 }
 
 
@@ -216,6 +223,20 @@ Group_Multimap::iterator Group_Container::contains_computer_in_group(
 	return groups_and_computers->end();;
 }
 
+Group_Multimap::iterator Group_Container::contains_computer_in_all_groups_but_NONE(
+		std::string computer_name)
+{
+	for (Group_Multimap::iterator it = groups_and_computers->begin();
+			it != groups_and_computers->end(); it++)
+	{
+		if (it->second.first == computer_name && it->first != "NONE")
+		{
+			return it;
+		}
+	}
+	return groups_and_computers->end();
+}
+
 Group_Multimap::iterator Group_Container::contains_computer_in_all_groups(
 		std::string computer_name)
 {
@@ -340,13 +361,22 @@ void Group_Container::reset_container()
 
 Group_Multimap Group_Container::get_computers_not_in_groups()
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " == Group_Container::get_computers_not_in_groups()" << std::endl;
+#endif
 	Group_Multimap out_map;
 	for(Group_Multimap::iterator it = groups_and_computers->begin();
 		it != groups_and_computers->end();
 		it++)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Group: " << it->first << std::endl;
+#endif
 		if (it->first == "NONE")
 		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  + NONE" << std::endl;
+#endif
 			out_map.insert(*it);
 		}
 	}

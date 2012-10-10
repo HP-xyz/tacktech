@@ -73,6 +73,14 @@ public:
 	/** Checks if in item with computer_name already already exists in
 	 ** the Group_Container. Returns an iterator to groups_and_computers.end()
 	 ** if the Group_Container DOES NOT contain the computer_name, else returns
+	 ** an iterator to the item found
+	 ** NOTE: This search excludes the NONE group.*/
+	Group_Multimap::iterator contains_computer_in_all_groups_but_NONE(
+			std::string computer_name);
+
+	/** Checks if in item with computer_name already already exists in
+	 ** the Group_Container. Returns an iterator to groups_and_computers.end()
+	 ** if the Group_Container DOES NOT contain the computer_name, else returns
 	 ** an iterator to the item found */
 	Group_Multimap::iterator contains_computer_in_all_groups(
 			std::string computer_name);
