@@ -203,6 +203,7 @@ void Edit_Group::repopulate_tree_widget()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " = repopulate_tree_widget" << std::endl;
 	std::cout << "  - Clearing the main_tree_widget" << std::endl;
+	groups_and_computer_names->print_contents();
 #endif // _DEBUG
 	ui->main_tree_widget->clear();
 	Typed_QTreeWidgetItem *group_item;
@@ -218,36 +219,40 @@ void Edit_Group::repopulate_tree_widget()
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "   - Group Name: " << it->first << std::endl;
 #endif // _DEBUG
-		group_item = new Typed_QTreeWidgetItem();
-		group_item->set_group_name(QString::fromStdString(it->first));
-		group_item->set_type("GROUP");
-		group_item->setText(0, QString::fromStdString(it->first));
-		ui->main_tree_widget->addTopLevelItem(group_item);
-		Group_Computer_Range range =
-				groups_and_computer_names->get_groups_and_computers()->equal_range(
-						it->first);
-		Group_Multimap::iterator it2 = range.first;
-		for (it2; it2 != range.second; ++it2)
+		if (it->first != "NONE")
 		{
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "    - Computer Name: " << it2->second.first << std::endl;
-#endif // _DEBUG
-			computer_item = new Typed_QTreeWidgetItem();
-			computer_item->set_computer_name(
-					QString::fromStdString(it2->second.first));
-			computer_item->set_group_name(QString::fromStdString(it2->first));
-			computer_item->set_type("COMPUTER");
-			computer_item->setText(0, QString::fromStdString(it2->second.first));
-			group_item->addChild(computer_item);
+			group_item = new Typed_QTreeWidgetItem();
+			group_item->set_group_name(QString::fromStdString(it->first));
+			group_item->set_type("GROUP");
+			group_item->setText(0, QString::fromStdString(it->first));
+			ui->main_tree_widget->addTopLevelItem(group_item);
+			Group_Computer_Range range =
+					groups_and_computer_names->get_groups_and_computers()->equal_range(
+							it->first);
+			Group_Multimap::iterator it2 = range.first;
+			for (it2; it2 != range.second; ++it2)
+			{
+	#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << "    - Computer Name: " << it2->second.first << std::endl;
+	#endif // _DEBUG
+				computer_item = new Typed_QTreeWidgetItem();
+				computer_item->set_computer_name(
+						QString::fromStdString(it2->second.first));
+				computer_item->set_group_name(QString::fromStdString(it2->first));
+				computer_item->set_type("COMPUTER");
+				computer_item->setText(0, QString::fromStdString(it2->second.first));
+				group_item->addChild(computer_item);
+			}
 		}
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "  - Clearing the all_computers_tree_widget" 
 				<< std::endl;
 #endif // _DEBUG
+	ui->all_computers_tree_widget->clear();
 	Group_Multimap no_group_map =
 		groups_and_computer_names->get_computers_not_in_groups();
-	for (Group_Multimap::iterator it = no_group_map.end();
+	for (Group_Multimap::iterator it = no_group_map.begin();
 		it != no_group_map.end();
 		it++)
 	{

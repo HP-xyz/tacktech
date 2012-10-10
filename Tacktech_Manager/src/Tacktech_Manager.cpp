@@ -337,46 +337,62 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager::data_recieved_slot()" << std::endl;
-	std::cout << " - Data Received: " << 
-		data_recieved.toStdString() << std::endl;
+	std::cout << " - Data Received Size: " <<
+		data_recieved.toStdString().length() << std::endl;
+	std::cout << data_recieved.toStdString() << std::endl;
 #endif // _DEBUG
 	std::string status_msg;
 	pugi::xml_document document;
 	document.load(data_recieved.toStdString().c_str());
-	pugi::xml_node tacktech = document.child("Tacktech");
 	std::string type_string =
-			tacktech.child("Type").attribute("TYPE").as_string();
+			document.child("Tacktech").child("Type").attribute("TYPE").as_string();
 	if (type_string == "SET_VARIABLES")
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
+		document.print(std::cout);
 #endif // _DEBUG
-		tacktech.print(std::cout);
 		xml_string_writer playlist_writer;
-		tacktech.child("Variables").
+		document.child("PLAYLIST_NODE").
 			child("Playlist").print(playlist_writer);
 		playlist->reset_container();
 		playlist->construct_playlist(playlist_writer.result);
-
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Playlist Print: " << std::endl;
+		playlist->print_contents();
+#endif
 		xml_string_writer groups_and_computers_writer;
-		tacktech.child("Variables").child("Groups_And_Computers").print(
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "Groups_And_Computers sub XML:" << std::endl;
+		document.child("GROUPS_AND_COMPUTERS_NODE").print(
+						std::cout);
+#endif
+		document.child("GROUPS_AND_COMPUTERS_NODE").child("Groups_And_Computers").print(
 				groups_and_computers_writer);
 		groups_and_computers->reset_container();
 		groups_and_computers->construct_groups_and_computers(
 				groups_and_computers_writer.result);
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Groups_And_Computers Print: " << std::endl;
+		groups_and_computers->print_contents();
+#endif
 
 		xml_string_writer group_playlist_writer;
-		tacktech.child("Variables").child("Group_Playlist").print(
+		document.child("GROUPS_PLAYLIST_NODE").child("Group_Playlist").print(
 				group_playlist_writer);
 		group_playlist->reset_container();
 		group_playlist->construct_group_playlist(
 			group_playlist_writer.result);
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - group_playlist Print: " << std::endl;
+		groups_and_computers->print_contents();
+#endif
 		status_msg += "Received variables successfully";
 	}
 	else if(type_string == "UPLOAD_RESULT")
 	{
 		std::string succes_string =
-			tacktech.child("Success").attribute("SUCCESS").as_string();
+			document.child("Success").attribute("SUCCESS").as_string();
 		if (succes_string == "TRUE")
 		{
 			status_msg += "Uploaded successfully to server";

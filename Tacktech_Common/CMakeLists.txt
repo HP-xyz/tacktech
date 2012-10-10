@@ -35,6 +35,7 @@ if(BUILD_SHARED_LIBS)
 				SHARED
 				${TACKTECH_COMMON_HDRS}
 				${TACKTECH_COMMON_SRCS}
+				${TACKTECH_COMMON_MOC_HDRS}
 				${MOCS}
 				)
 	target_link_libraries(Tacktech_Common
@@ -47,6 +48,7 @@ else(BUILD_SHARED_LIBS)
 				STATIC
 				${TACKTECH_COMMON_HDRS}
 				${TACKTECH_COMMON_SRCS}
+				${TACKTECH_COMMON_MOC_HDRS}
 				${MOCS}
 				)
 	target_link_libraries(Tacktech_Common
