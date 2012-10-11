@@ -143,13 +143,23 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::string organization_name =
 				tacktech.child("Organization")
 				.attribute("ORGANIZATION_NAME").as_string();
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  -> Organization_Name: " << organization_name 
+			<< std::endl;
+#endif // _DEBUG
 		upload_xml += "<Tacktech>\n";
 		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
 		upload_xml += "</Tacktech>";
 		upload_xml += "    <PLAYLIST_NODE>\n";
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  -> Getting playlist XML" << std::endl;
+#endif // _DEBUG
 		upload_xml += playlist->get_playlists_xml();
 		upload_xml += "    </PLAYLIST_NODE>\n";
 		upload_xml += "    <GROUPS_AND_COMPUTERS_NODE>\n";
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  -> Getting groups_and_computers XML" << std::endl;
+#endif // _DEBUG
 		upload_xml += groups_and_computers->
 			get_organization_map()[organization_name]
 			.get_groups_and_computers_xml();
