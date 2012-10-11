@@ -154,8 +154,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			get_organization_map()[organization_name]
 			.get_groups_and_computers_xml();
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "Printing the computers_and_groups to be sent:" 
-				<< std::endl;
+			std::cout << "Printing the computers_and_groups for: "
+				<< organization_name << std::endl;
 			groups_and_computers->get_organization_map()[organization_name]
 			.print_contents();
 #endif // _SHOW_DEBUG_OUTPUT

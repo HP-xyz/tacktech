@@ -289,6 +289,10 @@ Group_Multimap Group_Container::get_unique_groups()
 
 std::string Group_Container::get_groups_and_computers_xml()
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "== Group_Container::get_groups_and_computers_xml()" 
+		<< std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document groups_and_computers_document;
 	pugi::xml_node root_node_groups_and_computers =
 			groups_and_computers_document.append_child("Groups_And_Computers");
@@ -301,9 +305,15 @@ std::string Group_Container::get_groups_and_computers_xml()
 		group_node.append_attribute("Group_Name") = it->first.c_str();
 		Group_Computer_Range group_range =
 				get_groups_and_computers()->equal_range(it->first);
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - " << it->first	<< std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		for (Group_Multimap::iterator it2 = group_range.first;
 				it2 != group_range.second; ++it2)
 		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  -> " << it->second.first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 			pugi::xml_node computer_item_node = group_node.append_child(
 					"Computer_Item");
 			pugi::xml_node computer_node = computer_item_node.append_child(
