@@ -368,7 +368,7 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 		document.child("Variables").child("GROUPS_AND_COMPUTERS_NODE").print(
 						std::cout);
 #endif
-		document.child("GROUPS_AND_COMPUTERS_NODE").child("Groups_And_Computers").print(
+		document.child("Variables").child("GROUPS_AND_COMPUTERS_NODE").child("Groups_And_Computers").print(
 				groups_and_computers_writer);
 		groups_and_computers->reset_container();
 		groups_and_computers->construct_groups_and_computers(
@@ -415,8 +415,8 @@ void Tacktech_Manager::upload_new_variables_slot()
 	std::cout << "=Tacktech_Manager::upload_new_variables_slot()" << std::endl;
 #endif // _DEBUG
 	upload_data.reset(new Upload_Data_Container(parameters));
-	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
-			SLOT(start_upload(std::string)));
+	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)),
+		this, SLOT(start_upload(std::string)));
 	upload_data->set_playlist(playlist);
 	upload_data->set_groups(groups_and_computers);
 	upload_data->set_group_playlist(group_playlist);

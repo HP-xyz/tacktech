@@ -148,6 +148,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << "  -> Organization_Name: " << organization_name 
 			<< std::endl;
 #endif // _DEBUG
+		upload_xml += "<?xml version=\"1.0\"?>";
 		upload_xml += "<Tacktech>\n";
 		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
 		upload_xml += "</Tacktech>\n";
