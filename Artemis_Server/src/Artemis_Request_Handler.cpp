@@ -150,7 +150,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #endif // _DEBUG
 		upload_xml += "<Tacktech>\n";
 		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
-		upload_xml += "</Tacktech>";
+		upload_xml += "</Tacktech>\n";
+		upload_xml += "<Variables>\n";
 		upload_xml += "    <PLAYLIST_NODE>\n";
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "  -> Getting playlist XML" << std::endl;
@@ -174,6 +175,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		upload_xml += "    <GROUPS_PLAYLIST_NODE>\n";
 		upload_xml += group_playlist->get_group_playlist_xml();
 		upload_xml += "    </GROUPS_PLAYLIST_NODE>\n";
+		upload_xml += "</Variables>\n";
 		return_xml->append(upload_xml);
 		result_status = SINGLE_RESULT;
 	}

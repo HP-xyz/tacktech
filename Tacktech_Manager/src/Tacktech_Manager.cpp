@@ -350,21 +350,22 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
-		document.print(std::cout);
+		document.child("Variables").print(std::cout);
 #endif // _DEBUG
 		xml_string_writer playlist_writer;
-		document.child("PLAYLIST_NODE").
+		document.child("Variables").child("PLAYLIST_NODE").
 			child("Playlist").print(playlist_writer);
 		playlist->reset_container();
 		playlist->construct_playlist(playlist_writer.result);
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Playlist Print: " << std::endl;
+		std::cout << "==================" << std::endl;
 		playlist->print_contents();
 #endif
 		xml_string_writer groups_and_computers_writer;
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "Groups_And_Computers sub XML:" << std::endl;
-		document.child("GROUPS_AND_COMPUTERS_NODE").print(
+		document.child("Variables").child("GROUPS_AND_COMPUTERS_NODE").print(
 						std::cout);
 #endif
 		document.child("GROUPS_AND_COMPUTERS_NODE").child("Groups_And_Computers").print(
@@ -374,17 +375,19 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 				groups_and_computers_writer.result);
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Groups_And_Computers Print: " << std::endl;
+		std::cout << "===============================" << std::endl;
 		groups_and_computers->print_contents();
 #endif
 
 		xml_string_writer group_playlist_writer;
-		document.child("GROUPS_PLAYLIST_NODE").child("Group_Playlist").print(
+		document.child("Variables").child("GROUPS_PLAYLIST_NODE").child("Group_Playlist").print(
 				group_playlist_writer);
 		group_playlist->reset_container();
 		group_playlist->construct_group_playlist(
 			group_playlist_writer.result);
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - group_playlist Print: " << std::endl;
+		std::cout << "=========================" << std::endl;
 		groups_and_computers->print_contents();
 #endif
 		status_msg += "Received variables successfully";

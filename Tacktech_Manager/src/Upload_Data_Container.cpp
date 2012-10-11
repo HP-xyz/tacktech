@@ -28,6 +28,16 @@ Upload_Data_Container::Upload_Data_Container(
 		std::map<std::string, std::string>& p_parms)
 {
 	parameters = p_parms;
+	//read_config();
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Parameters: " << std::endl << "==================="
+		<< std::endl;
+	for (std::map<std::string,std::string>::iterator it =
+		parameters.begin(); it != parameters.end(); it++)
+	{
+		std::cout << " - " << it->first << " = " << it->second << std::endl;
+	}
+#endif
 }
 
 Upload_Data_Container::~Upload_Data_Container()
@@ -155,6 +165,7 @@ void Upload_Data_Container::set_command(QString p_command)
  */
 void Upload_Data_Container::get_xml_upload()
 {
+	read_config();
 	if (command == "GET_VARIABLES")
 	{
 		emit xml_creation_complete(
@@ -343,4 +354,41 @@ std::string Upload_Data_Container::upload_file()
 	xml_string_writer upload_writer;
 	transmit_document.print(upload_writer);
 	return upload_writer.result;
+}
+
+void Upload_Data_Container::read_config()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Tacktech_Manager::read_config()" << std::endl;
+#endif // _DEBUG
+	std::ifstream config("config.ini");
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Created config ifstream" << std::endl;
+#endif // _DEBUG
+	if (!config)
+	{
+		std::cerr << " == Error -> No config found" << std::endl;
+	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Creating options.insert" << std::endl;
+#endif // _DEBUG
+	options.insert("*");
+	try
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "Config file read: " << std::endl << "==================="
+			<< std::endl;
+#endif
+		for (boost::program_options::detail::config_file_iterator i(config,
+			options), e; i != e; ++i)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << i->string_key << " " << i->value[0] << std::endl;
+#endif
+			parameters[i->string_key] = i->value[0];
+		}
+	} catch (std::exception& e)
+	{
+		std::cerr << "Exception: " << e.what() << std::endl;
+	}
 }
