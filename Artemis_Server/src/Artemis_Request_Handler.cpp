@@ -134,6 +134,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received GET_VARIABLES command" << std::endl;
+		tacktech.print(std::cout);
 #endif // _DEBUG
 		std::string dest_ip =
 				tacktech.child("Return_IP").attribute("IP").as_string();
