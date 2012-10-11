@@ -9,12 +9,15 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <sstream>
 #include <exception>
 #include <cctype>
 #include <pugixml.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options/detail/config_file.hpp>
+#include <boost/program_options/parsers.hpp>
 #include <b64/encode.h>
 #include <Playlist_Container.h>
 #include <Group_Container.h>
@@ -39,8 +42,7 @@ public:
 	void get_xml_upload();
 protected:
 private:
-	std::string
-	get_binary_file(QString);
+	std::string	get_binary_file(QString);
 	Playlist_Container_Ptr playlist;
 	Group_Container_Ptr groups;
 	Group_Playlist_Container_Ptr group_playlist;
@@ -50,7 +52,9 @@ private:
 	QString command;
 	QString organization_name;
 	std::ifstream::pos_type m_size;
+	void read_config();
 	std::map<std::string, std::string> parameters;
+	std::set<std::string> options;
 
 	std::string get_variables_request_xml();
 	std::string	set_variable_command_xml();

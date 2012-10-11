@@ -18,3 +18,4 @@ ISSUES:
 	  the main window
 	- Identified computers do not show in the Edit_Group	= UNTESTED
 	  GUI
+	- Make Organization selectable in Manager
