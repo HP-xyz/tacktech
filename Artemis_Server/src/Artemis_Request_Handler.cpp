@@ -291,7 +291,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			indentification_node.attribute("Computer_Name").as_string());
 
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "Print of groups_and_computers:" << std::endl;
+		std::cout << "Should now contain '" 
+			<< indentification_node.attribute("Computer_Name").as_string() 
+			<<  "':" << std::endl;
 		groups_and_computers->get_organization_map()
 				[indentification_node.attribute("Organization_Name").as_string()]
 				 .print_contents();

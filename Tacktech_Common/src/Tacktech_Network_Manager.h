@@ -19,6 +19,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <exception>
 
 class Tacktech_Network_Manager: public QObject,
 	public boost::enable_shared_from_this<

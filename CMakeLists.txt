@@ -32,7 +32,7 @@ SET(CMAKE_MODULE_PATH
     ${CMAKE_SOURCE_DIR}/cmake
 )
 
-if (MSVC)
+if (WIN32)
 	set (QT_QMAKE_EXECUTABLE ${QT_DIR}/bin/qmake.exe)
 	set (QT_MOC_EXECUTABLE ${QT_DIR}/bin/moc.exe)
 	set (QT_RCC_EXECUTABLE ${QT_DIR}/bin/rcc.exe)
@@ -44,9 +44,9 @@ if (MSVC)
 	MESSAGE (STATUS "QT_RCC_EXECUTABLE: " ${QT_RCC_EXECUTABLE})
 	MESSAGE (STATUS "QT_UIC_EXECUTABLE: " ${QT_UIC_EXECUTABLE})	
 	find_package (Qt4 COMPONENTS QtMain QtNetwork QtCore QtGui REQUIRED)
-else (MSVC)
+else (WIN32)
 	find_package (Qt4 COMPONENTS QtNetwork QtCore QtGui REQUIRED)
-endif (MSVC)
+endif (WIN32)
 
 include ( ${QT_USE_FILE} )
 ADD_DEFINITIONS(${QT_DEFINITIONS})

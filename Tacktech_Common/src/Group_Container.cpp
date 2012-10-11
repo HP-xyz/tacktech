@@ -69,7 +69,7 @@ bool Group_Container::add_computer_name(std::string group_name,
 bool Group_Container::add_computer_name( std::string computer_name )
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "" << std::endl;
+	std::cout << "== Group_Container::add_computer_name" << std::endl;
 #endif
 	Group_Multimap::iterator it =
 		contains_computer_in_all_groups(computer_name);
@@ -81,11 +81,22 @@ bool Group_Container::add_computer_name( std::string computer_name )
 			boost::posix_time::second_clock::universal_time());
 		groups_and_computers->insert(Group_Item("NONE", item));
 		return true;
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Adding computer '" << computer_name 
+			<< "'" << std::endl;
+#endif
 	}
 	else
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Updating computer '" << computer_name 
+			<< "' to time '" 
+			<< boost::posix_time::second_clock::universal_time() 
+			<< "'" << std::endl;
+#endif
 		/* We only update the time of the PC's last ping */
-		it->second.second = boost::posix_time::second_clock::universal_time();
+		it->second.second =
+			boost::posix_time::second_clock::universal_time();
 		return true;
 	}
 }
