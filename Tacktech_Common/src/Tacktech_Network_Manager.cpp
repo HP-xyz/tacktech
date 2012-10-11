@@ -68,30 +68,37 @@ void Tacktech_Network_Manager::handle_write(
 void Tacktech_Network_Manager::connect(std::string dest_ip,
 		std::string dest_port)
 {
+	try
+	{
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Tacktech_Network_Manager::connect()" 
-		<< std::endl;
-	std::cout << " ->> Dest IP:   " << dest_ip << std::endl;
-	std::cout << " ->> Dest PORT: " << dest_port << std::endl;
-	std::cout << " - Creating resolver" << std::endl;
+		std::cout << "= Tacktech_Network_Manager::connect()" 
+			<< std::endl;
+		std::cout << " ->> Dest IP:   " << dest_ip << std::endl;
+		std::cout << " ->> Dest PORT: " << dest_port << std::endl;
+		std::cout << " - Creating resolver" << std::endl;
 #endif // _DEBUG
-	boost::asio::ip::tcp::resolver resolver(m_socket->get_io_service());
+		boost::asio::ip::tcp::resolver resolver(m_socket->get_io_service());
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Creating query" << std::endl;
+		std::cout << " - Creating query" << std::endl;
 #endif //_DEBUG
-	boost::asio::ip::tcp::resolver::query query(dest_ip, dest_port);
+		boost::asio::ip::tcp::resolver::query query(dest_ip, dest_port);
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Creating endpoint_iterator" << std::endl;
+		std::cout << " - Creating endpoint_iterator" << std::endl;
 #endif //_DEBUG
-	boost::asio::ip::tcp::resolver::iterator endpoint_iterator =
+		boost::asio::ip::tcp::resolver::iterator endpoint_iterator =
 			resolver.resolve(query);
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Calling async_connect" << std::endl;
+		std::cout << " - Calling async_connect" << std::endl;
 #endif //_DEBUG
-	m_socket->get_io_service().post(
+		m_socket->get_io_service().post(
 			boost::bind(&Tacktech_Network_Manager::do_connect,
 					this,
 					endpoint_iterator));
+	}
+	catch(std::exception &ex)
+	{
+		std::cerr << ex.what() << std::endl;
+	}
 }
 void Tacktech_Network_Manager::do_connect(
 		boost::asio::ip::tcp::resolver::iterator endpoint_iterator)

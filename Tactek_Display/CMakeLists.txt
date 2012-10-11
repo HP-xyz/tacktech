@@ -31,7 +31,7 @@ if (NOT WIN32)
 find_package(LIBVLCQT REQUIRED)
 else (NOT WIN32)
 	set (LIBVLCQT_INCLUDE_DIR "E:\\Akademie\\Code\\DVCS\\tacktech_clean\\libvlc-qt\\include")
-	set (LIBVLCQT_LIBRARY "E:\\Akademie\\Code\\DVCS\\tacktech_clean\\mingw32-build-libs\\libvlc-qt.dll")
+	set (LIBVLCQT_LIBRARY "E:\\Akademie\\Code\\DVCS\\tacktech_clean\\mingw32-build-libs\\win32\\libvlc-qt.dll")
 endif (NOT WIN32)
 #Lets find boost
 find_package(Boost 1.47.0 COMPONENTS program_options REQUIRED)
@@ -45,6 +45,8 @@ if (NOT WIN32)
     find_package(Threads REQUIRED)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lrt -ldl")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt -ldl")
+else (NOT WIN32)
+	add_definitions(-D_WIN32_WINNT=0x0501 -DWINVER=0x0501)
 endif (NOT WIN32)
 
 include ( ${QT_USE_FILE} )
@@ -96,13 +98,14 @@ message (STATUS "CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG} ")
 message (STATUS "CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG} ")
 message("")
 
-add_executable ( Tacktech_Display 
+add_executable ( Tacktech_Display
 				${Tacktech_Display_SOURCE_DIR}/main.cpp
 				${Tacktech_Display_SRCS} 
 				${Tacktech_Display_HDRS} 
 				${MOCS} 
 				${RSCS} 
 				${UIS})
+
 target_link_libraries ( Tacktech_Display 
 						${QT_LIBRARIES}
 						${QT_QTCORE_LIBRARY} 
@@ -114,4 +117,6 @@ target_link_libraries ( Tacktech_Display
 						libb64
 						pugixml
 						Tacktech_Common
+						ws2_32
+						wsock32
                         )

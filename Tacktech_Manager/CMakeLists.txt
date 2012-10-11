@@ -117,12 +117,12 @@ install (TARGETS Tacktech_Manager
 		DESTINATION bin)
 		
 set(CPACK_PACKAGE_NAME "Tacktech_Manager")
-set(CPACK_PACKAGE_VENDOR "CMake.org")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MyLib - CPack Component Installation Example")
+set(CPACK_PACKAGE_VENDOR "Tacktech")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Tacktech Advertising")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "CPack Component Example")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Tacktech")
  
 include (CPack)
