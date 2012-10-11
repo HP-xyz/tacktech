@@ -292,7 +292,6 @@ std::string Group_Container::get_groups_and_computers_xml()
 	pugi::xml_document groups_and_computers_document;
 	pugi::xml_node root_node_groups_and_computers =
 			groups_and_computers_document.append_child("Groups_And_Computers");
-
 	Group_Multimap group_map = get_unique_groups();
 	for (Group_Multimap::iterator it = group_map.begin(); it != group_map.end();
 			it++)
