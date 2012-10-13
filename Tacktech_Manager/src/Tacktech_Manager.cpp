@@ -350,10 +350,50 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received SET_VARIABLES command" << std::endl;
-		document.child("Variables").print(std::cout);
 #endif // _DEBUG
+		/* We declare 3 strings that contain the variables */
+		std::string groups_and_computers_str = data_recieved.toStdString();
+		std::string playlist_str = data_recieved.toStdString();
+		std::string group_playlist_str = data_recieved.toStdString();
+
+		/* Now substring the recieved data, and assign only the needed data
+		 * to the appropraite string */
+		playlist_str = playlist_str.substr(
+			playlist_str.find("<PLAYLIST_NODE>"),
+			playlist_str.rfind("</PLAYLIST_NODE>") + 16);
+		groups_and_computers_str = group_playlist_str.substr(
+			groups_and_computers_str.find("<GROUPS_AND_COMPUTERS_NODE"),
+			groups_and_computers_str.rfind("</GROUPS_AND_COMPUTERS_NODE>") + 28);
+		group_playlist_str = group_playlist_str.substr(
+			group_playlist_str.find("<GROUPS_PLAYLIST_NODE>"),
+			group_playlist_str.rfind("</GROUPS_PLAYLIST_NODE>") + 23);
+
+		pugi::xml_document playlist_doc;
+		playlist_doc.load(playlist_str.c_str());
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Playlist RECIEVED Print: " << std::endl;
+		std::cout << "==================" << std::endl;
+		playlist_doc.print(std::cout);
+#endif
+
+		pugi::xml_document groups_and_computers_doc;
+		groups_and_computers_doc.load(groups_and_computers_str.c_str());
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Groups_And_Computers RECIEVED Print: " << std::endl;
+		std::cout << "==================" << std::endl;
+		groups_and_computers_doc.print(std::cout);
+#endif
+
+		pugi::xml_document group_playlist_doc;
+		group_playlist_doc.load(group_playlist_str.c_str());
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Group_Playlist RECIEVED Print: " << std::endl;
+		std::cout << "==================" << std::endl;
+		group_playlist_doc.print(std::cout);
+#endif
+
 		xml_string_writer playlist_writer;
-		document.child("Variables").child("PLAYLIST_NODE").
+		playlist_doc.child("PLAYLIST_NODE").
 			child("Playlist").print(playlist_writer);
 		playlist->reset_container();
 		playlist->construct_playlist(playlist_writer.result);
@@ -363,13 +403,9 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 		playlist->print_contents();
 #endif
 		xml_string_writer groups_and_computers_writer;
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "Groups_And_Computers sub XML:" << std::endl;
-		document.child("Variables").child("GROUPS_AND_COMPUTERS_NODE").print(
-						std::cout);
-#endif
-		document.child("Variables").child("GROUPS_AND_COMPUTERS_NODE").child("Groups_And_Computers").print(
-				groups_and_computers_writer);
+		groups_and_computers_doc.child("GROUPS_AND_COMPUTERS_NODE")
+			.child("Groups_And_Computers")
+			.print(groups_and_computers_writer);
 		groups_and_computers->reset_container();
 		groups_and_computers->construct_groups_and_computers(
 				groups_and_computers_writer.result);
@@ -380,8 +416,8 @@ void Tacktech_Manager::data_recieved_slot(QString data_recieved)
 #endif
 
 		xml_string_writer group_playlist_writer;
-		document.child("Variables").child("GROUPS_PLAYLIST_NODE").child("Group_Playlist").print(
-				group_playlist_writer);
+		group_playlist_doc.child("GROUPS_PLAYLIST_NODE")
+			.child("Group_Playlist").print(	group_playlist_writer);
 		group_playlist->reset_container();
 		group_playlist->construct_group_playlist(
 			group_playlist_writer.result);
