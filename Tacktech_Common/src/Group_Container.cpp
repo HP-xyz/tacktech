@@ -69,7 +69,8 @@ bool Group_Container::add_computer_name(std::string group_name,
 bool Group_Container::add_computer_name( std::string computer_name )
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "== Group_Container::add_computer_name" << std::endl;
+	std::cout << "==> Group_Container::add_computer_name" 
+		<< " --> For computer: " << computer_name << std::endl;
 #endif
 	Group_Multimap::iterator it =
 		contains_computer_in_all_groups(computer_name);
@@ -82,15 +83,15 @@ bool Group_Container::add_computer_name( std::string computer_name )
 		groups_and_computers->insert(Group_Item("NONE", item));
 		return true;
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Adding computer '" << computer_name 
-			<< "'" << std::endl;
+		std::cout << "   - Adding computer '" << computer_name 
+			<< "' to group 'NONE'" << std::endl;
 #endif
 	}
 	else
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Updating computer '" << computer_name 
-			<< "' to time '" 
+		std::cout << "   - Updating computer '" << it->second.first 
+			<< "' in group '" << it->first << "' to time '" 
 			<< boost::posix_time::second_clock::universal_time() 
 			<< "'" << std::endl;
 #endif
@@ -251,14 +252,24 @@ Group_Multimap::iterator Group_Container::contains_computer_in_all_groups_but_NO
 Group_Multimap::iterator Group_Container::contains_computer_in_all_groups(
 		std::string computer_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "====> Group_Container::contains_computer_in_all_groups" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	for (Group_Multimap::iterator it = groups_and_computers->begin();
 			it != groups_and_computers->end(); it++)
 	{
 		if (it->second.first == computer_name)
 		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " ----> Return iterator to computer: " 
+				<< it->second.first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 			return it;
 		}
 	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " ----> Return end() iterator " << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return groups_and_computers->end();
 }
 

@@ -194,11 +194,27 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		playlist->construct_playlist(organization_name,
 			playlist_writer.result);
 
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  - ORGANIZATION: " << organization_name <<std::endl;
+		std::cout << "  - Printing new variables on server" << std::endl;
+		std::cout << "  ==================================" << std::endl;
+		std::cout << "   - Playlist" << std::endl;
+		std::cout << "   ==========" << std::endl;
+#endif // _DEBUG
+		playlist->get_organization_map()
+			[organization_name].print_contents();
+
 		xml_string_writer groups_and_computers_writer;
 		tacktech.child("Variables").child("Groups_And_Computers").print(
 				groups_and_computers_writer);
 		groups_and_computers->construct_groups_and_computers(
 			organization_name, groups_and_computers_writer.result);
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "   - Groups_And_Computers" << std::endl;
+		std::cout << "   ======================" << std::endl;
+#endif // _DEBUG
+		groups_and_computers->get_organization_map()
+			[organization_name].print_contents();
 
 		xml_string_writer group_playlist_writer;
 		tacktech.child("Variables").child("Group_Playlist").print(
@@ -301,23 +317,10 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << " - Received IDENTIFY command" << std::endl;
 #endif // _DEBUG
 		pugi::xml_node indentification_node = tacktech.child("Identity");
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  - IDENTITY_RECIEVED" << std::endl;
-		indentification_node.print(std::cout);
-#endif
 		groups_and_computers->get_organization_map()
 			[indentification_node.attribute("Organization_Name").as_string()]
 			.add_computer_name(
 			indentification_node.attribute("Computer_Name").as_string());
-
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "Should now contain '" 
-			<< indentification_node.attribute("Computer_Name").as_string() 
-			<<  "':" << std::endl;
-		groups_and_computers->get_organization_map()
-				[indentification_node.attribute("Organization_Name").as_string()]
-				 .print_contents();
-#endif
 
 		std::string upload_xml;
 		upload_xml += "<Tacktech>";
