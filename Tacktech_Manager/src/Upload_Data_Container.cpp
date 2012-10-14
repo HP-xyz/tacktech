@@ -250,12 +250,14 @@ std::string Upload_Data_Container::set_variable_command_xml()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Upload_Data_Container::set_variable_command_xml()"
 			<< std::endl;
+	std::cout << " -> ORGANIZATION = " 
+		<< parameters["general.organization_name"].c_str() << std::endl;
 #endif // _DEBUG
 	std::string return_str;
 	return_str += "<Tacktech>";
 	return_str += "<Type TYPE=\"SET_VARIABLES\" />";
-	return_str += "<Organization ORGANIZATION=\"";
-	return_str += organization_name.toStdString();
+	return_str += "<Organization ORGANIZATION_NAME=\"";
+	return_str += parameters["general.organization_name"].c_str();
 	return_str += "\"/>";
 	return_str += "<Variables>";
 	return_str += playlist->get_playlists_xml();
