@@ -112,17 +112,24 @@ target_link_libraries ( Tacktech_Manager
 					${CMAKE_THREAD_LIBS_INIT}
 					${Boost_LIBRARIES}
 					)
-install (TARGETS Tacktech_Manager
-		RUNTIME
-		DESTINATION bin)
-		
-set(CPACK_PACKAGE_NAME "Tacktech_Manager")
-set(CPACK_PACKAGE_VENDOR "Tacktech")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Tacktech Advertising")
-set(CPACK_PACKAGE_VERSION "1.0.0")
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "0")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Tacktech")
- 
-include (CPack)
+if (WIN32)
+	INCLUDE(InstallRequiredSystemLibraries)
+						
+	install (TARGETS Tacktech_Manager
+			RUNTIME
+			DESTINATION bin)
+	install (FILES ${Tacktech_Manager_SOURCE_DIR}/config.ini
+			DESTINATION bin)
+			
+	set(CPACK_PACKAGE_NAME "Tacktech_Manager")
+	set(CPACK_PACKAGE_VENDOR "Tacktech")
+	set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Tacktech Advertising")
+	set(CPACK_PACKAGE_VERSION "1.0.0")
+	set(CPACK_PACKAGE_VERSION_MAJOR "1")
+	set(CPACK_PACKAGE_VERSION_MINOR "0")
+	set(CPACK_PACKAGE_VERSION_PATCH "0")
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "Tacktech")
+	set(CPACK_CREATE_DESKTOP_LINKS "${EXE_TARGET_NAME}")
+	set(CPACK_RESOURCE_FILE_LICENSE "${Tacktech_Manager_SOURCE_DIR}/License.txt")
+	include (CPack)
+endif (WIN32)
