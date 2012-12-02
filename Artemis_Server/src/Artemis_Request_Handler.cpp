@@ -372,7 +372,7 @@ std::string Artemis_Request_Handler::get_binary_file(std::string filename)
 #endif // _DEBUG
 		file.close();
 	}
-	return file_encoded;
+	return (file_encoded);
 }
 
 /** Function handles the upload of data to a IP. Receives
@@ -455,7 +455,7 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 		out_file << file_data;
 		out_file.close();
 	}
-	return successfull_save;
+	return (successfull_save);
 }
 
 }
