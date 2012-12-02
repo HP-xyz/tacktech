@@ -209,7 +209,8 @@ void Edit_Playlist::keyPressEvent(QKeyEvent *event)
 	}
 	default:
 		QWidget::keyPressEvent(event);
-	}
+    break;
+    }
 }
 
 void Edit_Playlist::cancel_clicked()

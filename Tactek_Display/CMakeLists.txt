@@ -30,6 +30,7 @@ endif (WIN32)
 if (NOT WIN32)
 find_package(LIBVLCQT REQUIRED)
 else (NOT WIN32)
+	set (SYSTEM_LIBRARIES ws2_32 wsock32)
 	set (LIBVLCQT_INCLUDE_DIR "E:\\Akademie\\Code\\DVCS\\tacktech_clean\\libvlc-qt\\include")
 	set (LIBVLCQT_LIBRARY "E:\\Akademie\\Code\\DVCS\\tacktech_clean\\mingw32-build-libs\\win32\\libvlc-qt.dll")
 endif (NOT WIN32)
@@ -117,6 +118,52 @@ target_link_libraries ( Tacktech_Display
 						libb64
 						pugixml
 						Tacktech_Common
-						ws2_32
-						wsock32
+						${SYSTEM_LIBRARIES}
                         )
+if (WIN32)
+	INCLUDE(InstallRequiredSystemLibraries)
+						
+	install (TARGETS Tacktech_Display
+			RUNTIME
+			DESTINATION Tacktech_Display/bin)
+	install (FILES ${Tacktech_Display_SOURCE_DIR}/config.ini "${QT_LIBRARIES}" "${LIBVLCQT_LIBRARY}"
+			DESTINATION Tacktech_Display/bin)
+			
+	set(CPACK_PACKAGE_NAME "Tacktech_Display")
+	set(CPACK_PACKAGE_VENDOR "Tacktech")
+	set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Tacktech Advertising")
+	set(CPACK_PACKAGE_VERSION "1.0.0")
+	set(CPACK_PACKAGE_VERSION_MAJOR "1")
+	set(CPACK_PACKAGE_VERSION_MINOR "0")
+	set(CPACK_PACKAGE_VERSION_PATCH "0")
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "Tacktech")
+	set(CPACK_CREATE_DESKTOP_LINKS "${EXE_TARGET_NAME}")
+	set(CPACK_RESOURCE_FILE_LICENSE "${Tacktech_Display_SOURCE_DIR}/License.txt")
+	include (CPack)
+else (WIN32)
+	install (TARGETS Tacktech_Display
+			RUNTIME
+			DESTINATION Tacktech_Display/bin)
+	install (FILES ${Tacktech_Display_SOURCE_DIR}/config.ini "${LIBVLCQT_LIBRARY}"
+			DESTINATION Tacktech_Display/bin)
+			
+	set(CPACK_PACKAGE_NAME "Tacktech_Display")
+	set(CPACK_PACKAGE_VENDOR "Tacktech")
+	set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Tacktech Advertising")
+	set(CPACK_PACKAGE_VERSION "1.0.0")
+	set(CPACK_PACKAGE_VERSION_MAJOR "1")
+	set(CPACK_PACKAGE_VERSION_MINOR "0")
+	set(CPACK_PACKAGE_VERSION_PATCH "0")
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "Tacktech")
+	set(CPACK_RESOURCE_FILE_LICENSE "${Tacktech_Display_SOURCE_DIR}/License.txt")
+	set(CPACK_RPM_PACKAGE_SUMMARY "Tacktech Display application")
+	set(CPACK_RPM_PACKAGE_NAME "Tacktech_Display")
+	set(CPACK_RPM_PACKAGE_VERSION "1")
+	set(CPACK_RPM_PACKAGE_RELEASE "fedora1")
+	set(CPACK_RPM_PACKAGE_LICENSE "${Tacktech_Display_SOURCE_DIR}/License.txt")
+	set(CPACK_RPM_PACKAGE_GROUP "Applications/Multimedia")
+	set(CPACK_RPM_PACKAGE_VENDOR "Tacktech")
+	set(CPACK_RPM_PACKAGE_DESCRIPTION "Displays media that is defined through other Tacktech products")
+	set(CPACK_RPM_PACKAGE_REQUIRES "Qt4, Boost>=1.4.7")
+	include (CPack)
+endif (WIN32)
