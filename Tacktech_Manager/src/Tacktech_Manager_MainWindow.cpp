@@ -261,7 +261,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 		display_client_container.reset(new Display_Client_Container(display_client_container_writer.result));
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Dislpay_Client_Container Print: " << std::endl;
-		std::cout << "===============================" << std::endl;
+		std::cout << " ===============================" << std::endl;
 		display_client_container->print_contents();
 #endif
 //

@@ -20,6 +20,7 @@ Display_Client_Container::Display_Client_Container( std::string display_client_c
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Display_Client_Container(STRING)"<< std::endl;
+	std::cout << " - String: " << display_client_container_str << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document display_client_container_doc;
 	display_client_container_doc.load(display_client_container_str.c_str());
