@@ -23,8 +23,10 @@ Display_Client_Container::Display_Client_Container( std::string display_client_c
 #endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document display_client_container_doc;
 	display_client_container_doc.load(display_client_container_str.c_str());
+	display_client_container_doc.print(std::cout);
 	pugi::xml_node root_node =
 		display_client_container_doc.child("Dislpay_Client_Container");
+	root_node.print(std::cout);
 	for (pugi::xml_node display_item_node = root_node.child("Display_Client_Item");
 		display_item_node; display_item_node.next_sibling("Display_Client_Item"))
 	{
