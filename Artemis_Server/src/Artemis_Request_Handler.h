@@ -28,6 +28,7 @@
 #include <b64/encode.h>
 #include <Group_Container.h>
 #include <Playlist_Container.h>
+#include <Display_Client_Container.h>
 #include <Group_Playlist_Container.h>
 #include "Group_Container_Server.h"
 #include "Playlist_Container_Server.h"
@@ -46,7 +47,8 @@ public:
 	explicit Artemis_Request_Handler(
 			Group_Container_Server_Ptr p_groups_and_computers,
 			Playlist_Container_Server_Ptr p_playlist,
-			Group_Playlist_Container_Server_Ptr p_group_playlist);
+			Group_Playlist_Container_Server_Ptr p_group_playlist,
+			Display_Client_Container_Ptr p_display_client_container);
 	~Artemis_Request_Handler();
 
 	/** Handle a request and produce a reply*/
@@ -81,6 +83,7 @@ private:
 	/* Variable for the group_playlist container */
 	Group_Playlist_Container_Server_Ptr group_playlist;
 
+	Display_Client_Container_Ptr display_client_container;
 };
 }
 #endif	/* ARTEMIS_REQUEST_HANDLER_H */

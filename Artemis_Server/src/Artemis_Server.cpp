@@ -49,6 +49,7 @@ void Artemis_Server::initialize_variables()
 	playlist.reset(new Playlist_Container_Server());
 	groups_and_computers.reset(new Group_Container_Server());
 	group_playlist.reset(new Group_Playlist_Container_Server());
+	display_client_container.reset(new Display_Client_Container());
 
 	playlist->construct_playlist("./playlist.xml");
 	groups_and_computers->construct_groups_and_computers(
@@ -191,7 +192,7 @@ void Artemis_Server::start_accept()
 {
 	new_connection.reset(
 			new Artemis_Server_Connection(io_service, parameters,
-					groups_and_computers, playlist, group_playlist));
+					groups_and_computers, playlist, group_playlist, display_client_container));
 	acceptor.async_accept(new_connection->socket(),
 			boost::bind(&Artemis_Server::handle_accept, this,
 					boost::asio::placeholders::error));

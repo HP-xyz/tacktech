@@ -3,12 +3,12 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
 #include <QtCore/QStringList>
+#include <set>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/date_time.hpp>
-#include <Group_Container.h>
 #include <Playlist_Container.h>
-#include <Group_Playlist_Container.h>
+#include <Display_Client_Container.h>
 #include <Tacktech_Network_Manager.h>
 #include "Upload_Data_Container.h"
 #include "Typed_QTreeWidgetItem.h"
@@ -28,9 +28,16 @@ private:
 	/* Variable for the upload_data container */
 	Upload_Data_Container_Ptr upload_data;
 
+	Tacktech_Network_Manager_Ptr network_manager;
+	boost::shared_ptr<boost::asio::io_service> io_service;
+	Display_Client_Container_Ptr display_client_container;
+private slots:
 	void read_config();
 	/** Repopulates the UI, updating the main_treewidget */
 	void repopulate_ui();
+	void refresh_all_request();
+	void start_upload(std::string);
+	void data_recieved_slot(QString data_recieved);
 };
 
 #endif //TACKTECH_MANAGER_MAINWINDOW_H

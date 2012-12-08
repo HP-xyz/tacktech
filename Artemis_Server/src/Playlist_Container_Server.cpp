@@ -40,7 +40,7 @@ std::string Playlist_Container_Server::get_playlists_xml()
 		return_str += "<Playlist_Container_Item Organization_Name=\"";
 		return_str += it->first;
 		return_str += "\"/>";
-		return_str += it->second.get_playlists_xml();
+		//return_str += it->second.get_playlists_xml();
 		return_str += "</Playlist_Container_Item>";
 	}
 	return_str += "</Tacktech>";
@@ -67,13 +67,13 @@ void Playlist_Container_Server::construct_playlist(
 			item_node = item_node.next_sibling("Item"))
 		{
 			
-			if(organization_map[organization_name].add_filename(
-				playlist_item.attribute("Playlist_Name").as_string(),
-				item_node.child_value("Filename"),
-				boost::lexical_cast<int>(item_node.child_value("Pause"))))
-#ifdef _SHOW_DEBUG_OUTPUT
-				items_added += 1;
-#endif // _SHOW_DEBUG_OUTPUT
+//			if(organization_map[organization_name].add_filename(
+//				playlist_item.attribute("Playlist_Name").as_string(),
+//				item_node.child_value("Filename"),
+//				boost::lexical_cast<int>(item_node.child_value("Pause"))))
+//#ifdef _SHOW_DEBUG_OUTPUT
+//				items_added += 1;
+//#endif // _SHOW_DEBUG_OUTPUT
 		}
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -108,10 +108,10 @@ void Playlist_Container_Server::construct_playlist(
 				item_node;
 				item_node = item_node.next_sibling("Item"))
 			{
-				organization_map[organization_name].add_filename(
+				/*organization_map[organization_name].add_filename(
 					playlist_item.attribute("Playlist_Name").as_string(),
 					item_node.child_value("Filename"),
-					boost::lexical_cast<int>(item_node.child_value("Pause")));
+					boost::lexical_cast<int>(item_node.child_value("Pause")));*/
 			}
 		}
 	}
