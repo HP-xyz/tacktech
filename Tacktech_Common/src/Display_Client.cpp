@@ -91,6 +91,9 @@ bool Display_Client::add_organization( std::string p_organization_name)
 
 std::string Display_Client::get_display_client_xml()
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client::get_display_client_xml" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document disply_client_document;
 	pugi::xml_node display_client_root 
 		= disply_client_document.append_child("Display_Client");

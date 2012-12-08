@@ -91,6 +91,9 @@ void Playlist::set_end_time( boost::posix_time::time_duration p_time_of_day)
 
 std::string Playlist::get_playlist_xml()
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist::get_playlist_xml" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document playlist_document;
 	pugi::xml_node root_node =
 		playlist_document.append_child("Playlist");
