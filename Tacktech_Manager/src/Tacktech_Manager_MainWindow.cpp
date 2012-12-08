@@ -120,26 +120,17 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 			get_display_client_container()
 			[i]->get_identification()));
 
-		std::string groups;
-		for (std::set<std::string>::iterator it 
-			= display_client_container->get_display_client_container()
-			[i]->get_groups().begin();
-			it != display_client_container->get_display_client_container()
-			[i]->get_groups().end();
-			++it)
-		{
-			groups += *it;
-			groups += ", ";
-		}
-		groups = groups.substr(0, groups.size() - 2);
-
-		computer_item->set_group_name(QString::fromStdString(groups));
+		computer_item->set_group_name(QString::fromStdString(
+			display_client_container->get_display_client_container()
+			[i]->get_groups_string()));
 		computer_item->set_type("COMPUTER");
 		computer_item->setText(0, 
 			QString::fromStdString(display_client_container->
 			get_display_client_container()
 			[i]->get_identification()));
-		computer_item->setText(1, QString::fromStdString(groups));
+		computer_item->setText(1, QString::fromStdString(
+			display_client_container->get_display_client_container()
+			[i]->get_groups_string()));
 
 		/** Here we get the elapsed time between now, and the last ping the
 		  * remote screen has answered */

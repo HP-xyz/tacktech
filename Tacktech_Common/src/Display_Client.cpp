@@ -23,13 +23,15 @@ Display_Client::Display_Client( std::string display_client_str)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Display_Client(STRING)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+	m_playlist_container.reset(new Playlist_Container());
 	pugi::xml_document disply_client_document;
 	disply_client_document.load(display_client_str.c_str());
-	set_identification(disply_client_document.attribute("Identification").as_string());
-	set_last_ping(boost::posix_time::from_iso_string(disply_client_document.attribute("Last_Ping").as_string()));
-	set_groups(make_set(disply_client_document.attribute("Groups").as_string()));
-	set_organizations(make_set(disply_client_document.attribute("Organizations").as_string()));
-	set_playlist_container_name(disply_client_document.attribute("Playlist_Container").as_string());
+	pugi::xml_node root_node = disply_client_document.child("Display_Client_Item").child("Display_Client");
+	set_identification(root_node.attribute("Identification").as_string());
+	set_last_ping(boost::posix_time::from_iso_string(root_node.attribute("Last_Ping").as_string()));
+	set_groups(make_set(root_node.attribute("Groups").as_string()));
+	set_organizations(make_set(root_node.attribute("Organizations").as_string()));
+	set_playlist_container_name(root_node.attribute("Playlist_Container").as_string());
 }
 
 
@@ -175,4 +177,9 @@ void Display_Client::set_playlist_container_name( std::string p_name)
 std::string Display_Client::get_playlist_container_name()
 {
 	return m_playlist_container_name;
+}
+
+std::string Display_Client::get_groups_string()
+{
+	return make_list(get_groups());
 }

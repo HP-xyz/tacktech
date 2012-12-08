@@ -54,6 +54,10 @@ public:
 	 ** the Display_Client belongs to. */
 	bool add_organization(std::string);
 
+	/** Return a std::string representation of the groups std::set.
+	 ** The set will be returned as a comma separated list. */
+	std::string get_groups_string();
+
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
 
