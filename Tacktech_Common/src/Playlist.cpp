@@ -16,6 +16,25 @@ Playlist::Playlist(void)
 {
 }
 
+Playlist::Playlist( std::string playlist_str)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist::Playlist(STRING)" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	pugi::xml_document playlist_document;
+	playlist_document.load(playlist_str.c_str());
+	set_playlist_name(playlist_document.child("Playlist").attribute("Playlist_Name").as_string());
+	set_current_item_index(playlist_document.child("Playlist").attribute("Current_Item_Index").as_int());
+	set_start_time(boost::posix_time::from_iso_string(playlist_document.child("Playlist").attribute("Start_Time").as_string()));
+	set_end_time(boost::posix_time::from_iso_string(playlist_document.child("Playlist").attribute("End_Time").as_string()));
+	for (pugi::xml_node playlist_item_node = playlist_document.child("Playlist").child("Playlist_Item");
+		playlist_item_node; playlist_item_node = playlist_item_node.next_sibling("Playlist_Item"))
+	{
+		add_playlist_item(playlist_item_node.attribute("Filename").as_string(),
+			playlist_item_node.attribute("Pause").as_int());
+	}
+}
+
 
 Playlist::~Playlist(void)
 {
@@ -80,6 +99,11 @@ void Playlist::set_start_time( boost::posix_time::time_duration p_time_of_day)
 	m_start_time = boost::posix_time::ptime(boost::posix_time::from_iso_string(true_new_start_time));
 }
 
+void Playlist::set_start_time( boost::posix_time::ptime p_time)
+{
+	m_start_time = p_time;
+}
+
 void Playlist::set_end_time( boost::posix_time::time_duration p_time_of_day)
 {
 	std::string new_end_time = boost::posix_time::to_iso_string(p_time_of_day);
@@ -87,6 +111,11 @@ void Playlist::set_end_time( boost::posix_time::time_duration p_time_of_day)
 	std::string true_new_end_time = old_date_time.substr(0, 9);
 	true_new_end_time += new_end_time.substr(0, 6);
 	m_end_time = boost::posix_time::ptime(boost::posix_time::from_iso_string(true_new_end_time));
+}
+
+void Playlist::set_end_time( boost::posix_time::ptime p_time)
+{
+	m_end_time = p_time;
 }
 
 std::string Playlist::get_playlist_xml()

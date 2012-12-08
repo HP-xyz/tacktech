@@ -9,6 +9,9 @@ class Playlist
 {
 public:
 	Playlist(void);
+	/** Takes a string representation of a Playlist object,
+	 ** and constructs a Playlist. */
+	Playlist(std::string);
 	~Playlist(void);
 	/** Returns a std::string identifying the playlist */
 	std::string get_playlist_name();
@@ -55,6 +58,14 @@ public:
 	 ** NOTE: Time zones must be taken into account by
 	          the calling function. */
 	void set_end_time(boost::posix_time::time_duration);
+	/** Receives a boost::posix_time::ptime that will
+	 ** be used to identify the start time when the playlist
+	 ** should start playing. */
+	void set_start_time(boost::posix_time::ptime);
+	/** Receives a boost::posix_time::ptime thaw will
+	 ** be used to identify the end time when the playlist
+	 ** should stop playing. */
+	void set_end_time(boost::posix_time::ptime);
 	/** Returns a string representation of the Playlist. */
 	std::string get_playlist_xml();
 private:

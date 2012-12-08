@@ -18,6 +18,21 @@ Display_Client::Display_Client(void)
 	m_playlist_container->set_playlist_container_name("NONE");
 }
 
+Display_Client::Display_Client( std::string display_client_str)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client(STRING)" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	pugi::xml_document disply_client_document;
+	disply_client_document.load(display_client_str.c_str());
+	pugi::xml_node root_node = disply_client_document.child("Display_Client");
+	set_identification(root_node.attribute("Identification").as_string());
+	set_last_ping(boost::posix_time::from_iso_string(root_node.attribute("Last_Ping").as_string()));
+	set_groups(make_set(root_node.attribute("Groups").as_string()));
+	set_organizations(make_set(root_node.attribute("Organizations").as_string()));
+	set_playlist_container_name(root_node.attribute("Playlist_Container").as_string());
+}
+
 
 Display_Client::~Display_Client(void)
 {
@@ -51,6 +66,10 @@ void Display_Client::set_last_ping(boost::posix_time::ptime p_last_ping)
 void Display_Client::set_groups(std::set<std::string> p_groups)
 {
 	m_groups = p_groups;
+}
+void Display_Client::set_organizations( std::set<std::string> p_organizations)
+{
+	m_organizations = p_organizations;
 }
 void Display_Client::set_playlist_container(Playlist_Container_Ptr p_playlist_container)
 {
@@ -126,4 +145,35 @@ std::string Display_Client::make_list( std::set<std::string> p_set)
 	comma_separated_list =
 		comma_separated_list.substr(0, comma_separated_list.length() - 2);
 	return comma_separated_list;
+}
+
+std::set<std::string> Display_Client::make_set( std::string comma_separated_list)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client::make_set" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	std::set<std::string> set_from_string;
+	while(comma_separated_list.find(",") != std::string::npos)
+	{
+		set_from_string.insert(comma_separated_list.substr(0, comma_separated_list.find(",")));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " ++ " << comma_separated_list.substr(0, comma_separated_list.find(",")) << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		comma_separated_list = comma_separated_list.substr(comma_separated_list.find(",") + 1);
+	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " ++ " << comma_separated_list << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	set_from_string.insert(comma_separated_list);
+	return set_from_string;
+}
+
+void Display_Client::set_playlist_container_name( std::string p_name)
+{
+	m_playlist_container_name = p_name;
+}
+
+std::string Display_Client::get_playlist_container_name()
+{
+	return m_playlist_container_name;
 }
