@@ -134,53 +134,25 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "GET_VARIABLES")
 	{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Received GET_VARIABLES command" << std::endl;
-//		tacktech.print(std::cout);
-//#endif // _DEBUG
-//		std::string dest_ip =
-//				tacktech.child("Return_IP").attribute("IP").as_string();
-//		std::string dest_port =
-//				tacktech.child("Return_IP").attribute("PORT").as_string();
-//		std::string upload_xml;
-//		std::string organization_name =
-//				tacktech.child("Organization")
-//				.attribute("ORGANIZATION_NAME").as_string();
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << "  -> Organization_Name: " << organization_name 
-//			<< std::endl;
-//#endif // _DEBUG
-//		upload_xml += "<?xml version=\"1.0\"?>";
-//		upload_xml += "<Tacktech>\n";
-//		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
-//		upload_xml += "</Tacktech>\n";
-//		upload_xml += "<Variables>\n";
-//		upload_xml += "    <PLAYLIST_NODE>\n";
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << "  -> Getting playlist XML" << std::endl;
-//#endif // _DEBUG
-//		upload_xml += playlist->get_playlists_xml();
-//		upload_xml += "    </PLAYLIST_NODE>\n";
-//		upload_xml += "    <GROUPS_AND_COMPUTERS_NODE>\n";
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << "  -> Getting groups_and_computers XML" << std::endl;
-//#endif // _DEBUG
-//		upload_xml += groups_and_computers->
-//			get_organization_map()[organization_name]
-//			.get_groups_and_computers_xml();
-//#ifdef _SHOW_DEBUG_OUTPUT
-//			std::cout << "Printing the computers_and_groups for: "
-//				<< organization_name << std::endl;
-//			groups_and_computers->get_organization_map()[organization_name]
-//			.print_contents();
-//#endif // _SHOW_DEBUG_OUTPUT
-//		upload_xml += "    </GROUPS_AND_COMPUTERS_NODE>\n";
-//		upload_xml += "    <GROUPS_PLAYLIST_NODE>\n";
-//		upload_xml += group_playlist->get_group_playlist_xml();
-//		upload_xml += "    </GROUPS_PLAYLIST_NODE>\n";
-//		upload_xml += "</Variables>\n";
-//		return_xml->append(upload_xml);
-//		result_status = SINGLE_RESULT;
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received GET_VARIABLES command" << std::endl;
+		tacktech.print(std::cout);
+#endif // _DEBUG
+		std::string dest_ip =
+				tacktech.child("Return_IP").attribute("IP").as_string();
+		std::string dest_port =
+				tacktech.child("Return_IP").attribute("PORT").as_string();
+		std::string upload_xml;
+		std::string organization_name =
+				tacktech.child("Organization")
+				.attribute("ORGANIZATION_NAME").as_string();
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  -> ORGANIZATION_NAME: " << organization_name 
+			<< std::endl;
+#endif // _DEBUG
+		return_xml->append(playlist_container->get_playlist_container_xml(organization_name));
+		return_xml->append(display_client_container->get_display_client_container_xml(organization_name));
+		result_status = SINGLE_RESULT;
 	}
 	else if (type_string == "SET_VARIABLES")
 	{
@@ -319,10 +291,6 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << " - Received IDENTIFY command" << std::endl;
 #endif // _DEBUG
 		pugi::xml_node indentification_node = tacktech.child("Identity");
-		/*groups_and_computers->get_organization_map()
-			[indentification_node.attribute("Organization_Name").as_string()]
-			.add_computer_name(
-			indentification_node.attribute("Computer_Name").as_string());*/
 		Display_Client_Ptr display_client(new Display_Client());
 		display_client->add_group(indentification_node.attribute("Organization_Name").as_string());
 		display_client->set_identification(indentification_node.attribute("Computer_Name").as_string());

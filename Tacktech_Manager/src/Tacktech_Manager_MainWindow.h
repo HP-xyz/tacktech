@@ -3,6 +3,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
 #include <QtCore/QStringList>
+#include <QtCore/QTimer>
 #include <set>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -24,6 +25,7 @@ private:
 	Ui::Tacktech_Manager_MainWindow ui;
 	std::map<std::string, std::string> parameters;
 	std::set<std::string> options;
+	QTimer *refresh_timer;
 
 	/* Variable for the upload_data container */
 	Upload_Data_Container_Ptr upload_data;
@@ -31,6 +33,7 @@ private:
 	Tacktech_Network_Manager_Ptr network_manager;
 	boost::shared_ptr<boost::asio::io_service> io_service;
 	Display_Client_Container_Ptr display_client_container;
+	Playlist_Container_Ptr playlist_container;
 private slots:
 	void read_config();
 	/** Repopulates the UI, updating the main_treewidget */

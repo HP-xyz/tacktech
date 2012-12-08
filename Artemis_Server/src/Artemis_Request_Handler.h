@@ -84,6 +84,7 @@ private:
 	Group_Playlist_Container_Server_Ptr group_playlist;
 
 	Display_Client_Container_Ptr display_client_container;
+	Playlist_Container_Ptr playlist_container;
 };
 }
 #endif	/* ARTEMIS_REQUEST_HANDLER_H */

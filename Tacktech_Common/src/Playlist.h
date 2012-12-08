@@ -4,6 +4,7 @@
 #include <vector>
 #include <boost/date_time.hpp>
 #include <boost/shared_ptr.hpp>
+#include <pugixml.hpp>
 class Playlist
 {
 public:
@@ -54,6 +55,8 @@ public:
 	 ** NOTE: Time zones must be taken into account by
 	          the calling function. */
 	void set_end_time(boost::posix_time::time_duration);
+	/** Returns a string representation of the Playlist. */
+	std::string get_playlist_xml();
 private:
 	std::string m_playlist_name;
 	std::vector< std::pair<std::string,int> > m_playlist_items;

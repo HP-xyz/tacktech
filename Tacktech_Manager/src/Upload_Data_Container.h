@@ -22,6 +22,7 @@
 #include <Playlist_Container.h>
 #include <Group_Container.h>
 #include <Group_Playlist_Container.h>
+#include <Display_Client_Container.h>
 class Upload_Data_Container: public QObject
 {
 Q_OBJECT
@@ -32,6 +33,7 @@ public:
 	virtual
 	~Upload_Data_Container();
 	void set_playlist(Playlist_Container_Ptr);
+	void set_display_client_container(Display_Client_Container_Ptr);
 	void set_groups(Group_Container_Ptr);
 	void set_group_playlist(Group_Playlist_Container_Ptr);
 	void set_playlist_name(QString);
@@ -43,7 +45,8 @@ public:
 protected:
 private:
 	std::string	get_binary_file(QString);
-	Playlist_Container_Ptr playlist;
+	Playlist_Container_Ptr playlist_container;
+	Display_Client_Container_Ptr display_client_container;
 	Group_Container_Ptr groups;
 	Group_Playlist_Container_Ptr group_playlist;
 	QString group_name;
@@ -58,7 +61,8 @@ private:
 
 	std::string get_variables_request_xml();
 	std::string	set_variable_command_xml();
-	std::string	upload_file();signals:
+	std::string	upload_file();
+signals:
 	void xml_creation_complete(std::string);
 };
 

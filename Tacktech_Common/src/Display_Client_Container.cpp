@@ -57,3 +57,25 @@ std::vector<Display_Client_Ptr>::iterator
 	}
 	return m_display_client_container.end();
 }
+
+std::string Display_Client_Container::get_display_client_container_xml( std::string p_organization_name)
+{
+	std::string upload_xml;
+	upload_xml += "<Tacktech>";
+	upload_xml += "<Display_Client_Container>";
+	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container().begin();
+		it != get_display_client_container().end(); ++it)
+	{
+		std::set<std::string>::iterator it2 =
+			it->get()->get_organizations().find(p_organization_name);
+		if(it2 != it->get()->get_organizations().end())
+		{
+			upload_xml += "<Display_Client_Item>";
+			upload_xml += it->get()->get_display_client_xml();
+			upload_xml += "</Display_Client_Item>";
+		}
+	}
+	upload_xml += "</Display_Client_Container>";
+	upload_xml += "</Tacktech>";
+	return upload_xml;
+}

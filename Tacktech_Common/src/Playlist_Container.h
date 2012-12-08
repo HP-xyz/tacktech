@@ -13,12 +13,6 @@
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
-typedef std::multimap<std::string, std::pair<std::string, int> > Playlist_Multimap;
-typedef std::map<std::string, std::pair<std::string, int> > Playlist_Map;
-typedef std::pair<
-		std::multimap<std::string, std::pair<std::string, int> >::iterator,
-		std::multimap<std::string, std::pair<std::string, int> >::iterator> Playlist_Range;
-
 /** Container is the type that will hold the playlists. It consists of a 
  ** set, containing a pair where the first member of the pair is the 
  ** Playlist object, and the second member is a vector of strings, that will
@@ -37,8 +31,16 @@ public:
 	/** Adds a Playlist to the Container, including a std::vector of strings
 	 ** to identify which groups have access to it. */
 	void add_playlist(Playlist_Ptr, std::vector<std::string>);
+	/** Returns a std::string representation of a playlist_container,
+	 ** containing only the playlists that can be used by the group,
+	 ** identified by the parameter string. */
+	std::string get_playlist_container_xml(std::string);
+
+	void set_playlist_container_name(std::string);
+	std::string get_playlist_container_name();
 private:
 	Container m_playlist_container;
+	std::string m_playlist_container_name;
 };
 typedef boost::shared_ptr<Playlist_Container> Playlist_Container_Ptr;
 #endif //PLAYLIST_CONTAINER_H
