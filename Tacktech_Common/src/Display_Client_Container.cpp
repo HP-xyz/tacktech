@@ -67,15 +67,18 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 	std::string upload_xml;
 	upload_xml += "<Tacktech>";
 	upload_xml += "<Display_Client_Container>";
-	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container().begin();
-		it != get_display_client_container().end(); ++it)
+	for (int i = 0; i < get_display_client_container().size(); ++i)
 	{
+
 		std::set<std::string>::iterator it2 =
-			it->get()->get_organizations().find(p_organization_name);
-		if(it2 != it->get()->get_organizations().end())
+			get_display_client_container()
+			[i]->get_organizations().find(p_organization_name);
+		if(it2 != get_display_client_container()
+			[i]->get_organizations().end())
 		{
 			upload_xml += "<Display_Client_Item>";
-			upload_xml += it->get()->get_display_client_xml();
+			upload_xml += get_display_client_container()
+				[i]->get_display_client_xml();
 			upload_xml += "</Display_Client_Item>";
 		}
 	}
