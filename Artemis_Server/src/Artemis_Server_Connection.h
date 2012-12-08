@@ -28,6 +28,7 @@
 #include <Group_Container.h>
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
+#include <Display_Client_Container.h>
 #include "Group_Container_Server.h"
 #include "Playlist_Container_Server.h"
 #include "Group_Playlist_Container_Server.h"
@@ -47,7 +48,8 @@ public:
 			std::map<std::string, std::string>&,
 			Group_Container_Server_Ptr p_groups_and_computers,
 			Playlist_Container_Server_Ptr p_playlist,
-			Group_Playlist_Container_Server_Ptr p_group_playlist);
+			Group_Playlist_Container_Server_Ptr p_group_playlist,
+			Display_Client_Container_Ptr p_display_client_container);
 
 	/** Get the socket associated with the connection*/
 	boost::asio::ip::tcp::socket&
@@ -83,6 +85,8 @@ private:
 
 	/* Variable for the group_playlist container */
 	Group_Playlist_Container_Server_Ptr group_playlist;
+
+	Display_Client_Container_Ptr display_client_container;
 
 	std::string	get_binary_file(std::string filename);
 };

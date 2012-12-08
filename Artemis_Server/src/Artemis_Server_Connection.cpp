@@ -47,7 +47,8 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 		std::map<std::string, std::string>& parameters,
 		Group_Container_Server_Ptr p_groups_and_computers,
 		Playlist_Container_Server_Ptr p_playlist,
-		Group_Playlist_Container_Server_Ptr p_group_playlist) :
+		Group_Playlist_Container_Server_Ptr p_group_playlist,
+		Display_Client_Container_Ptr p_display_client_container) :
 		strand(io_service)
 {
 	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));
@@ -55,6 +56,7 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 	Artemis_Server_Connection::groups_and_computers = p_groups_and_computers;
 	Artemis_Server_Connection::playlist = p_playlist;
 	Artemis_Server_Connection::group_playlist = p_group_playlist;
+	Artemis_Server_Connection::display_client_container = p_display_client_container;
 	received_size = 0;
 	return_xml.reset(new std::string());
 }
@@ -127,7 +129,7 @@ void Artemis_Server_Connection::handle_read(
 
 		boost::shared_ptr<Artemis_Request_Handler> request_handler(
 			new Artemis_Request_Handler(groups_and_computers, playlist,
-			group_playlist));
+			group_playlist, display_client_container));
 		request_handler->handle_request(received_xml, return_xml,
 			Artemis_Server_Connection::parms);
 		try

@@ -14,7 +14,6 @@ struct xml_string_writer: pugi::xml_writer
 
 Playlist_Container::Playlist_Container()
 {
-
 }
 
 Playlist_Container::~Playlist_Container()

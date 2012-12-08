@@ -20,6 +20,7 @@
 #include <Group_Container.h>
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
+#include <Display_Client_Container.h>
 #include "Group_Container_Server.h"
 #include "Playlist_Container_Server.h"
 #include "Group_Playlist_Container_Server.h"
@@ -81,6 +82,8 @@ private:
 
 	/* Variable for the group_playlist container */
 	Group_Playlist_Container_Server_Ptr group_playlist;
+
+	Display_Client_Container_Ptr display_client_container;
 };
 }
 #endif //ARTEMIS_SERVER_H

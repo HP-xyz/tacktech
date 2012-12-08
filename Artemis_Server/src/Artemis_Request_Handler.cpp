@@ -31,7 +31,8 @@ struct xml_string_writer: pugi::xml_writer
 Artemis_Request_Handler::Artemis_Request_Handler(
 		Group_Container_Server_Ptr p_groups_and_computers,
 		Playlist_Container_Server_Ptr p_playlist,
-		Group_Playlist_Container_Server_Ptr p_group_playlist)
+		Group_Playlist_Container_Server_Ptr p_group_playlist,
+		Display_Client_Container_Ptr p_display_client_container)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()"
@@ -40,6 +41,7 @@ Artemis_Request_Handler::Artemis_Request_Handler(
 	groups_and_computers = p_groups_and_computers;
 	playlist = p_playlist;
 	group_playlist = p_group_playlist;
+	display_client_container = p_display_client_container;
 }
 
 Artemis_Request_Handler::~Artemis_Request_Handler()
@@ -132,184 +134,184 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "GET_VARIABLES")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Received GET_VARIABLES command" << std::endl;
-		tacktech.print(std::cout);
-#endif // _DEBUG
-		std::string dest_ip =
-				tacktech.child("Return_IP").attribute("IP").as_string();
-		std::string dest_port =
-				tacktech.child("Return_IP").attribute("PORT").as_string();
-		std::string upload_xml;
-		std::string organization_name =
-				tacktech.child("Organization")
-				.attribute("ORGANIZATION_NAME").as_string();
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  -> Organization_Name: " << organization_name 
-			<< std::endl;
-#endif // _DEBUG
-		upload_xml += "<?xml version=\"1.0\"?>";
-		upload_xml += "<Tacktech>\n";
-		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
-		upload_xml += "</Tacktech>\n";
-		upload_xml += "<Variables>\n";
-		upload_xml += "    <PLAYLIST_NODE>\n";
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  -> Getting playlist XML" << std::endl;
-#endif // _DEBUG
-		upload_xml += playlist->get_playlists_xml();
-		upload_xml += "    </PLAYLIST_NODE>\n";
-		upload_xml += "    <GROUPS_AND_COMPUTERS_NODE>\n";
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  -> Getting groups_and_computers XML" << std::endl;
-#endif // _DEBUG
-		upload_xml += groups_and_computers->
-			get_organization_map()[organization_name]
-			.get_groups_and_computers_xml();
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "Printing the computers_and_groups for: "
-				<< organization_name << std::endl;
-			groups_and_computers->get_organization_map()[organization_name]
-			.print_contents();
-#endif // _SHOW_DEBUG_OUTPUT
-		upload_xml += "    </GROUPS_AND_COMPUTERS_NODE>\n";
-		upload_xml += "    <GROUPS_PLAYLIST_NODE>\n";
-		upload_xml += group_playlist->get_group_playlist_xml();
-		upload_xml += "    </GROUPS_PLAYLIST_NODE>\n";
-		upload_xml += "</Variables>\n";
-		return_xml->append(upload_xml);
-		result_status = SINGLE_RESULT;
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << " - Received GET_VARIABLES command" << std::endl;
+//		tacktech.print(std::cout);
+//#endif // _DEBUG
+//		std::string dest_ip =
+//				tacktech.child("Return_IP").attribute("IP").as_string();
+//		std::string dest_port =
+//				tacktech.child("Return_IP").attribute("PORT").as_string();
+//		std::string upload_xml;
+//		std::string organization_name =
+//				tacktech.child("Organization")
+//				.attribute("ORGANIZATION_NAME").as_string();
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << "  -> Organization_Name: " << organization_name 
+//			<< std::endl;
+//#endif // _DEBUG
+//		upload_xml += "<?xml version=\"1.0\"?>";
+//		upload_xml += "<Tacktech>\n";
+//		upload_xml += "    <Type TYPE=\"SET_VARIABLES\" />\n";
+//		upload_xml += "</Tacktech>\n";
+//		upload_xml += "<Variables>\n";
+//		upload_xml += "    <PLAYLIST_NODE>\n";
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << "  -> Getting playlist XML" << std::endl;
+//#endif // _DEBUG
+//		upload_xml += playlist->get_playlists_xml();
+//		upload_xml += "    </PLAYLIST_NODE>\n";
+//		upload_xml += "    <GROUPS_AND_COMPUTERS_NODE>\n";
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << "  -> Getting groups_and_computers XML" << std::endl;
+//#endif // _DEBUG
+//		upload_xml += groups_and_computers->
+//			get_organization_map()[organization_name]
+//			.get_groups_and_computers_xml();
+//#ifdef _SHOW_DEBUG_OUTPUT
+//			std::cout << "Printing the computers_and_groups for: "
+//				<< organization_name << std::endl;
+//			groups_and_computers->get_organization_map()[organization_name]
+//			.print_contents();
+//#endif // _SHOW_DEBUG_OUTPUT
+//		upload_xml += "    </GROUPS_AND_COMPUTERS_NODE>\n";
+//		upload_xml += "    <GROUPS_PLAYLIST_NODE>\n";
+//		upload_xml += group_playlist->get_group_playlist_xml();
+//		upload_xml += "    </GROUPS_PLAYLIST_NODE>\n";
+//		upload_xml += "</Variables>\n";
+//		return_xml->append(upload_xml);
+//		result_status = SINGLE_RESULT;
 	}
 	else if (type_string == "SET_VARIABLES")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Received SET_VARIABLES command" << std::endl;
-#endif // _DEBUG
-		xml_string_writer playlist_writer;
-		std::string organization_name =
-			tacktech.child("Organization")
-			.attribute("ORGANIZATION_NAME").as_string();
-		tacktech.child("Variables").
-			child("Playlist").print(playlist_writer);
-		playlist->construct_playlist(organization_name,
-			playlist_writer.result);
-
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  - ORGANIZATION: " << organization_name <<std::endl;
-		std::cout << "  - Printing new variables on server" << std::endl;
-		std::cout << "  ==================================" << std::endl;
-		std::cout << "   - Playlist" << std::endl;
-		std::cout << "   ==========" << std::endl;
-#endif // _DEBUG
-		playlist->get_organization_map()
-			[organization_name].print_contents();
-
-		xml_string_writer groups_and_computers_writer;
-		tacktech.child("Variables").child("Groups_And_Computers").print(
-				groups_and_computers_writer);
-		groups_and_computers->construct_groups_and_computers(
-			organization_name, groups_and_computers_writer.result);
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "   - Groups_And_Computers" << std::endl;
-		std::cout << "   ======================" << std::endl;
-#endif // _DEBUG
-		groups_and_computers->get_organization_map()
-			[organization_name].print_contents();
-
-		xml_string_writer group_playlist_writer;
-		tacktech.child("Variables").child("Group_Playlist").print(
-				group_playlist_writer);
-		group_playlist->construct_group_playlist(organization_name,
-			group_playlist_writer.result);
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << " - Received SET_VARIABLES command" << std::endl;
+//#endif // _DEBUG
+//		xml_string_writer playlist_writer;
+//		std::string organization_name =
+//			tacktech.child("Organization")
+//			.attribute("ORGANIZATION_NAME").as_string();
+//		tacktech.child("Variables").
+//			child("Playlist").print(playlist_writer);
+//		playlist->construct_playlist(organization_name,
+//			playlist_writer.result);
+//
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << "  - ORGANIZATION: " << organization_name <<std::endl;
+//		std::cout << "  - Printing new variables on server" << std::endl;
+//		std::cout << "  ==================================" << std::endl;
+//		std::cout << "   - Playlist" << std::endl;
+//		std::cout << "   ==========" << std::endl;
+//#endif // _DEBUG
+//		playlist->get_organization_map()
+//			[organization_name].print_contents();
+//
+//		xml_string_writer groups_and_computers_writer;
+//		tacktech.child("Variables").child("Groups_And_Computers").print(
+//				groups_and_computers_writer);
+//		groups_and_computers->construct_groups_and_computers(
+//			organization_name, groups_and_computers_writer.result);
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << "   - Groups_And_Computers" << std::endl;
+//		std::cout << "   ======================" << std::endl;
+//#endif // _DEBUG
+//		groups_and_computers->get_organization_map()
+//			[organization_name].print_contents();
+//
+//		xml_string_writer group_playlist_writer;
+//		tacktech.child("Variables").child("Group_Playlist").print(
+//				group_playlist_writer);
+//		group_playlist->construct_group_playlist(organization_name,
+//			group_playlist_writer.result);
 	}
 	else if (type_string == "GET_UPDATES")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Received GET_UPDATES command" << std::endl;
-#endif // _DEBUG
-		std::string organization_name =
-			tacktech.child("Organization").attribute("Organization_Name").as_string();
-		pugi::xml_node has_files_node = tacktech.child("Files");
-		pugi::xml_node playlist_node = tacktech.child("Playlist");
-		std::map<std::string, std::string> filemap;
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Remote has files: " << std::endl;
-#endif // _DEBUG
-		for (pugi::xml_attribute_iterator it =
-				has_files_node.attributes().begin();
-				it != has_files_node.attributes().end(); it++)
-		{
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "  - " << it->value() << std::endl;
-#endif // _DEBUG
-			filemap.insert(
-					std::pair<std::string, std::string>(it->value(),
-							"FILE"));
-		}
-		Playlist_Range range = playlist->get_organization_map()
-			[organization_name]	.get_files_in_playlist(
-			playlist_node.attribute("PLAYLIST").as_string());
-		Playlist_Multimap::iterator it = range.first;
-		pugi::xml_document upload_document;
-		pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
-		pugi::xml_node type_node = tacktech_node.append_child("Type");
-		type_node.append_attribute("TYPE") = "UPLOAD";
-		upload_document.print(std::cout);
-		pugi::xml_node computer_node = tacktech_node.append_child("Computer");
-		for (it; it != range.second; ++it)
-		{
-			std::string temp_filename = it->second.first;
-
-			/* This will remove the path from the filename */
-			if (temp_filename.find("\\") != std::string::npos)
-				temp_filename = temp_filename.substr(
-				temp_filename.find_last_of("\\") + 1);
-			if (temp_filename.find("/") != std::string::npos)
-				temp_filename = temp_filename.substr(
-				temp_filename.find_last_of("/") + 1);
-			if (filemap.find(temp_filename) == filemap.end())
-			{ //Upload file here
-#ifdef _SHOW_DEBUG_OUTPUT
-				std::cout << " ++ " << temp_filename << std::endl;
-#endif // _DEBUG
-				pugi::xml_node item_node = computer_node.append_child("Item");
-
-				/* Creating item children */
-				pugi::xml_node filename_node = item_node.append_child("Filename");
-				pugi::xml_node file_data_node = item_node.append_child("File_Data");
-				pugi::xml_node pause_node = item_node.append_child("Pause");
-
-				/* Creating item children's pcdata */
-				pugi::xml_node filename_pcdata = filename_node.append_child(
-						pugi::node_pcdata);
-				pugi::xml_node file_data_pcdata = file_data_node.append_child(
-						pugi::node_pcdata);
-				pugi::xml_node pause_pcdata = pause_node.append_child(
-						pugi::node_pcdata);
-
-				/* Giving pcdata a value */
-				std::string true_filename = parameters["general.playlist_directory"];
-
-				true_filename += temp_filename;
-
-				filename_pcdata.set_value(temp_filename.c_str());
-				file_data_pcdata.set_value(
-						get_binary_file(true_filename).c_str());
-				pause_pcdata.set_value(
-						boost::lexical_cast<std::string>
-						(it->second.second).c_str());
-			}
-			else
-			{
-#ifdef _SHOW_DEBUG_OUTPUT
-				std::cout << " -- " << temp_filename << std::endl;
-#endif // _DEBUG
-			}
-		}
-		xml_string_writer writer;
-		upload_document.print(writer);
-		return_xml->append(writer.result);
-		result_status = SINGLE_RESULT;
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << " - Received GET_UPDATES command" << std::endl;
+//#endif // _DEBUG
+//		std::string organization_name =
+//			tacktech.child("Organization").attribute("Organization_Name").as_string();
+//		pugi::xml_node has_files_node = tacktech.child("Files");
+//		pugi::xml_node playlist_node = tacktech.child("Playlist");
+//		std::map<std::string, std::string> filemap;
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << " - Remote has files: " << std::endl;
+//#endif // _DEBUG
+//		for (pugi::xml_attribute_iterator it =
+//				has_files_node.attributes().begin();
+//				it != has_files_node.attributes().end(); it++)
+//		{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//			std::cout << "  - " << it->value() << std::endl;
+//#endif // _DEBUG
+//			filemap.insert(
+//					std::pair<std::string, std::string>(it->value(),
+//							"FILE"));
+//		}
+//		Playlist_Range range = playlist->get_organization_map()
+//			[organization_name].get_files_in_playlist(
+//			playlist_node.attribute("PLAYLIST").as_string());
+//		Playlist_Multimap::iterator it = range.first;
+//		pugi::xml_document upload_document;
+//		pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
+//		pugi::xml_node type_node = tacktech_node.append_child("Type");
+//		type_node.append_attribute("TYPE") = "UPLOAD";
+//		upload_document.print(std::cout);
+//		pugi::xml_node computer_node = tacktech_node.append_child("Computer");
+//		for (it; it != range.second; ++it)
+//		{
+//			std::string temp_filename = it->second.first;
+//
+//			/* This will remove the path from the filename */
+//			if (temp_filename.find("\\") != std::string::npos)
+//				temp_filename = temp_filename.substr(
+//				temp_filename.find_last_of("\\") + 1);
+//			if (temp_filename.find("/") != std::string::npos)
+//				temp_filename = temp_filename.substr(
+//				temp_filename.find_last_of("/") + 1);
+//			if (filemap.find(temp_filename) == filemap.end())
+//			{ //Upload file here
+//#ifdef _SHOW_DEBUG_OUTPUT
+//				std::cout << " ++ " << temp_filename << std::endl;
+//#endif // _DEBUG
+//				pugi::xml_node item_node = computer_node.append_child("Item");
+//
+//				/* Creating item children */
+//				pugi::xml_node filename_node = item_node.append_child("Filename");
+//				pugi::xml_node file_data_node = item_node.append_child("File_Data");
+//				pugi::xml_node pause_node = item_node.append_child("Pause");
+//
+//				/* Creating item children's pcdata */
+//				pugi::xml_node filename_pcdata = filename_node.append_child(
+//						pugi::node_pcdata);
+//				pugi::xml_node file_data_pcdata = file_data_node.append_child(
+//						pugi::node_pcdata);
+//				pugi::xml_node pause_pcdata = pause_node.append_child(
+//						pugi::node_pcdata);
+//
+//				/* Giving pcdata a value */
+//				std::string true_filename = parameters["general.playlist_directory"];
+//
+//				true_filename += temp_filename;
+//
+//				filename_pcdata.set_value(temp_filename.c_str());
+//				file_data_pcdata.set_value(
+//						get_binary_file(true_filename).c_str());
+//				pause_pcdata.set_value(
+//						boost::lexical_cast<std::string>
+//						(it->second.second).c_str());
+//			}
+//			else
+//			{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//				std::cout << " -- " << temp_filename << std::endl;
+//#endif // _DEBUG
+//			}
+//		}
+//		xml_string_writer writer;
+//		upload_document.print(writer);
+//		return_xml->append(writer.result);
+//		result_status = SINGLE_RESULT;
 	}
 	else if (type_string == "IDENTIFY")
 	{
@@ -317,10 +319,15 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << " - Received IDENTIFY command" << std::endl;
 #endif // _DEBUG
 		pugi::xml_node indentification_node = tacktech.child("Identity");
-		groups_and_computers->get_organization_map()
+		/*groups_and_computers->get_organization_map()
 			[indentification_node.attribute("Organization_Name").as_string()]
 			.add_computer_name(
-			indentification_node.attribute("Computer_Name").as_string());
+			indentification_node.attribute("Computer_Name").as_string());*/
+		Display_Client_Ptr display_client(new Display_Client());
+		display_client->add_group(indentification_node.attribute("Organization_Name").as_string());
+		display_client->set_identification(indentification_node.attribute("Computer_Name").as_string());
+		display_client->set_last_ping(boost::posix_time::second_clock::universal_time());
+		display_client_container->add_display_client(display_client);
 
 		std::string upload_xml;
 		upload_xml += "<Tacktech>";
