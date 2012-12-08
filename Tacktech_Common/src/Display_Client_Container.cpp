@@ -30,6 +30,9 @@ Display_Client_Container::Display_Client_Container( std::string display_client_c
 	{
 		xml_string_writer writer;
 		display_item_node.print(writer);
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Sending to Display_Client"<< writer.result << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		Display_Client_Ptr display_client(new Display_Client(writer.result));
 	}
 }

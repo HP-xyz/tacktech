@@ -240,7 +240,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 		pugi::xml_document display_client_doc;
 		display_client_doc.load(display_client_str.c_str());
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Groups_And_Computers RECIEVED Print: " << std::endl;
+		std::cout << " - Display_Client_Container RECIEVED Print: " << std::endl;
 		std::cout << "==================" << std::endl;
 		display_client_doc.print(std::cout);
 #endif
@@ -251,7 +251,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 		playlist_container.reset(
 			new Playlist_Container(playlist_container_writer.result));
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Playlist Print: " << std::endl;
+		std::cout << " - Playlist_Container Print: " << std::endl;
 		std::cout << "==================" << std::endl;
 		playlist_container->print_contents();
 #endif
@@ -260,7 +260,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 			.print(display_client_container_writer);
 		display_client_container.reset(new Display_Client_Container(display_client_container_writer.result));
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Groups_And_Computers Print: " << std::endl;
+		std::cout << " - Dislpay_Client_Container Print: " << std::endl;
 		std::cout << "===============================" << std::endl;
 		display_client_container->print_contents();
 #endif
