@@ -16,7 +16,7 @@ public:
 	 ** NOTE: Pair is -> std::string to identify filename
 	 **               -> int to identify pause
 	 */
-	std::vector<std::pair<std::string,int>> get_playlist_items();
+	std::vector< std::pair<std::string,int> > get_playlist_items();
 	/** Returns an int indicating the index of the file currently
 	 ** being played. */
 	int get_current_item_index();
@@ -32,7 +32,7 @@ public:
 	void set_playlist_name(std::string);
 	/** Receives a std::vector<std::pair<std::string,int>> that
 	 ** will replace the current playlist_items vector. */
-	void set_playlist_items(std::vector<std::pair<std::string,int>>);
+	void set_playlist_items(std::vector< std::pair<std::string,int> >);
 	/** Receives a std::string and int that will be made a pair to
 	 ** add to the playlist_items of the Playlist. */
 	void add_playlist_item(std::string, int);
@@ -56,7 +56,7 @@ public:
 	void set_end_time(boost::posix_time::time_duration);
 private:
 	std::string m_playlist_name;
-	std::vector<std::pair<std::string,int>> m_playlist_items;
+	std::vector< std::pair<std::string,int> > m_playlist_items;
 	int m_current_item_index;
 	boost::posix_time::ptime m_start_time;
 	boost::posix_time::ptime m_end_time;
