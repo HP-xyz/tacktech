@@ -84,5 +84,9 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 	}
 	upload_xml += "</Display_Client_Container>";
 	upload_xml += "</Tacktech>";
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Sending: " << std::endl;
+	std::cout << upload_xml << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return upload_xml;
 }
