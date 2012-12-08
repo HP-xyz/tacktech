@@ -18,9 +18,8 @@ struct xml_string_writer: pugi::xml_writer
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - (XML_WRITER)write of size: " << size << std::endl;
 #endif // _DEBUG
-		result += static_cast<const char*>(data);
-		//result += std::string(static_cast<const char*>(data),
-		//	size);
+		//result += static_cast<const char*>(data);
+		result += std::string(static_cast<const char*>(data), size);
 	}
 };
 
@@ -199,7 +198,7 @@ void Upload_Data_Container::get_xml_upload()
 std::string Upload_Data_Container::get_variables_request_xml()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= pload_Data_Container::get_variables_request_xml()"
+	std::cout << "= Upload_Data_Container::get_variables_request_xml()"
 			<< std::endl;
 #endif // _DEBUG
 	pugi::xml_document transmit_document;
@@ -218,8 +217,7 @@ std::string Upload_Data_Container::get_variables_request_xml()
 	transmit_document.print(writer);
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "  - Sending variable request:" << std::endl << writer.result
-			<< std::endl << "  - Variable request c_str():" << std::endl
-			<< writer.result.c_str() << std::endl;
+			<< std::endl;
 #endif // _DEBUG
 	return writer.result;
 }

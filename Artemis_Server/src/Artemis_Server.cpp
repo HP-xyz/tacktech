@@ -46,12 +46,12 @@ void Artemis_Server::initialize_variables()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Artemis_Server::initialize_variables()" << std::endl;
 #endif // _DEBUG
-	playlist.reset(new Playlist_Container_Server());
+	playlist_container.reset(new Playlist_Container());
 	groups_and_computers.reset(new Group_Container_Server());
 	group_playlist.reset(new Group_Playlist_Container_Server());
 	display_client_container.reset(new Display_Client_Container());
 
-	playlist->construct_playlist("./playlist.xml");
+	//playlist->construct_playlist("./playlist.xml");
 	groups_and_computers->construct_groups_and_computers(
 			"./groups_and_computers.xml");
 	group_playlist->construct_group_playlist("./group_playlist.xml");
@@ -64,7 +64,7 @@ void Artemis_Server::store_variables()
 #endif // _DEBUG
 	/* Save playlist to file */
 	pugi::xml_document playlist_document;
-	playlist_document.load(playlist->get_playlists_xml().c_str());
+	//playlist_document.load(playlist->get_playlists_xml().c_str());
 	playlist_document.save_file("./playlist.xml");
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Playlist stored successfully" << std::endl;
@@ -192,7 +192,7 @@ void Artemis_Server::start_accept()
 {
 	new_connection.reset(
 			new Artemis_Server_Connection(io_service, parameters,
-					groups_and_computers, playlist, group_playlist, display_client_container));
+					groups_and_computers, playlist_container, group_playlist, display_client_container));
 	acceptor.async_accept(new_connection->socket(),
 			boost::bind(&Artemis_Server::handle_accept, this,
 					boost::asio::placeholders::error));

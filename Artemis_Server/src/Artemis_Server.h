@@ -78,7 +78,7 @@ private:
 	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	Playlist_Container_Server_Ptr playlist;
+	Playlist_Container_Ptr playlist_container;
 
 	/* Variable for the group_playlist container */
 	Group_Playlist_Container_Server_Ptr group_playlist;

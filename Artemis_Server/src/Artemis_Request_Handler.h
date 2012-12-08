@@ -46,7 +46,7 @@ public:
 	/** Construct Artemis_Request_Handler object */
 	explicit Artemis_Request_Handler(
 			Group_Container_Server_Ptr p_groups_and_computers,
-			Playlist_Container_Server_Ptr p_playlist,
+			Playlist_Container_Ptr p_playlist,
 			Group_Playlist_Container_Server_Ptr p_group_playlist,
 			Display_Client_Container_Ptr p_display_client_container);
 	~Artemis_Request_Handler();
@@ -78,13 +78,12 @@ private:
 	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	Playlist_Container_Server_Ptr playlist;
+	Playlist_Container_Ptr playlist_container;
 
 	/* Variable for the group_playlist container */
 	Group_Playlist_Container_Server_Ptr group_playlist;
 
 	Display_Client_Container_Ptr display_client_container;
-	Playlist_Container_Ptr playlist_container;
 };
 }
 #endif	/* ARTEMIS_REQUEST_HANDLER_H */

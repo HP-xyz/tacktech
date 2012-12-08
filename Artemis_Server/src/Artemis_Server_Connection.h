@@ -47,7 +47,7 @@ public:
 	explicit Artemis_Server_Connection(boost::asio::io_service& io_service,
 			std::map<std::string, std::string>&,
 			Group_Container_Server_Ptr p_groups_and_computers,
-			Playlist_Container_Server_Ptr p_playlist,
+			Playlist_Container_Ptr p_playlist_container,
 			Group_Playlist_Container_Server_Ptr p_group_playlist,
 			Display_Client_Container_Ptr p_display_client_container);
 
@@ -81,7 +81,7 @@ private:
 	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
-	Playlist_Container_Server_Ptr playlist;
+	Playlist_Container_Ptr playlist_container;
 
 	/* Variable for the group_playlist container */
 	Group_Playlist_Container_Server_Ptr group_playlist;
