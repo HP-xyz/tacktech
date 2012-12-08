@@ -86,6 +86,10 @@ std::string Playlist_Container::get_playlist_container_xml( std::string group_na
 		}
 	}	
 	upload_xml += "</Tacktech>";
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Sending: " << std::endl;
+	std::cout << upload_xml << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return upload_xml;
 }
 

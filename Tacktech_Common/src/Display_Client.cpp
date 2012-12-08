@@ -14,6 +14,8 @@ struct xml_string_writer: pugi::xml_writer
 
 Display_Client::Display_Client(void)
 {
+	m_playlist_container.reset(new Playlist_Container());
+	m_playlist_container->set_playlist_container_name("NONE");
 }
 
 
