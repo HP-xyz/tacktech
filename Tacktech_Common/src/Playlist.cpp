@@ -15,7 +15,7 @@ std::string Playlist::get_playlist_name()
 	return m_playlist_name;
 }
 
-std::vector<std::pair<std::string,int>> Playlist::get_playlist_items()
+std::vector< std::pair<std::string,int> > Playlist::get_playlist_items()
 {
 	return m_playlist_items;
 }
@@ -40,7 +40,7 @@ void Playlist::set_playlist_name( std::string p_playlist_name)
 	m_playlist_name = p_playlist_name;
 }
 
-void Playlist::set_playlist_items( std::vector<std::pair<std::string,int>> p_playlist_items)
+void Playlist::set_playlist_items( std::vector< std::pair<std::string,int> > p_playlist_items)
 {
 	m_playlist_items = p_playlist_items;
 }
