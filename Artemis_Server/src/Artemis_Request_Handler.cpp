@@ -30,7 +30,7 @@ struct xml_string_writer: pugi::xml_writer
 //************************************
 Artemis_Request_Handler::Artemis_Request_Handler(
 		Group_Container_Server_Ptr p_groups_and_computers,
-		Playlist_Container_Server_Ptr p_playlist,
+		Playlist_Container_Ptr p_playlist,
 		Group_Playlist_Container_Server_Ptr p_group_playlist,
 		Display_Client_Container_Ptr p_display_client_container)
 {
@@ -39,7 +39,7 @@ Artemis_Request_Handler::Artemis_Request_Handler(
 			<< std::endl;
 #endif //_DEBUG
 	groups_and_computers = p_groups_and_computers;
-	playlist = p_playlist;
+	playlist_container = p_playlist;
 	group_playlist = p_group_playlist;
 	display_client_container = p_display_client_container;
 }

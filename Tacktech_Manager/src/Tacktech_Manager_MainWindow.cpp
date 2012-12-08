@@ -10,6 +10,10 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	ui.setupUi(this);
 	read_config();
 
+	io_service.reset(new boost::asio::io_service);
+	network_manager.reset(
+		new Tacktech_Network_Manager(*io_service, parameters));
+
 	QStringList manager_headers;
 	manager_headers << "Computer Name" << "Groups" << "Last Ping";
 	ui.main_tree_widget->setHeaderLabels(manager_headers);
