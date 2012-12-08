@@ -149,8 +149,12 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "  -> ORGANIZATION_NAME: " << organization_name 
 			<< std::endl;
+		std::cout << "  - Adding playlist_container XML" << std::endl;
 #endif // _DEBUG
 		return_xml->append(playlist_container->get_playlist_container_xml(organization_name));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  - Adding display_client_container XML" << std::endl;
+#endif // _DEBUG
 		return_xml->append(display_client_container->get_display_client_container_xml(organization_name));
 		result_status = SINGLE_RESULT;
 	}

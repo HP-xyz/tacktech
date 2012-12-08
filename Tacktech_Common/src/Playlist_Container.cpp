@@ -51,6 +51,10 @@ void Playlist_Container::add_playlist( Playlist_Ptr playlist, std::vector<std::s
 
 std::string Playlist_Container::get_playlist_container_xml( std::string group_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist_Container::get_playlist_container_xml" << std::endl;
+	std::cout << " - For organization: " << group_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::string upload_xml;
 	upload_xml += "<Tacktech>";
 	for (Container::iterator it = m_playlist_container.begin();

@@ -60,6 +60,10 @@ std::vector<Display_Client_Ptr>::iterator
 
 std::string Display_Client_Container::get_display_client_container_xml( std::string p_organization_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client_Container::get_display_client_container_xml"<< std::endl;
+	std::cout << " - For organization: " << p_organization_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::string upload_xml;
 	upload_xml += "<Tacktech>";
 	upload_xml += "<Display_Client_Container>";
