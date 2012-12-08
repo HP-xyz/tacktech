@@ -48,3 +48,49 @@ void Playlist_Container::add_playlist( Playlist_Ptr playlist, std::vector<std::s
 {
 	m_playlist_container.insert(Playlist_Item(playlist, groups));
 }
+
+std::string Playlist_Container::get_playlist_container_xml( std::string group_name)
+{
+	std::string upload_xml;
+	upload_xml += "<Tacktech>";
+	for (Container::iterator it = m_playlist_container.begin();
+		it != m_playlist_container.end(); ++it)
+	{
+		std::vector<std::string>::const_iterator it2 =
+			std::find(it->second.begin(), it->second.end(), group_name);
+		if(it2 != it->second.end())
+		{
+			upload_xml += "<Playlist_Group>";
+			upload_xml += "<Groups GROUPLIST=\"";
+			for (unsigned int i = 0; i < it->second.size(); ++i)
+			{
+				if (i != (it->second.size() -1))
+				{
+					upload_xml += it->second[i];
+					upload_xml += ",";
+				}
+				else
+				{
+					upload_xml += it->second[i];
+				}
+			}
+			upload_xml += "\"/>";
+			upload_xml += "<Playlist_Node>";
+			upload_xml += it->first->get_playlist_xml();
+			upload_xml += "</Playlist_Node>";
+			upload_xml += "</Playlist_Group";
+		}
+	}	
+	upload_xml += "</Tacktech>";
+	return upload_xml;
+}
+
+void Playlist_Container::set_playlist_container_name( std::string p_playlist_container_name)
+{
+	m_playlist_container_name = p_playlist_container_name;
+}
+
+std::string Playlist_Container::get_playlist_container_name()
+{
+	return m_playlist_container_name;
+}

@@ -1,5 +1,16 @@
 #include "Display_Client.h"
 
+/** Struct to define a xml_writer to string.
+ ** Copied directly from the pugixml quickstart */
+struct xml_string_writer: pugi::xml_writer
+{
+	std::string result;
+
+	virtual void write(const void* data, size_t size)
+	{
+		result += std::string(static_cast<const char*>(data), size);
+	}
+};
 
 Display_Client::Display_Client(void)
 {
@@ -56,4 +67,58 @@ bool Display_Client::add_group(std::string p_group_name)
 		m_groups.insert(p_group_name);
 		return true;
 	}
+}
+
+std::set<std::string> Display_Client::get_organizations()
+{
+	return m_organizations;
+}
+
+bool Display_Client::add_organization( std::string p_organization_name)
+{
+	std::set<std::string>::iterator it =
+		get_organizations().find(p_organization_name);
+	if(it != get_organizations().end())
+	{
+		return false;
+	}
+	else
+	{
+		m_organizations.insert(p_organization_name);
+		return true;
+	}
+}
+
+std::string Display_Client::get_display_client_xml()
+{
+	pugi::xml_document disply_client_document;
+	pugi::xml_node display_client_root 
+		= disply_client_document.append_child("Display_Client");
+	display_client_root.append_attribute("Identification") =
+		get_identification().c_str();
+	display_client_root.append_attribute("Last_Ping") =
+		boost::posix_time::to_iso_string(get_last_ping()).c_str();
+	display_client_root.append_attribute("Playlist_Container") =
+		get_playlist_container()->get_playlist_container_name().c_str();
+	display_client_root.append_attribute("Organizations") =
+		make_list(get_organizations()).c_str();
+	display_client_root.append_attribute("Groups") =
+		make_list(get_groups()).c_str();
+	xml_string_writer writer;
+	disply_client_document.print(writer);
+	return writer.result;
+}
+
+std::string Display_Client::make_list( std::set<std::string> p_set)
+{
+	std::string comma_separated_list;
+	for (std::set<std::string>::iterator it = p_set.begin();
+		it != p_set.end(); ++it)
+	{
+		comma_separated_list += *it;
+		comma_separated_list += ", ";
+	}
+	comma_separated_list =
+		comma_separated_list.substr(0, comma_separated_list.length() - 2);
+	return comma_separated_list;
 }

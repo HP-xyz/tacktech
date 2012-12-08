@@ -4,6 +4,7 @@
 #include <set>
 #include <boost/date_time.hpp>
 #include <boost/shared_ptr.hpp>
+#include <pugixml.hpp>
 #include "Playlist_Container.h"
 class Display_Client
 {
@@ -20,6 +21,9 @@ public:
 	/** Returns a std::set<std::string> reference to the 
 	 ** groups that the Display_Client is part of. */
 	std::set<std::string> get_groups();
+	/** Returns a std::set<std::string> containing the organizations
+	 ** that the Display_Client belongs to. */
+	std::set<std::string> get_organizations();
 	/** Returns a Playlist_Container_Ptr to the Dislpay_
 	 ** Client object. */
 	Playlist_Container_Ptr get_playlist_container();
@@ -42,11 +46,21 @@ public:
 	/** Receives a std::string that will be added to the groups
 	 ** the Display_Client is part of. */
 	bool add_group(std::string);
+	/** Receives a std:string the will be added to the organizations
+	 ** the Display_Client belongs to. */
+	bool add_organization(std::string);
+
+	/** Returns a std::string representation of the Display_Client. */
+	std::string get_display_client_xml();
 private:
 	std::string m_identification;
 	boost::posix_time::ptime m_last_ping;
+	std::set<std::string> m_organizations;
 	std::set<std::string> m_groups;
 	Playlist_Container_Ptr m_playlist_container;
+
+	/** Creates a comma separated list from a std::set<std::string> */
+	std::string make_list(std::set<std::string>);
 };
 typedef boost::shared_ptr<Display_Client> Display_Client_Ptr;
 #endif //DISPLAY_CLIENT_H

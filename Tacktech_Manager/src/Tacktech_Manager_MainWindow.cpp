@@ -13,6 +13,10 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	QStringList manager_headers;
 	manager_headers << "Computer Name" << "Groups" << "Last Ping";
 	ui.main_tree_widget->setHeaderLabels(manager_headers);
+	refresh_timer = new QTimer(this);
+
+	connect(refresh_timer, SIGNAL(timeout()), this, SLOT(refresh_all_request()));
+	refresh_timer->start(30000);
 }
 
 void Tacktech_Manager_MainWindow::read_config()
@@ -69,6 +73,7 @@ Tacktech_Manager_MainWindow::~Tacktech_Manager_MainWindow(void)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=~Tacktech_Manager_MainWindow" << std::endl;
 #endif // _DEBUG
+	delete refresh_timer;
 }
 
 void Tacktech_Manager_MainWindow::repopulate_ui()
@@ -83,7 +88,7 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 	ui.main_tree_widget->clear();
 
 	Typed_QTreeWidgetItem *computer_item;
-	for (int i = 0;
+	for (unsigned int i = 0;
 		i < display_client_container->get_display_client_container().size();
 		++i)
 	{
