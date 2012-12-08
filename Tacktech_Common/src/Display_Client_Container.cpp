@@ -24,12 +24,11 @@ Display_Client_Container::Display_Client_Container( std::string display_client_c
 #endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document display_client_container_doc;
 	display_client_container_doc.load(display_client_container_str.c_str());
-	display_client_container_doc.print(std::cout);
 	pugi::xml_node root_node =
-		display_client_container_doc.child("Dislpay_Client_Container");
-	root_node.print(std::cout);
+		display_client_container_doc.child("Display_Client_Container");
 	for (pugi::xml_node display_item_node = root_node.child("Display_Client_Item");
-		display_item_node; display_item_node.next_sibling("Display_Client_Item"))
+		display_item_node;
+		display_item_node = display_item_node.next_sibling("Display_Client_Item"))
 	{
 		xml_string_writer writer;
 		display_item_node.print(writer);
@@ -37,6 +36,7 @@ Display_Client_Container::Display_Client_Container( std::string display_client_c
 		std::cout << " - Sending to Display_Client"<< writer.result << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 		Display_Client_Ptr display_client(new Display_Client(writer.result));
+		add_display_client(display_client);
 	}
 }
 
