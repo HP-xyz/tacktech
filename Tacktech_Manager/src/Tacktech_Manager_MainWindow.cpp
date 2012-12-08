@@ -1,5 +1,17 @@
 #include "Tacktech_Manager_MainWindow.h"
 
+/** Struct to define a xml_writer to string.
+ ** Copied directly from the pugixml quickstart */
+struct xml_string_writer: pugi::xml_writer
+{
+	std::string result;
+
+	virtual void write(const void* data, size_t size)
+	{
+		result += std::string(static_cast<const char*>(data), size);
+	}
+};
+
 Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*/, Qt::WFlags flags /*= 0*/ )
 {
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -201,72 +213,57 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 			document.child("Tacktech").child("Type").attribute("TYPE").as_string();
 	if (type_string == "SET_VARIABLES")
 	{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Received SET_VARIABLES command" << std::endl;
-//#endif // _DEBUG
-//		/* We declare 3 strings that contain the variables */
-//		std::string groups_and_computers_str = data_recieved.toStdString();
-//		std::string playlist_str = data_recieved.toStdString();
-//		std::string group_playlist_str = data_recieved.toStdString();
-//
-//		/* Now substring the recieved data, and assign only the needed data
-//		 * to the appropraite string */
-//		playlist_str = playlist_str.substr(
-//			playlist_str.find("<PLAYLIST_NODE>"),
-//			playlist_str.rfind("</PLAYLIST_NODE>") + 16);
-//		groups_and_computers_str = group_playlist_str.substr(
-//			groups_and_computers_str.find("<GROUPS_AND_COMPUTERS_NODE"),
-//			groups_and_computers_str.rfind("</GROUPS_AND_COMPUTERS_NODE>") + 28);
-//		group_playlist_str = group_playlist_str.substr(
-//			group_playlist_str.find("<GROUPS_PLAYLIST_NODE>"),
-//			group_playlist_str.rfind("</GROUPS_PLAYLIST_NODE>") + 23);
-//
-//		pugi::xml_document playlist_doc;
-//		playlist_doc.load(playlist_str.c_str());
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Playlist RECIEVED Print: " << std::endl;
-//		std::cout << "==================" << std::endl;
-//		playlist_doc.print(std::cout);
-//#endif
-//
-//		pugi::xml_document groups_and_computers_doc;
-//		groups_and_computers_doc.load(groups_and_computers_str.c_str());
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Groups_And_Computers RECIEVED Print: " << std::endl;
-//		std::cout << "==================" << std::endl;
-//		groups_and_computers_doc.print(std::cout);
-//#endif
-//
-//		pugi::xml_document group_playlist_doc;
-//		group_playlist_doc.load(group_playlist_str.c_str());
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Group_Playlist RECIEVED Print: " << std::endl;
-//		std::cout << "==================" << std::endl;
-//		group_playlist_doc.print(std::cout);
-//#endif
-//
-//		xml_string_writer playlist_writer;
-//		playlist_doc.child("PLAYLIST_NODE").
-//			child("Playlist").print(playlist_writer);
-//		playlist->reset_container();
-//		playlist->construct_playlist(playlist_writer.result);
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Playlist Print: " << std::endl;
-//		std::cout << "==================" << std::endl;
-//		playlist->print_contents();
-//#endif
-//		xml_string_writer groups_and_computers_writer;
-//		groups_and_computers_doc.child("GROUPS_AND_COMPUTERS_NODE")
-//			.child("Groups_And_Computers")
-//			.print(groups_and_computers_writer);
-//		groups_and_computers->reset_container();
-//		groups_and_computers->construct_groups_and_computers(
-//				groups_and_computers_writer.result);
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Groups_And_Computers Print: " << std::endl;
-//		std::cout << "===============================" << std::endl;
-//		groups_and_computers->print_contents();
-//#endif
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received SET_VARIABLES command" << std::endl;
+#endif // _DEBUG
+		/* We declare 2 strings that contain the variables */
+		std::string display_client_str = data_recieved.toStdString();
+		std::string playlist_str = data_recieved.toStdString();
+
+		/* Now substring the recieved data, and assign only the needed data
+		 * to the appropraite string */
+		playlist_str = playlist_str.substr(
+			playlist_str.find("<Playlist_Container>"),
+			playlist_str.rfind("</Playlist_Container>") + 21);
+		display_client_str = display_client_str.substr(
+			display_client_str.find("<Display_Client_Container"),
+			display_client_str.rfind("</Display_Client_Container>") + 27);
+
+		pugi::xml_document playlist_container_doc;
+		playlist_container_doc.load(playlist_str.c_str());
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Playlist_Container RECIEVED Print: " << std::endl;
+		std::cout << "==================" << std::endl;
+		playlist_container_doc.print(std::cout);
+#endif
+
+		pugi::xml_document display_client_doc;
+		display_client_doc.load(display_client_str.c_str());
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Groups_And_Computers RECIEVED Print: " << std::endl;
+		std::cout << "==================" << std::endl;
+		display_client_doc.print(std::cout);
+#endif
+
+		xml_string_writer playlist_container_writer;
+		playlist_container_doc.child("Playlist_Container")
+			.print(playlist_container_writer);
+		playlist_container.reset(
+			new Playlist_Container(playlist_container_writer.result));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Playlist Print: " << std::endl;
+		std::cout << "==================" << std::endl;
+		playlist_container->print_contents();
+#endif
+		xml_string_writer display_client_container_writer;
+		display_client_doc.child("Display_Client_Container")
+			.print(display_client_container_writer);
+		display_client_container.reset(new Display_Client_Container(display_client_container_writer.result));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Groups_And_Computers Print: " << std::endl;
+		std::cout << "===============================" << std::endl;
+		display_client_container->print_contents();
+#endif
 //
 //		xml_string_writer group_playlist_writer;
 //		group_playlist_doc.child("GROUPS_PLAYLIST_NODE")
@@ -283,7 +280,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 	}
 	else if(type_string == "UPLOAD_RESULT")
 	{
-		/*std::string succes_string =
+		std::string succes_string =
 			document.child("Success").attribute("SUCCESS").as_string();
 		if (succes_string == "TRUE")
 		{
@@ -292,7 +289,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 		else
 		{
 			status_msg += "Uploaded failed to server";
-		}*/
+		}
 	}
 	ui.statusbar->showMessage(status_msg.c_str());
 	repopulate_ui();

@@ -10,6 +10,7 @@ class Display_Client
 {
 public:
 	Display_Client(void);
+	Display_Client(std::string);
 	~Display_Client(void);
 	
 	/** Return std::string reference to the identification
@@ -39,6 +40,9 @@ public:
 	 ** replace the current groups the Dislay_Client
 	 ** is part of. */
 	void set_groups(std::set<std::string>);
+	/** Receives a std::set<std::string that will replace
+	 ** the current organizations for the Display_Client. */
+	void set_organizations(std::set<std::string>);
 	/** Receives a Playlist_Container_Ptr that will replace
 	 ** the current playlist container of the Display_Client. */
 	void set_playlist_container(Playlist_Container_Ptr);
@@ -50,6 +54,9 @@ public:
 	 ** the Display_Client belongs to. */
 	bool add_organization(std::string);
 
+	void set_playlist_container_name(std::string);
+	std::string get_playlist_container_name();
+
 	/** Returns a std::string representation of the Display_Client. */
 	std::string get_display_client_xml();
 private:
@@ -58,9 +65,13 @@ private:
 	std::set<std::string> m_organizations;
 	std::set<std::string> m_groups;
 	Playlist_Container_Ptr m_playlist_container;
-
+	std::string m_playlist_container_name;
 	/** Creates a comma separated list from a std::set<std::string> */
 	std::string make_list(std::set<std::string>);
+
+	/** Takes a comma_separated_list and creates a
+	 ** std::vector of strings. */
+	std::set<std::string> make_set(std::string);
 };
 typedef boost::shared_ptr<Display_Client> Display_Client_Ptr;
 #endif //DISPLAY_CLIENT_H

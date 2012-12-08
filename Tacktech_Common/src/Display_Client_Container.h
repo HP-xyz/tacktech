@@ -3,6 +3,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "Display_Client.h"
+#include "Playlist_Container.h"
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _SHOW_DEBUG_OUTPUT
@@ -10,6 +11,7 @@ class Display_Client_Container
 {
 public:
 	Display_Client_Container(void);
+	Display_Client_Container(std::string);
 	~Display_Client_Container(void);
 	/** Returns a std::vector containing the Display_Client_Container*/
 	std::vector<Display_Client_Ptr> get_display_client_container();
@@ -26,6 +28,9 @@ public:
 	/** Returns a std::string representation of the Display_Client_Container,
 	 ** containing only the Display_Clients that belong to a certain organization. */
 	std::string get_display_client_container_xml(std::string);
+#ifdef _SHOW_DEBUG_OUTPUT
+	void print_contents();
+#endif // _SHOW_DEBUG_OUTPUT
 private:
 	std::vector<Display_Client_Ptr> m_display_client_container;
 	/** Searches the display_client_container for a Display_CLient

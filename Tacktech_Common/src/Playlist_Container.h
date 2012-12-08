@@ -23,6 +23,9 @@ class Playlist_Container
 {
 public:
 	Playlist_Container();
+	/** Takes a string representation of a Playlist_Container
+	 ** object, and constructs the Playlist_Container object. */
+	Playlist_Container(std::string);
 	~Playlist_Container();
 	/** Returns a Container that will contain only the Playlist's that
 	 ** are allowed to be used by the std::string supplied in the parameter.
@@ -38,9 +41,20 @@ public:
 
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
+
+#ifdef _SHOW_DEBUG_OUTPUT
+	void print_contents();
+#endif // _SHOW_DEBUG_OUTPUT
 private:
 	Container m_playlist_container;
 	std::string m_playlist_container_name;
+
+	/** Takes a comma_separated_list and creates a
+	 ** std::vector of strings. */
+	std::vector<std::string> make_vector(std::string);
+
+	/** Creates a comma separated list from a std::set<std::string> */
+	std::string make_list(std::vector<std::string>);
 };
 typedef boost::shared_ptr<Playlist_Container> Playlist_Container_Ptr;
 #endif //PLAYLIST_CONTAINER_H
