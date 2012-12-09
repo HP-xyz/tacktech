@@ -108,7 +108,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	pugi::xml_node tacktech = document.child("Tacktech");
 	std::string type_string =
 			tacktech.child("Type").attribute("TYPE").as_string();
-	if (type_string == "UPLOAD")
+	if (type_string == "FILE_UPLOAD")
 	{
 		//Handle uploads
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -386,12 +386,13 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::save_uploaded_file()" << std::endl;
 #endif // _DEBUG
+	std::string organization_name = tacktech.attribute("ORGANIZATION_NAME").as_string();
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Organization_Name: " << organization_name << std::endl;
+#endif // _DEBUG
 	bool successfull_save = false;
-	std::string playlist_name =
-			tacktech.child("Playlist").attribute("PLAYLIST").as_string();
-
 	for (pugi::xml_node item_node =
-		tacktech.child("Playlist").child("Item");
+		tacktech.child("Item");
 		item_node;
 		item_node = item_node.next_sibling("Item"))
 	{
@@ -411,6 +412,10 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 		D.decode(encoded_stream, decoded_stream);
 		file_data = decoded_stream.str();
 
+		filename = organization_name + "_" + filename;
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "   - New Filename: " << file_data.size() << std::endl;
+#endif
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "   - File_Data size: " << file_data.size() << std::endl;
 #endif
@@ -427,6 +432,7 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 			std::cout << "   - Output file is good" << std::endl;
 #endif // _DEBUG
 			successfull_save = true;
+			//Add to server_filelist here
 		}
 		else
 		{

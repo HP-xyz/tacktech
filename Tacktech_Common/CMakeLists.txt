@@ -23,6 +23,7 @@ set(TACKTECH_COMMON_HDRS
 	${Tacktech_Common_SOURCE_DIR}/src/Display_Client.h
 	${Tacktech_Common_SOURCE_DIR}/src/Display_Client_Container.h
 	${Tacktech_Common_SOURCE_DIR}/src/Playlist.h
+	${Tacktech_Common_SOURCE_DIR}/src/Filelist.h
 	)
 set(TACKTECH_COMMON_SRCS
 	${Tacktech_Common_SOURCE_DIR}/src/Group_Container.cpp
@@ -31,6 +32,7 @@ set(TACKTECH_COMMON_SRCS
 	${Tacktech_Common_SOURCE_DIR}/src/Display_Client.cpp
 	${Tacktech_Common_SOURCE_DIR}/src/Display_Client_Container.cpp
 	${Tacktech_Common_SOURCE_DIR}/src/Playlist.cpp
+	${Tacktech_Common_SOURCE_DIR}/src/Filelist.cpp
 	${Tacktech_Common_SOURCE_DIR}/src/Tacktech_Network_Manager.cpp
 	)
 

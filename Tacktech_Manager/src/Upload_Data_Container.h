@@ -36,6 +36,7 @@ public:
 	void set_display_client_container(Display_Client_Container_Ptr);
 	void set_groups(Group_Container_Ptr);
 	void set_group_playlist(Group_Playlist_Container_Ptr);
+	void set_upload_items(std::vector<std::string>);
 	void set_playlist_name(QString);
 	void set_group_name(QString);
 	void set_upload_time(QString);
@@ -49,6 +50,7 @@ private:
 	Display_Client_Container_Ptr display_client_container;
 	Group_Container_Ptr groups;
 	Group_Playlist_Container_Ptr group_playlist;
+	std::vector<std::string> upload_items;
 	QString group_name;
 	QString playlist_name;
 	QString upload_time;
