@@ -26,7 +26,7 @@ void Upload_Files_To_Server_Dialog::add_files()
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Adding " << qPrintable(filename) << std::endl;
 #endif // _DEBUG
-		if(std::find(selected_files.begin(), selected_files.end(), filename) 
+		if(std::find(selected_files.begin(), selected_files.end(), filename.toStdString()) 
 			!= selected_files.end())
 		{
 			QMessageBox msgBox;

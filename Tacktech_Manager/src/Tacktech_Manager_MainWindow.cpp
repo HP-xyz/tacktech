@@ -289,5 +289,65 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 
 void Tacktech_Manager_MainWindow::upload_files_to_server( std::vector<std::string> items, QTime time)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tacktech_Manager_MainWindow::upload_files_to_server" << std::endl;
+#endif // _DEBUG
+	if(items.size() > 0)
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - There ARE items to upload" << std::endl;
+#endif // _DEBUG
+		if (time.hour() == 22 && time.second() == 22 && time.minute() == 22)
+		{//Time is equal to the specially defined time that means to upload instantly
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " ## Upload time is: NOW" << std::endl;
+#endif // _DEBUG
+			upload_data.reset(new Upload_Data_Container(parameters));
+			connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+				SLOT(start_upload(std::string)));
+			upload_data->set_upload_items(items);
+			upload_data->set_command("FILE_UPLOAD");
+			upload_data->get_xml_upload();
+		}
+		else
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " ## Upload time is: " << time.toString().toStdString() << std::endl;
+#endif // _DEBUG
+			pending_uploads->push_back(std::pair<std::vector<std::string>, QTime>(items, time));
+		}
+	}
+}
 
+void Tacktech_Manager_MainWindow::check_uploads_pending()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tacktech_Manager_MainWindow::check_uploads_pending()" << std::endl;
+#endif // _DEBUG
+	for (std::vector<std::pair<std::vector<std::string>, QTime> >::iterator it = pending_uploads->begin();
+		it != pending_uploads->end(); ++it)
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " ## Upload time is: " << it->second.toString().toStdString() << std::endl;
+#endif // _DEBUG
+		QTime current_time(QTime::currentTime());
+		if (it->second == current_time.addSecs(180) 
+			|| it->second == current_time.addSecs(-180))
+		{//Checks if the time when the upload should start is
+		 //close to the actual time, with -+2 mins of discrepancy
+		 //allowed
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " ++ Uploading NOW" << std::endl;
+#endif // _DEBUG
+			upload_data.reset(new Upload_Data_Container(parameters));
+			connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+				SLOT(start_upload(std::string)));
+			upload_data->set_upload_items(it->first);
+			upload_data->set_command("FILE_UPLOAD");
+			upload_data->get_xml_upload();
+
+			/* Erasing the pending upload from the pending_uploads */
+			pending_uploads->erase(it);
+		}
+	}
 }

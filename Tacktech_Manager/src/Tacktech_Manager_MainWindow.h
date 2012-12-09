@@ -57,6 +57,7 @@ private slots:
 	void start_upload(std::string);
 	void upload_files_to_server(std::vector<std::string>, QTime);
 	void data_recieved_slot(QString data_recieved);
+	void check_uploads_pending();
 };
 
 #endif //TACKTECH_MANAGER_MAINWINDOW_H

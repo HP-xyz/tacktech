@@ -175,7 +175,7 @@ void Upload_Data_Container::get_xml_upload()
 		emit xml_creation_complete(
 				Upload_Data_Container::set_variable_command_xml());
 	}
-	else if (command == "UPLOAD")
+	else if (command == "FILE_UPLOAD")
 	{
 		emit xml_creation_complete(Upload_Data_Container::upload_file());
 	}
@@ -300,59 +300,48 @@ void Upload_Data_Container::set_group_playlist(
  */
 std::string Upload_Data_Container::upload_file()
 {
-//	//TODO MOVE THIS TO ARTEMIS_SERVER
-//#ifdef _SHOW_DEBUG_OUTPUT
-//	std::cout << "= Upload_Data_Container::get_xml_upload()" << std::endl;
-//#endif // _DEBUG
-//	pugi::xml_document transmit_document;
-//	pugi::xml_node root_node = transmit_document.append_child("Tacktech");
-//	pugi::xml_node type_node = root_node.append_child("Type");
-//	type_node.append_attribute("TYPE") = "UPLOAD";
-//	pugi::xml_node upload_node = type_node.append_child("Upload");
-//	upload_node.append_attribute("Upload_Time") =
-//			upload_time.toStdString().c_str();
-//	pugi::xml_node playlist_node = root_node.append_child("Playlist");
-//	playlist_node.append_attribute("PLAYLIST") =
-//			playlist_name.toStdString().c_str();
-//	Playlist_Range range2 = playlist->get_playlist()->equal_range(
-//			playlist_name.toStdString());
-//	Playlist_Multimap::iterator it2 = range2.first;
-//	for (it2; it2 != range2.second; ++it2)
-//	{
-//		pugi::xml_node item_node = playlist_node.append_child("Item");
-//
-//		/* Creating item children */
-//		pugi::xml_node filename_node = item_node.append_child("Filename");
-//		pugi::xml_node file_data_node = item_node.append_child("File_Data");
-//		pugi::xml_node pause_node = item_node.append_child("Pause");
-//
-//		/* Creating item children's pcdata */
-//		pugi::xml_node filename_pcdata = filename_node.append_child(
-//				pugi::node_pcdata);
-//		pugi::xml_node file_data_pcdata = file_data_node.append_child(
-//				pugi::node_pcdata);
-//		pugi::xml_node pause_pcdata = pause_node.append_child(
-//				pugi::node_pcdata);
-//
-//		/* Giving pcdata a value */
-//		std::string temp_filename = it2->second.first;
-//
-//		/* This will remove the path from the filename */
-//		if (temp_filename.find("\\") != std::string::npos)
-//			temp_filename = temp_filename.substr(
-//					temp_filename.find_last_of("\\") + 1);
-//		if (temp_filename.find("/") != std::string::npos)
-//			temp_filename = temp_filename.substr(
-//					temp_filename.find_last_of("/") + 1);
-//
-//		filename_pcdata.set_value(temp_filename.c_str());
-//		file_data_pcdata.set_value(
-//				get_binary_file(QString::fromStdString(it2->second.first)).c_str());
-//		pause_pcdata.set_value(
-//				boost::lexical_cast<std::string>(it2->second.second).c_str());
-//	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Upload_Data_Container::get_xml_upload()" << std::endl;
+#endif // _DEBUG
+	pugi::xml_document transmit_document;
+	pugi::xml_node root_node = transmit_document.append_child("Tacktech");
+	pugi::xml_node type_node = root_node.append_child("Type");
+	type_node.append_attribute("TYPE") = "UPLOAD";
+	root_node.append_attribute("ORGANIZATION_NAME") =
+		parameters["general.organization_name"].c_str();
+	pugi::xml_node upload_node = type_node.append_child("Upload");
+	for (std::vector<std::string>::iterator it = upload_items.begin();
+		it != upload_items.end(); ++it)
+	{
+		pugi::xml_node item_node = upload_node.append_child("Item");
+
+		/* Creating item children */
+		pugi::xml_node filename_node = item_node.append_child("Filename");
+		pugi::xml_node file_data_node = item_node.append_child("File_Data");
+
+		/* Creating item children's pcdata */
+		pugi::xml_node filename_pcdata = filename_node.append_child(
+				pugi::node_pcdata);
+		pugi::xml_node file_data_pcdata = file_data_node.append_child(
+				pugi::node_pcdata);
+
+		std::string temp_filename = *it;
+
+		/* This will remove the path from the filename */
+		if (temp_filename.find("\\") != std::string::npos)
+			temp_filename = temp_filename.substr(
+					temp_filename.find_last_of("\\") + 1);
+		if (temp_filename.find("/") != std::string::npos)
+			temp_filename = temp_filename.substr(
+					temp_filename.find_last_of("/") + 1);
+
+		/* Giving pcdata a value */
+		filename_pcdata.set_value(temp_filename.c_str());
+		file_data_pcdata.set_value(
+				get_binary_file(QString::fromStdString(*it)).c_str());
+	}
 	xml_string_writer upload_writer;
-//	transmit_document.print(upload_writer);
+	transmit_document.print(upload_writer);
 	return upload_writer.result;
 }
 
@@ -396,4 +385,9 @@ void Upload_Data_Container::read_config()
 void Upload_Data_Container::set_display_client_container( Display_Client_Container_Ptr p_display_client_container)
 {
 	display_client_container = p_display_client_container;
+}
+
+void Upload_Data_Container::set_upload_items( std::vector<std::string> p_items)
+{
+	upload_items = p_items;
 }
