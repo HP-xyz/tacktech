@@ -18,7 +18,8 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	std::cout << "=Tacktech_Manager_MainWindow" << std::endl;
 #endif // _DEBUG
 	display_client_container.reset(new Display_Client_Container());
-
+	file_upload_dialog.reset(new Upload_Files_To_Server_Dialog());
+	pending_uploads.reset(new std::vector<std::pair<std::vector<std::string>, QTime> >);
 	ui.setupUi(this);
 	read_config();
 
@@ -284,4 +285,9 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 	}
 	ui.statusbar->showMessage(status_msg.c_str());
 	repopulate_ui();
+}
+
+void Tacktech_Manager_MainWindow::upload_files_to_server( std::vector<std::string> items, QTime time)
+{
+
 }
