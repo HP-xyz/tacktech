@@ -48,6 +48,7 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Typed_QTreeWidgetItem.cpp
 		#${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.cpp
 		#${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Files_To_Server_Dialog.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager_MainWindow.cpp
 	)
@@ -63,6 +64,7 @@ set ( Tacktech_Manager_HDRS
 		#${Tacktech_Manager_SOURCE_DIR}/src/Select_Playlist_Dialog.h
 		#${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data_Container.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Files_To_Server_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager_MainWindow.h
 	)
 #FOR NOW, THERE ARE NO RESOURCES
@@ -88,6 +90,7 @@ set ( Tacktech_Manager_UI_FORMS
 		#${Tacktech_Manager_SOURCE_DIR}/ui/Add_Pause_Dialog.ui
 		#${Tacktech_Manager_SOURCE_DIR}/ui/Select_Playlist_Dialog.ui
 		#${Tacktech_Manager_SOURCE_DIR}/ui/Upload_Data.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Upload_Files_To_Server_Dialog.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Tacktech_Manager_MainWindow.ui
 	)
 QT4_ADD_RESOURCES(RSCS ${Tacktech_Manager_RSCS})
