@@ -4,9 +4,9 @@
 #include <iostream>
 #endif // _SHOW_DEBUG_OUTPUT
 #include <utility>
-#include <Boost/shared_ptr.hpp>
-#include <Boost/filesystem.hpp>
-#include <Boost/regex.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 typedef std::vector<std::pair<std::vector<std::string>, std::string> > Filelist_Data;
 class Filelist
 {
