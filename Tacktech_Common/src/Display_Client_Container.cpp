@@ -136,4 +136,37 @@ void Display_Client_Container::print_contents()
 #endif // _SHOW_DEBUG_OUTPUT
 
 
+std::vector<std::string> Display_Client_Container::get_unique_group_names()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client_Container::get_unique_group_names()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	std::vector<std::string> unique_groups;
+	for (int i = 0; i < m_display_client_container.size(); ++i)
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Checking Display_Client: " << m_display_client_container[i]->get_identification() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		Display_Client_Ptr display_client = m_display_client_container[i];
+		std::set<std::string> group_set = display_client->get_groups();
+		for (std::set<std::string>::iterator iter = group_set.begin(); iter != group_set.end(); ++iter)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Checking Group: " << *iter << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			std::string group_name = *iter;
+			std::vector<std::string>::iterator it2 = std::find(unique_groups.begin(), unique_groups.end(), group_name);
+			if (it2 != unique_groups.end())
+			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << "    + " << group_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+				unique_groups.push_back(group_name);
+			}
+		}
+	}
+	return unique_groups;
+}
+
+
 

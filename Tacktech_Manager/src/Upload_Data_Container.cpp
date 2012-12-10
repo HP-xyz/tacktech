@@ -309,7 +309,7 @@ std::string Upload_Data_Container::upload_file()
 	type_node.append_attribute("TYPE") = "FILE_UPLOAD";
 	root_node.append_attribute("ORGANIZATION_NAME") =
 		parameters["general.organization_name"].c_str();
-	pugi::xml_node upload_node = type_node.append_child("Upload");
+	pugi::xml_node upload_node = root_node.append_child("Upload");
 	for (std::vector<std::string>::iterator it = upload_items.begin();
 		it != upload_items.end(); ++it)
 	{

@@ -2,6 +2,8 @@
 #define TACKTECH_MANAGER_MAINWINDOW_H
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
 #include <QtCore/QStringList>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
@@ -16,6 +18,7 @@
 #include <Tacktech_Network_Manager.h>
 #include "Upload_Data_Container.h"
 #include "Upload_Files_To_Server_Dialog.h"
+#include "Assign_Group.h"
 #include "Typed_QTreeWidgetItem.h"
 #include "ui_Tacktech_Manager_MainWindow.h"
 typedef boost::shared_ptr<Upload_Files_To_Server_Dialog> File_Upload_Dialog_Ptr;
@@ -33,6 +36,9 @@ private:
 	std::set<std::string> options;
 	QTimer *refresh_timer;
 
+	boost::shared_ptr<QMenu> node_menu;
+	boost::shared_ptr<QAction> add_to_group;
+
 	/* Variable for the upload_data container */
 	Upload_Data_Container_Ptr upload_data;
 
@@ -49,6 +55,8 @@ private:
 
 	 File_Upload_Dialog_Ptr file_upload_dialog;
 
+	 boost::shared_ptr<Assign_Group> assign_group_dialog;
+
 private slots:
 	void read_config();
 	/** Repopulates the UI, updating the main_treewidget */
@@ -59,6 +67,7 @@ private slots:
 	void upload_files_to_server(std::vector<std::string>, QTime);
 	void data_recieved_slot(QString data_recieved);
 	void check_uploads_pending();
+	void assign_group();
 };
 
 #endif //TACKTECH_MANAGER_MAINWINDOW_H
