@@ -77,3 +77,8 @@ void Upload_Files_To_Server_Dialog::cancel_clicked()
 {
 	this->close();
 }
+
+void Upload_Files_To_Server_Dialog::show_gui()
+{
+	this->show();
+}

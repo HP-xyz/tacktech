@@ -53,6 +53,7 @@ private slots:
 	void read_config();
 	/** Repopulates the UI, updating the main_treewidget */
 	void repopulate_ui();
+	void show_upload_gui();
 	void refresh_all_request();
 	void start_upload(std::string);
 	void upload_files_to_server(std::vector<std::string>, QTime);

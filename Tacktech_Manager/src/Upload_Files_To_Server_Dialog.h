@@ -14,6 +14,7 @@ class Upload_Files_To_Server_Dialog : QWidget
 public:
 	Upload_Files_To_Server_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Upload_Files_To_Server_Dialog(void);
+	void show_gui();
 private:
 	Ui::Uplaod_Files_Dialog ui;
 	std::vector<std::string> selected_files;
