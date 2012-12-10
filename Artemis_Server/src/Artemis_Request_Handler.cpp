@@ -392,7 +392,7 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 #endif // _DEBUG
 	bool successfull_save = false;
 	for (pugi::xml_node item_node =
-		tacktech.child("Item");
+		tacktech.child("Upload").child("Item");
 		item_node;
 		item_node = item_node.next_sibling("Item"))
 	{

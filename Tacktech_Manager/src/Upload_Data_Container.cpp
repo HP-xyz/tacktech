@@ -306,7 +306,7 @@ std::string Upload_Data_Container::upload_file()
 	pugi::xml_document transmit_document;
 	pugi::xml_node root_node = transmit_document.append_child("Tacktech");
 	pugi::xml_node type_node = root_node.append_child("Type");
-	type_node.append_attribute("TYPE") = "UPLOAD";
+	type_node.append_attribute("TYPE") = "FILE_UPLOAD";
 	root_node.append_attribute("ORGANIZATION_NAME") =
 		parameters["general.organization_name"].c_str();
 	pugi::xml_node upload_node = type_node.append_child("Upload");

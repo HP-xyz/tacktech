@@ -8,7 +8,7 @@
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _SHOW_DEBUG_OUTPUT
-class Upload_Files_To_Server_Dialog : QWidget
+class Upload_Files_To_Server_Dialog : public QWidget
 {
 	Q_OBJECT
 public:

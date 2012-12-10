@@ -34,6 +34,8 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 
 	connect(refresh_timer, SIGNAL(timeout()), this, SLOT(refresh_all_request()));
 	connect(ui.actionUpload_Files_To_Server, SIGNAL(triggered()), this, SLOT(show_upload_gui()));
+	connect(file_upload_dialog.get(), SIGNAL(selection_complete(std::vector<std::string>, QTime)),
+		this, SLOT(upload_files_to_server( std::vector<std::string>, QTime)));
 	refresh_timer->start(30000);
 }
 
