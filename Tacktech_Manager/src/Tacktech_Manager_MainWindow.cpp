@@ -33,6 +33,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	refresh_timer = new QTimer(this);
 
 	connect(refresh_timer, SIGNAL(timeout()), this, SLOT(refresh_all_request()));
+	connect(ui.actionUpload_Files_To_Server, SIGNAL(triggered()), this, SLOT(show_upload_gui()));
 	refresh_timer->start(30000);
 }
 
@@ -350,4 +351,9 @@ void Tacktech_Manager_MainWindow::check_uploads_pending()
 			pending_uploads->erase(it);
 		}
 	}
+}
+
+void Tacktech_Manager_MainWindow::show_upload_gui()
+{
+	file_upload_dialog->show_gui();
 }

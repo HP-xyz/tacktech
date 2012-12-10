@@ -35,8 +35,20 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuActions">
+    <property name="title">
+     <string>Actions</string>
+    </property>
+    <addaction name="actionUpload_Files_To_Server"/>
+   </widget>
+   <addaction name="menuActions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionUpload_Files_To_Server">
+   <property name="text">
+    <string>Upload Files To Server</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
