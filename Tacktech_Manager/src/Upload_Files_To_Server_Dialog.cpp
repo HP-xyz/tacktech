@@ -7,6 +7,8 @@ Upload_Files_To_Server_Dialog::Upload_Files_To_Server_Dialog(QWidget *parent /*=
 	ui.dateTimeEdit = new QDateTimeEdit(QTime::currentTime());
 	ui.checkBox->setChecked(true);
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(add_files()));
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ok_clicked()));
+	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(cancel_clicked()));
 }
 
 
@@ -64,6 +66,7 @@ void Upload_Files_To_Server_Dialog::ok_clicked()
 		else
 		{
 			emit selection_complete(selected_files, upload_time);
+			this->close();
 		}
 	}
 	else
