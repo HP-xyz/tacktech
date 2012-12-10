@@ -385,6 +385,8 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::save_uploaded_file()" << std::endl;
+	std::cout << " - RECEIVED:" << std::endl;
+	tacktech.print(std::cout);
 #endif // _DEBUG
 	std::string organization_name = tacktech.attribute("ORGANIZATION_NAME").as_string();
 #ifdef _SHOW_DEBUG_OUTPUT
