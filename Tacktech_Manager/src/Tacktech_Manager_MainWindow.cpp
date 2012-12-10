@@ -20,8 +20,15 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	display_client_container.reset(new Display_Client_Container());
 	file_upload_dialog.reset(new Upload_Files_To_Server_Dialog());
 	pending_uploads.reset(new std::vector<std::pair<std::vector<std::string>, QTime> >);
+
 	ui.setupUi(this);
 	read_config();
+
+	node_menu.reset(new QMenu());
+	ui.main_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
+	add_to_group.reset(new QAction("Add to group...", node_menu.get()));
+
+	ui.main_tree_widget->addAction(add_to_group.get());
 
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
@@ -36,6 +43,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	connect(ui.actionUpload_Files_To_Server, SIGNAL(triggered()), this, SLOT(show_upload_gui()));
 	connect(file_upload_dialog.get(), SIGNAL(selection_complete(std::vector<std::string>, QTime)),
 		this, SLOT(upload_files_to_server( std::vector<std::string>, QTime)));
+	connect(add_to_group.get(), SIGNAL(triggered()), this, SLOT(assign_group()));
 	refresh_timer->start(30000);
 }
 
@@ -358,4 +366,34 @@ void Tacktech_Manager_MainWindow::check_uploads_pending()
 void Tacktech_Manager_MainWindow::show_upload_gui()
 {
 	file_upload_dialog->show_gui();
+}
+
+void Tacktech_Manager_MainWindow::assign_group()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tacktech_Manager_MainWindow::assign_group()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	if (ui.main_tree_widget->selectedItems().count() > 0)
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Selected items count > 0" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT	
+		std::vector<std::string> selected_names;
+		foreach(QTreeWidgetItem *item, ui.main_tree_widget->selectedItems())
+		{
+			Typed_QTreeWidgetItem *t_item = static_cast<Typed_QTreeWidgetItem*>(item);
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " -- " << t_item->get_computer_name().toStdString() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			selected_names.push_back(t_item->get_computer_name().toStdString());
+		}
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " --- Resetting assign_group_dialog "  << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		assign_group_dialog.reset(new Assign_Group(display_client_container, selected_names));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " ---- Showing assign_group_dialog "  << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		assign_group_dialog->show();
+	}
 }

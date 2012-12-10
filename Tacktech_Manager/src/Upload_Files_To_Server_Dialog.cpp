@@ -83,5 +83,7 @@ void Upload_Files_To_Server_Dialog::cancel_clicked()
 
 void Upload_Files_To_Server_Dialog::show_gui()
 {
+	ui.listWidget->clear();
+	selected_files.clear();
 	this->show();
 }
