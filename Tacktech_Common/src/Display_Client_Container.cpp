@@ -22,6 +22,7 @@ Display_Client_Container::Display_Client_Container( std::string display_client_c
 	std::cout << "=Display_Client_Container(STRING)"<< std::endl;
 	std::cout << " - String: " << display_client_container_str << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+	m_display_client_container.reset(new std::vector<Display_Client_Ptr>);
 	pugi::xml_document display_client_container_doc;
 	display_client_container_doc.load(display_client_container_str.c_str());
 	pugi::xml_node root_node =
@@ -44,7 +45,7 @@ Display_Client_Container::~Display_Client_Container(void)
 {
 }
 
-std::vector<Display_Client_Ptr> Display_Client_Container::get_display_client_container()
+boost::shared_ptr<std::vector<Display_Client_Ptr> > Display_Client_Container::get_display_client_container()
 {
 	return m_display_client_container;
 }
@@ -56,7 +57,7 @@ void Display_Client_Container::add_display_client( Display_Client_Ptr display_cl
 #endif // _SHOW_DEBUG_OUTPUT
 	std::vector<Display_Client_Ptr>::iterator it =
 		find_display_client_by_ident(display_client->get_identification());
-	if (it != m_display_client_container.end())
+	if (it != m_display_client_container->end())
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " $$ Updating: "<< display_client->get_identification() << std::endl;
@@ -68,28 +69,28 @@ void Display_Client_Container::add_display_client( Display_Client_Ptr display_cl
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " ++ Adding: "<< display_client->get_identification() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-		m_display_client_container.push_back(display_client);
+		m_display_client_container->push_back(display_client);
 	}
 }
 
 void Display_Client_Container::remove_display_client( int index)
 {
-	m_display_client_container.erase(m_display_client_container.begin() 
+	m_display_client_container->erase(m_display_client_container->begin() 
 		+ (index - 1));
 }
 
-std::vector<Display_Client_Ptr>::iterator 
+std::vector<Display_Client_Ptr>::iterator
 	Display_Client_Container::find_display_client_by_ident( std::string ident)
 {
-	for (std::vector<Display_Client_Ptr>::iterator it = m_display_client_container.begin();
-		it != m_display_client_container.end(); ++it)
+	for (std::vector<Display_Client_Ptr>::iterator it = m_display_client_container->begin();
+		it != m_display_client_container->end(); ++it)
 	{
 		if(it->get()->get_identification() == ident)
 		{
 			return it;
 		}
 	}
-	return m_display_client_container.end();
+	return m_display_client_container->end();
 }
 
 std::string Display_Client_Container::get_display_client_container_xml( std::string p_organization_name)
@@ -100,18 +101,18 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 #endif // _SHOW_DEBUG_OUTPUT
 	std::string upload_xml;
 	upload_xml += "<Display_Client_Container>";
-	for (unsigned int i = 0; i < get_display_client_container().size(); ++i)
+	for (unsigned int i = 0; i < get_display_client_container()->size(); ++i)
 	{
 
 		std::set<std::string>::iterator it2 =
-			get_display_client_container()
-			[i]->get_organizations().find(p_organization_name);
+			get_display_client_container()->at(i)
+			->get_organizations().find(p_organization_name);
 		if(it2 != get_display_client_container()
-			[i]->get_organizations().end())
+			->at(i)->get_organizations().end())
 		{
 			upload_xml += "<Display_Client_Item>";
 			upload_xml += get_display_client_container()
-				[i]->get_display_client_xml();
+				->at(i)->get_display_client_xml();
 			upload_xml += "</Display_Client_Item>";
 		}
 	}
@@ -126,10 +127,10 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 void Display_Client_Container::print_contents()
 {
 	std::cout << "=Display_Client_Container::print_contents" << std::endl;
-	for (unsigned int i = 0; i < get_display_client_container().size(); ++i)
+	for (unsigned int i = 0; i < get_display_client_container()->size(); ++i)
 	{
 		std::cout << " -- Display_Name: " 
-			<< get_display_client_container()[i]->get_identification() 
+			<< get_display_client_container()->at(i)->get_identification() 
 			<< std::endl;
 	}
 }
@@ -142,13 +143,13 @@ std::vector<std::string> Display_Client_Container::get_unique_group_names()
 	std::cout << "=Display_Client_Container::get_unique_group_names()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	std::vector<std::string> unique_groups;
-	for (int i = 0; i < m_display_client_container.size(); ++i)
+	for (int i = 0; i < m_display_client_container->size(); ++i)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Checking Display_Client: " << m_display_client_container[i]->get_identification() << std::endl;
+		std::cout << " - Checking Display_Client: " << m_display_client_container->at(i)->get_identification() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-		Display_Client_Ptr display_client = m_display_client_container[i];
-		std::set<std::string> group_set = display_client->get_groups();
+		Display_Client_Ptr display_client = m_display_client_container->at(i);
+		std::set<std::string> group_set = *display_client->get_groups();
 		for (std::set<std::string>::iterator iter = group_set.begin(); iter != group_set.end(); ++iter)
 		{
 #ifdef _SHOW_DEBUG_OUTPUT

@@ -2,9 +2,9 @@
 
 Assign_Group::Assign_Group( Display_Client_Container_Ptr p_display_client_container, std::vector<std::string> p_selected_names)
 {
-#ifdef _SHOW_DEBUG_OUPUT
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Assign_Group::Assign_Group()" << std::endl;
-#endif // _SHOW_DEBUG_OUPUT
+#endif // _SHOW_DEBUG_OUTPUT
 	m_display_client_container = p_display_client_container;
 	m_selected_names = p_selected_names;
 	ui.setupUi(this);
@@ -15,6 +15,8 @@ Assign_Group::Assign_Group( Display_Client_Container_Ptr p_display_client_contai
 		ui.group_combo_box->addItem(QString::fromStdString(unique_group_names[i]));
 	}
 	connect(ui.add_new_group_pushbutton, SIGNAL(clicked()), this, SLOT(new_group_added()));
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ok_clicked()));
+	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(cancel_clicked()));
 }
 
 
@@ -39,15 +41,25 @@ void Assign_Group::new_group_added()
 
 void Assign_Group::ok_clicked()
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Assign_Group::ok_clicked()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	for(int i = 0; i < m_selected_names.size(); ++i)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Selected Name: " << m_selected_names[i] << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		std::vector<Display_Client_Ptr>::iterator it = 
 			m_display_client_container->find_display_client_by_ident(m_selected_names[i]);
-		if (it == m_display_client_container->get_display_client_container().end())
+		if (it != m_display_client_container->get_display_client_container()->end())
 		{
-			it->get()->add_group(m_selected_names[i]);
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Adding group '" << ui.group_combo_box->currentText().toStdString() << "' to display_client '" << it->get()->get_identification() << "'" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			it->get()->add_group(ui.group_combo_box->currentText().toStdString());
 		}
 	}
+	emit group_added();
 	this->close();
 }
 

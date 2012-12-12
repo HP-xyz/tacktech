@@ -21,7 +21,7 @@ public:
 	boost::posix_time::ptime get_last_ping();
 	/** Returns a std::set<std::string> reference to the 
 	 ** groups that the Display_Client is part of. */
-	std::set<std::string> get_groups();
+	boost::shared_ptr<std::set<std::string> > get_groups();
 	/** Returns a std::set<std::string> containing the organizations
 	 ** that the Display_Client belongs to. */
 	std::set<std::string> get_organizations();
@@ -67,7 +67,7 @@ private:
 	std::string m_identification;
 	boost::posix_time::ptime m_last_ping;
 	std::set<std::string> m_organizations;
-	std::set<std::string> m_groups;
+	boost::shared_ptr<std::set<std::string> > m_groups;
 	Playlist_Container_Ptr m_playlist_container;
 	std::string m_playlist_container_name;
 	/** Creates a comma separated list from a std::set<std::string> */

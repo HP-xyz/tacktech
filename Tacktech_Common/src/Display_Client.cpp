@@ -47,7 +47,7 @@ boost::posix_time::ptime Display_Client::get_last_ping()
 {
 	return m_last_ping;
 }
-std::set<std::string> Display_Client::get_groups()
+boost::shared_ptr<std::set<std::string> > Display_Client::get_groups()
 {
 	return m_groups;
 }
@@ -66,7 +66,8 @@ void Display_Client::set_last_ping(boost::posix_time::ptime p_last_ping)
 }
 void Display_Client::set_groups(std::set<std::string> p_groups)
 {
-	m_groups = p_groups;
+	boost::shared_ptr<std::set<std::string> > new_groups(new std::set<std::string>(p_groups));
+	m_groups = new_groups;
 }
 void Display_Client::set_organizations( std::set<std::string> p_organizations)
 {
@@ -79,14 +80,13 @@ void Display_Client::set_playlist_container(Playlist_Container_Ptr p_playlist_co
 
 bool Display_Client::add_group(std::string p_group_name)
 {
-	std::set<std::string>::iterator it = get_groups().find(p_group_name);
-	if(it != get_groups().end())
+	if(get_groups()->find(p_group_name) != get_groups()->end())
 	{
 		return false;
 	}
 	else
 	{
-		m_groups.insert(p_group_name);
+		m_groups->insert(p_group_name);
 		return true;
 	}
 }
@@ -128,7 +128,7 @@ std::string Display_Client::get_display_client_xml()
 	display_client_root.append_attribute("Organizations") =
 		make_list(get_organizations()).c_str();
 	display_client_root.append_attribute("Groups") =
-		make_list(get_groups()).c_str();
+		make_list(*get_groups()).c_str();
 	xml_string_writer writer;
 	disply_client_document.print(writer);
 	return writer.result;
@@ -136,15 +136,24 @@ std::string Display_Client::get_display_client_xml()
 
 std::string Display_Client::make_list( std::set<std::string> p_set)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client::make_list" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::string comma_separated_list;
 	for (std::set<std::string>::iterator it = p_set.begin();
 		it != p_set.end(); ++it)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Adding " << *it << ", " << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		comma_separated_list += *it;
 		comma_separated_list += ", ";
 	}
 	comma_separated_list =
 		comma_separated_list.substr(0, comma_separated_list.length() - 2);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Final list: " << comma_separated_list << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return comma_separated_list;
 }
 
@@ -154,18 +163,24 @@ std::set<std::string> Display_Client::make_set( std::string comma_separated_list
 	std::cout << "=Display_Client::make_set" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	std::set<std::string> set_from_string;
-	while(comma_separated_list.find(",") != std::string::npos)
+	if (comma_separated_list != "")
 	{
-		set_from_string.insert(comma_separated_list.substr(0, comma_separated_list.find(",")));
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " ++ " << comma_separated_list.substr(0, comma_separated_list.find(",")) << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-		comma_separated_list = comma_separated_list.substr(comma_separated_list.find(",") + 1);
+		while(comma_separated_list.find(",") != std::string::npos)
+		{
+			set_from_string.insert(comma_separated_list.substr(0, comma_separated_list.find(",")));
+	#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " ++ " << comma_separated_list.substr(0, comma_separated_list.find(",")) << std::endl;
+	#endif // _SHOW_DEBUG_OUTPUT
+			comma_separated_list = comma_separated_list.substr(comma_separated_list.find(",") + 1);
+		}
+	#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " ++ " << comma_separated_list << std::endl;
+	#endif // _SHOW_DEBUG_OUTPUT
+		set_from_string.insert(comma_separated_list);
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " ++ " << comma_separated_list << std::endl;
+	std::cout << " - List empty, returning empty set" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	set_from_string.insert(comma_separated_list);
 	return set_from_string;
 }
 
@@ -181,5 +196,5 @@ std::string Display_Client::get_playlist_container_name()
 
 std::string Display_Client::get_groups_string()
 {
-	return make_list(get_groups());
+	return make_list(*get_groups());
 }
