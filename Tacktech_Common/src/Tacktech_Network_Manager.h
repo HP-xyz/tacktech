@@ -31,7 +31,6 @@ public:
 		boost::asio::io_service &io_service,
 		std::map<std::string, std::string>&);
 	virtual ~Tacktech_Network_Manager();
-
 	void connect(std::string dest_ip, std::string dest_port);
 	void start_write(boost::shared_ptr<std::string> _xml_string);
 	void do_close();

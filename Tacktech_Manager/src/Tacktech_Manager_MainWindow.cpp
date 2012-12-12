@@ -33,6 +33,9 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
 		new Tacktech_Network_Manager(*io_service, parameters));
+	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+		SLOT(data_recieved_slot(QString)));
+	/** Start network_manager thread */
 
 	QStringList manager_headers;
 	manager_headers << "Computer Name" << "Groups" << "Last Ping";
@@ -117,38 +120,38 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 
 	Typed_QTreeWidgetItem *computer_item;
 	for (unsigned int i = 0;
-		i < display_client_container->get_display_client_container().size();
+		i < display_client_container->get_display_client_container()->size();
 		++i)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "   - Adding name: " 
 			<< display_client_container->get_display_client_container()
-			[i]->get_identification() 
+			->at(i)->get_identification() 
 			<< std::endl;
 #endif // _DEBUG
 		computer_item = new Typed_QTreeWidgetItem();
 		computer_item->set_computer_name(
 			QString::fromStdString(display_client_container->
 			get_display_client_container()
-			[i]->get_identification()));
+			->at(i)->get_identification()));
 
 		computer_item->set_group_name(QString::fromStdString(
 			display_client_container->get_display_client_container()
-			[i]->get_groups_string()));
+			->at(i)->get_groups_string()));
 		computer_item->set_type("COMPUTER");
 		computer_item->setText(0, 
 			QString::fromStdString(display_client_container->
 			get_display_client_container()
-			[i]->get_identification()));
+			->at(i)->get_identification()));
 		computer_item->setText(1, QString::fromStdString(
 			display_client_container->get_display_client_container()
-			[i]->get_groups_string()));
+			->at(i)->get_groups_string()));
 
 		/** Here we get the elapsed time between now, and the last ping the
 		  * remote screen has answered */
 		boost::posix_time::time_duration duration =
 			boost::posix_time::second_clock::universal_time()
-			- display_client_container->get_display_client_container()[i]->get_last_ping();
+			- display_client_container->get_display_client_container()->at(i)->get_last_ping();
 		std::string str_duration = boost::posix_time::to_simple_string(duration);
 
 		computer_item->setText(2, QString::fromStdString(str_duration));
@@ -190,8 +193,6 @@ void Tacktech_Manager_MainWindow::start_upload( std::string xml_string)
 	io_service->reset();
 	network_manager->connect(parameters["general.server_ip"],
 		parameters["general.server_port"]);
-	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-		SLOT(data_recieved_slot(QString)));
 	network_manager->start_write(string_to_send);
 	boost::thread t(
 		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
@@ -390,7 +391,12 @@ void Tacktech_Manager_MainWindow::assign_group()
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " --- Resetting assign_group_dialog "  << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+		if (assign_group_dialog.get() != nullptr)
+		{
+			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
+		}
 		assign_group_dialog.reset(new Assign_Group(display_client_container, selected_names));
+		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " ---- Showing assign_group_dialog "  << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT

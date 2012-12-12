@@ -22,5 +22,7 @@ private slots:
 	void new_group_added();
 	void ok_clicked();
 	void cancel_clicked();
+signals:
+	void group_added();
 };
 #endif //ASSIGN_GROUP_H
