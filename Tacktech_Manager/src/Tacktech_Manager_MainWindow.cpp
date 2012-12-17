@@ -118,45 +118,48 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 #endif // _DEBUG
 	ui.main_tree_widget->clear();
 
-	Typed_QTreeWidgetItem *computer_item;
-	for (unsigned int i = 0;
-		i < display_client_container->get_display_client_container()->size();
-		++i)
+	if(display_client_container.get() != 0)
 	{
+		Typed_QTreeWidgetItem *computer_item;
+		for (unsigned int i = 0;
+			i < display_client_container->get_display_client_container()->size();
+			++i)
+		{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "   - Adding name: "
-			<< display_client_container->get_display_client_container()
-			->at(i)->get_identification()
-			<< std::endl;
+			std::cout << "   - Adding name: "
+				<< display_client_container->get_display_client_container()
+				->at(i)->get_identification()
+				<< std::endl;
 #endif // _DEBUG
-		computer_item = new Typed_QTreeWidgetItem();
-		computer_item->set_computer_name(
-			QString::fromStdString(display_client_container->
-			get_display_client_container()
-			->at(i)->get_identification()));
+			computer_item = new Typed_QTreeWidgetItem();
+			computer_item->set_computer_name(
+				QString::fromStdString(display_client_container->
+				get_display_client_container()
+				->at(i)->get_identification()));
 
-		computer_item->set_group_name(QString::fromStdString(
-			display_client_container->get_display_client_container()
-			->at(i)->get_groups_string()));
-		computer_item->set_type("COMPUTER");
-		computer_item->setText(0,
-			QString::fromStdString(display_client_container->
-			get_display_client_container()
-			->at(i)->get_identification()));
-		computer_item->setText(1, QString::fromStdString(
-			display_client_container->get_display_client_container()
-			->at(i)->get_groups_string()));
+			computer_item->set_group_name(QString::fromStdString(
+				display_client_container->get_display_client_container()
+				->at(i)->get_groups_string()));
+			computer_item->set_type("COMPUTER");
+			computer_item->setText(0,
+				QString::fromStdString(display_client_container->
+				get_display_client_container()
+				->at(i)->get_identification()));
+			computer_item->setText(1, QString::fromStdString(
+				display_client_container->get_display_client_container()
+				->at(i)->get_groups_string()));
 
-		/** Here we get the elapsed time between now, and the last ping the
-		  * remote screen has answered */
-		boost::posix_time::time_duration duration =
-			boost::posix_time::second_clock::universal_time()
-			- display_client_container->get_display_client_container()->at(i)->get_last_ping();
-		std::string str_duration = boost::posix_time::to_simple_string(duration);
+			/** Here we get the elapsed time between now, and the last ping the
+			  * remote screen has answered */
+			boost::posix_time::time_duration duration =
+				boost::posix_time::second_clock::universal_time()
+				- display_client_container->get_display_client_container()->at(i)->get_last_ping();
+			std::string str_duration = boost::posix_time::to_simple_string(duration);
 
-		computer_item->setText(2, QString::fromStdString(str_duration));
+			computer_item->setText(2, QString::fromStdString(str_duration));
 
-		ui.main_tree_widget->addTopLevelItem(computer_item);
+			ui.main_tree_widget->addTopLevelItem(computer_item);
+		}
 	}
 }
 
