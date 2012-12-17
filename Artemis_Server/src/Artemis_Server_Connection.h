@@ -33,7 +33,9 @@
 #include "Playlist_Container_Server.h"
 #include "Group_Playlist_Container_Server.h"
 #include "Artemis_Request_Handler.h"
-
+#ifdef _SHOW_DEBUG_OUTPUT
+#include <iostream>
+#endif // _SHOW_DEBUG_OUTPUT
 namespace Artemis
 {
 
