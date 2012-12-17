@@ -16,6 +16,7 @@ link_libraries(${QT_LIBRARIES}
 				${QT_QTCORE_LIBRARY} 
 				${QT_QTGUI_LIBRARY} 
 				${QT_QTNETWORK_LIBRARY} 
+				${Boost_LIBRARIES}
 				)
 #link_directories(${BOOST_ROOT}/lib)
 include_directories (
@@ -100,6 +101,8 @@ QT4_ADD_RESOURCES(RSCS ${Tacktech_Manager_RSCS})
 QT4_WRAP_UI (UIS ${Tacktech_Manager_UI_FORMS})
 QT4_WRAP_CPP(MOCS ${Tacktech_Manager_HDRS})
 
+message (STATUS "Using boost libraries for MANAGER: " ${Boost_LIBRARIES})
+
 add_executable ( Tacktech_Manager 
 				${GUI_TYPE}
 				${Tacktech_Manager_Non_MOC_HDRS}
@@ -109,7 +112,6 @@ add_executable ( Tacktech_Manager
 				${RSCS} 
 				${UIS}
 				)
-
 target_link_libraries ( Tacktech_Manager 
 					pugixml
 					libb64
@@ -120,7 +122,9 @@ target_link_libraries ( Tacktech_Manager
 					${QT_QTNETWORK_LIBRARIES} 
 					${CMAKE_THREAD_LIBS_INIT}
 					${Boost_LIBRARIES}
+					${SYSTEM_LIBRARIES}
 					)
+
 if (WIN32)
 	INCLUDE(InstallRequiredSystemLibraries)
 						

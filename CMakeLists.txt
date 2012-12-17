@@ -1,7 +1,19 @@
-Project(Tactek)
+Project(Tacktech)
 cmake_minimum_required(VERSION 2.8)
 
 OPTION (SHOW_DEBUG_OUTPUT "Displays all debug info" ON)
+
+#I really hate the cmake verbose output
+#set this to on if it is needed
+set( CMAKE_VERBOSE_MAKEFILE OFF )
+
+IF( NOT CMAKE_BUILD_TYPE )
+	message (STATUS "###### WE ARE BUILD IN 'Debug' MODE")
+	SET( CMAKE_BUILD_TYPE Debug )
+	if (NOT WIN32)
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+	endif (NOT WIN32)
+ENDIF( NOT CMAKE_BUILD_TYPE )
 
 if(SHOW_DEBUG_OUTPUT)
 	add_definitions(-D_SHOW_DEBUG_OUTPUT)
@@ -56,21 +68,23 @@ endif (WIN32)
 include ( ${QT_USE_FILE} )
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-#Needed for windows
-#Change this to your boost path
-
-message(STATUS "BOOST_ROOT_DIR: " ${BOOST_ROOT_DIR})
-message(STATUS "BOOST_INCLUDE_DIR: " ${BOOST_INCLUDE_DIR})
-message(STATUS "BOOST_LIBRARY_DIR: " ${BOOST_LIBRARY_DIR})
+# Hack from random mailist
+if (MINGW)
+	SET (Boost_COMPILER  "-mgw46")
+endif (MINGW)
 if(BOOST_ROOT_DIR)
 	set(BOOST_ROOT ${BOOST_ROOT_DIR})
 endif(BOOST_ROOT_DIR)
-if(BOOST_INCLUDE_DIR)
-	set(BOOST_INCLUDEDIR ${BOOST_INCLUDE_DIR})
-endif(BOOST_INCLUDE_DIR)
 if(BOOST_LIBRARY_DIR)
 	set(BOOST_LIBRARYDIR ${BOOST_LIBRARY_DIR})
 endif(BOOST_LIBRARY_DIR)
+if(BOOST_INCLUDE_DIR)
+	set(BOOST_INCLUDEDIR ${BOOST_INCLUDE_DIR})
+endif(BOOST_INCLUDE_DIR)
+message(STATUS "BOOST_ROOT: " ${BOOST_ROOT})
+message(STATUS "BOOST_INCLUDEDIR: " ${BOOST_INCLUDEDIR})
+message(STATUS "BOOST_LIBRARYDIR: " ${BOOST_LIBRARYDIR})
+
 if (MSVC)
   message (STATUS "SETTING BOOST DEFINITIONS FOR MSVC") 
   add_definitions(-D_WIN32_WINNT=0x0501)
@@ -81,16 +95,15 @@ if (MSVC)
   set(Boost_USE_MULTITHREADED ON)
   set(Boost_USE_STATIC_RUNTIME OFF)
 endif (MSVC)
-
 if (WIN32 AND __COMPILER_GNU)
         # mingw-gcc fails to link boost::thread
 		message (STATUS "SETTING BOOST DEFINITIONS FOR GNU")
+		add_definitions(-D_WIN32_WINNT=0x0501)
         set(Boost_USE_STATIC_LIBS ON)
 		set(Boost_USE_MULTITHREADED ON)
         add_definitions(-DBOOST_ALL_NO_LIB)
         add_definitions(-DBOOST_THREAD_USE_LIB)
 endif (WIN32 AND __COMPILER_GNU)
-
 
 #Lets find boost
 set (BOOST_COMPONENTS_NEEDED
@@ -113,7 +126,7 @@ if(Boost_FOUND)
 		MESSAGE( STATUS "Boost " ${BOOST_COMPONENT} " Release: " ${Boost_${BOOST_COMPONENT_UPCASE}_LIBRARY_RELEASE} )
 	ENDFOREACH(BOOST_COMPONENT)
 endif(Boost_FOUND)
-	
+
 if (NOT WIN32)
 	# We need this for unix machines since Qt internally uses
 	# the pthread library (I think :D)
@@ -128,21 +141,34 @@ if (MINGW AND __COMPILER_GNU)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwsock32 -lws2_32")
 endif (MINGW AND __COMPILER_GNU)
 
+#Find the libvlcqt library
+if (MINGW AND __COMPILER_GNU)
+	message(STATUS "USING HARDCODED PATH FOR LIBVLC-QT")
+	set (SYSTEM_LIBRARIES ws2_32 wsock32)
+	set (LIBVLCQT_INCLUDE_DIR "G:\\Akademie\\Code\\DVCS\\tacktech_clean\\libvlc-qt\\include")
+	set (LIBVLCQT_LIBRARY "G:\\Akademie\\Code\\DVCS\\tacktech_clean\\mingw32-build-libs\\win32\\libvlc-qt.dll")
+elseif(MSVC)
+	message(STATUS "Cannot build libvlc-qt with MSVC, disabling Tacktech_Display")
+	set(BUILD_DISPLAY OFF)
+else(MINGW AND __COMPILER_GNU)
+	find_package(LIBVLCQT REQUIRED)
+endif(MINGW AND __COMPILER_GNU)
+
 OPTION (LOCAL_PUGIXML "Use local pugixml library (RECOMMENDED)" ON)
 
 if (LOCAL_PUGIXML)
 	message(STATUS "**** USING LOCAL PUGIXML ****")
-	add_subdirectory (${Tactek_SOURCE_DIR}/pugixml/scripts)
-	set (PUGIXML_INCLUDE_DIR ${Tactek_SOURCE_DIR}/pugixml/src)
+	add_subdirectory (${Tacktech_SOURCE_DIR}/pugixml/scripts)
+	set (PUGIXML_INCLUDE_DIR ${Tacktech_SOURCE_DIR}/pugixml/src)
 endif (LOCAL_PUGIXML)
-add_subdirectory(${Tactek_SOURCE_DIR}/libb64)
+add_subdirectory(${Tacktech_SOURCE_DIR}/libb64)
 
-add_subdirectory(${Tactek_SOURCE_DIR}/Tacktech_Common)
+add_subdirectory(${Tacktech_SOURCE_DIR}/Tacktech_Common)
 set(Tacktech_Common_INCLUDE_DIR
-	${Tactek_SOURCE_DIR}/Tacktech_Common/src
+	${Tacktech_SOURCE_DIR}/Tacktech_Common/src
 	)
 
-set(LIBB64_INCLUDE_DIR ${Tactek_SOURCE_DIR}/libb64/include)
+set(LIBB64_INCLUDE_DIR ${Tacktech_SOURCE_DIR}/libb64/include)
 
 message("")
 message (STATUS "Qt include dir	: ${QT_INCLUDE_DIR}")
