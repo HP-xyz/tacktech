@@ -135,31 +135,34 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	else if (type_string == "GET_VARIABLES")
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Received GET_VARIABLES command" << std::endl;
-		tacktech.print(std::cout);
+        std::cout << " - Received GET_VARIABLES command" << std::endl;
+        tacktech.print(std::cout);
 #endif // _DEBUG
-		std::string dest_ip =
-				tacktech.child("Return_IP").attribute("IP").as_string();
-		std::string dest_port =
-				tacktech.child("Return_IP").attribute("PORT").as_string();
-		std::string upload_xml;
-		std::string organization_name =
-				tacktech.child("Organization")
-				.attribute("ORGANIZATION_NAME").as_string();
+        if(display_client_container.get() != 0)
+        {
+            std::string dest_ip =
+                    tacktech.child("Return_IP").attribute("IP").as_string();
+            std::string dest_port =
+                    tacktech.child("Return_IP").attribute("PORT").as_string();
+            std::string upload_xml;
+            std::string organization_name =
+                    tacktech.child("Organization")
+                    .attribute("ORGANIZATION_NAME").as_string();
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  -> ORGANIZATION_NAME: " << organization_name
-			<< std::endl;
-		std::cout << "  - Adding playlist_container XML" << std::endl;
+            std::cout << "  -> ORGANIZATION_NAME: " << organization_name
+                << std::endl;
+            std::cout << "  - Adding playlist_container XML" << std::endl;
 #endif // _DEBUG
-		upload_xml += "<Tacktech>";
-		upload_xml += "<Type TYPE=\"SET_VARIABLES\" />";
-		upload_xml += playlist_container->get_playlist_container_xml(organization_name);
+            upload_xml += "<Tacktech>";
+            upload_xml += "<Type TYPE=\"SET_VARIABLES\" />";
+            upload_xml += playlist_container->get_playlist_container_xml(organization_name);
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  - Adding display_client_container XML" << std::endl;
+            std::cout << "  - Adding display_client_container XML" << std::endl;
 #endif // _DEBUG
-		upload_xml += display_client_container->get_display_client_container_xml(organization_name);
-		return_xml->append(upload_xml);
-		result_status = SINGLE_RESULT;
+            upload_xml += display_client_container->get_display_client_container_xml(organization_name);
+            return_xml->append(upload_xml);
+            result_status = SINGLE_RESULT;
+        }
 	}
 	else if (type_string == "UPDATE_DISPLAY_CONTAINER")
     {
