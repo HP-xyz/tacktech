@@ -164,16 +164,15 @@ void Upload_Data_Container::set_command(QString p_command)
  */
 void Upload_Data_Container::get_xml_upload()
 {
-	read_config();
 	if (command == "GET_VARIABLES")
 	{
 		emit xml_creation_complete(
 				Upload_Data_Container::get_variables_request_xml());
 	}
-	else if (command == "SET_VARIABLES")
+	else if (command == "SET_DISPLAY_CONTAINER")
 	{
 		emit xml_creation_complete(
-				Upload_Data_Container::set_variable_command_xml());
+				Upload_Data_Container::get_update_display_container_xml());
 	}
 	else if (command == "FILE_UPLOAD")
 	{
@@ -243,31 +242,29 @@ std::string Upload_Data_Container::get_variables_request_xml()
  * Tacktech
  *
  */
-std::string Upload_Data_Container::set_variable_command_xml()
+std::string Upload_Data_Container::get_update_display_container_xml()
 {
-//#ifdef _SHOW_DEBUG_OUTPUT
-//	std::cout << "= Upload_Data_Container::set_variable_command_xml()"
-//			<< std::endl;
-//	std::cout << " -> ORGANIZATION = " 
-//		<< parameters["general.organization_name"].c_str() << std::endl;
-//#endif // _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Upload_Data_Container::set_variable_command_xml()"
+			<< std::endl;
+	std::cout << " -> ORGANIZATION = "
+		<< parameters["general.organization_name"].c_str() << std::endl;
+#endif // _DEBUG
 	std::string return_str;
-//	return_str += "<Tacktech>";
-//	return_str += "<Type TYPE=\"SET_VARIABLES\" />";
-//	return_str += "<Organization ORGANIZATION_NAME=\"";
-//	return_str += parameters["general.organization_name"].c_str();
-//	return_str += "\"/>";
-//	return_str += "<Variables>";
-//	return_str += playlist->get_playlists_xml();
-//	return_str += groups->get_groups_and_computers_xml();
-//	return_str += group_playlist->get_group_playlist_xml();
-//	return_str += "</Variables>";
-//	return_str += "</Tacktech>";
-//#ifdef _SHOW_DEBUG_OUTPUT
-//	std::cout << "  - Set variable command:" << std::endl << return_str
-//			<< std::endl << "  - Set variable command c_str():" << std::endl
-//			<< return_str.c_str() << std::endl;
-//#endif // _DEBUG
+	return_str += "<Tacktech>";
+	return_str += "<Type TYPE=\"UPDATE_DISPLAY_CONTAINER\" />";
+	return_str += "<Organization ORGANIZATION_NAME=\"";
+	return_str += parameters["general.organization_name"].c_str();
+	return_str += "\"/>";
+    return_str += "<CONTAINER>";
+    return_str += display_client_container->
+        get_display_client_container_xml(
+         parameters["general.organization_name"]);
+    return_str += "</CONTAINER>";
+	return_str += "</Tacktech>";
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "  - Set variable command: " << return_str << std::endl;
+#endif // _DEBUG
 	return return_str;
 }
 
@@ -343,43 +340,6 @@ std::string Upload_Data_Container::upload_file()
 	xml_string_writer upload_writer;
 	transmit_document.print(upload_writer);
 	return upload_writer.result;
-}
-
-void Upload_Data_Container::read_config()
-{
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Tacktech_Manager::read_config()" << std::endl;
-#endif // _DEBUG
-	std::ifstream config("config.ini");
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Created config ifstream" << std::endl;
-#endif // _DEBUG
-	if (!config)
-	{
-		std::cerr << " == Error -> No config found" << std::endl;
-	}
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Creating options.insert" << std::endl;
-#endif // _DEBUG
-	options.insert("*");
-	try
-	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "Config file read: " << std::endl << "==================="
-			<< std::endl;
-#endif
-		for (boost::program_options::detail::config_file_iterator i(config,
-			options), e; i != e; ++i)
-		{
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << i->string_key << " " << i->value[0] << std::endl;
-#endif
-			parameters[i->string_key] = i->value[0];
-		}
-	} catch (std::exception& e)
-	{
-		std::cerr << "Exception: " << e.what() << std::endl;
-	}
 }
 
 void Upload_Data_Container::set_display_client_container( Display_Client_Container_Ptr p_display_client_container)

@@ -10,7 +10,7 @@ Assign_Group::Assign_Group( Display_Client_Container_Ptr p_display_client_contai
 	ui.setupUi(this);
 	
 	std::vector<std::string> unique_group_names = m_display_client_container->get_unique_group_names();
-	for (int i = 0; i < unique_group_names.size(); ++i)
+	for (unsigned int i = 0; i < unique_group_names.size(); ++i)
 	{
 		ui.group_combo_box->addItem(QString::fromStdString(unique_group_names[i]));
 	}
@@ -44,7 +44,7 @@ void Assign_Group::ok_clicked()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Assign_Group::ok_clicked()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	for(int i = 0; i < m_selected_names.size(); ++i)
+	for(unsigned int i = 0; i < m_selected_names.size(); ++i)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Selected Name: " << m_selected_names[i] << std::endl;

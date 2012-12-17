@@ -47,6 +47,8 @@ private:
 	Display_Client_Container_Ptr display_client_container;
 	Playlist_Container_Ptr playlist_container;
 
+	Display_Client_Container_Ptr temp_display_client_container;
+
 	/** Holds the pending uploads that will go to the server. Consists
 	 ** of a std::vector of pairs, where the pair consists of a std::vector
 	 ** containing the filenames to be uploaded, and a boost::posix_time::ptime
@@ -68,6 +70,7 @@ private slots:
 	void data_recieved_slot(QString data_recieved);
 	void check_uploads_pending();
 	void assign_group();
+	void group_assigned();
 };
 
 #endif //TACKTECH_MANAGER_MAINWINDOW_H

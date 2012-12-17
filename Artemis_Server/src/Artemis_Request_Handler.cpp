@@ -147,7 +147,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 				tacktech.child("Organization")
 				.attribute("ORGANIZATION_NAME").as_string();
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "  -> ORGANIZATION_NAME: " << organization_name 
+		std::cout << "  -> ORGANIZATION_NAME: " << organization_name
 			<< std::endl;
 		std::cout << "  - Adding playlist_container XML" << std::endl;
 #endif // _DEBUG
@@ -161,6 +161,17 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		return_xml->append(upload_xml);
 		result_status = SINGLE_RESULT;
 	}
+	else if (type_string == "UPDATE_DISPLAY_CONTAINER")
+    {
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received UPDATE_DISPLAY_CONTAINER command" << std::endl;
+#endif // _DEBUG
+        xml_string_writer writer;
+        pugi::xml_node container_node = tacktech.child("CONTAINER").child("Display_Client_Container");
+        container_node.print(writer);
+        Display_Client_Container container(writer.result);
+        display_client_container->update_groups_and_playlist(container);
+    }
 	else if (type_string == "SET_VARIABLES")
 	{
 //#ifdef _SHOW_DEBUG_OUTPUT
@@ -399,7 +410,7 @@ bool Artemis_Request_Handler::save_uploaded_file(pugi::xml_node tacktech)
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "  - Filename: " << item_node.child_value("Filename")
 				<< std::endl;
-		std::cout << "  - Pause: " << item_node.child_value("Pause") 
+		std::cout << "  - Pause: " << item_node.child_value("Pause")
 			<< std::endl;
 #endif //_DEBUG
 		std::string filename = item_node.child_value("Filename");

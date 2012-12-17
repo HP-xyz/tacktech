@@ -15,7 +15,7 @@ struct xml_string_writer: pugi::xml_writer
 Group_Container_Server::Group_Container_Server(void)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout 
+	std::cout
 		<< "=Group_Container_Server::Group_Container_Server()"
 		<< std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -25,12 +25,12 @@ Group_Container_Server::Group_Container_Server(void)
 Group_Container_Server::~Group_Container_Server(void)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout 
+	std::cout
 		<< "=Group_Container_Server::~Group_Container_Server()"
 		<< std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 }
-bool Group_Container_Server::add_organization( 
+bool Group_Container_Server::add_organization(
 	std::string organization_name, Group_Container group_container)
 {
 	if (organization_map.find(organization_name) == organization_map.end())
@@ -54,7 +54,7 @@ std::string Group_Container_Server::get_groups_and_computers_xml()
 	return_str += "<Tacktech>";
 	for (Group_Container_Server_Map::iterator it = organization_map.begin();
 		it !=  organization_map.end();
-		it++)
+		++it)
 	{
 		return_str += "<Group_Container_Item Organization_Name=\"";
 		return_str += it->first;

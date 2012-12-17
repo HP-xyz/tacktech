@@ -12,14 +12,14 @@ public:
 	Display_Client(void);
 	Display_Client(std::string);
 	~Display_Client(void);
-	
+
 	/** Return std::string reference to the identification
 	 ** string. */
 	std::string get_identification();
 	/** Return a boost::posix_time::ptime reference to the
 	 ** last recorded ping that was received. */
 	boost::posix_time::ptime get_last_ping();
-	/** Returns a std::set<std::string> reference to the 
+	/** Returns a std::set<std::string> reference to the
 	 ** groups that the Display_Client is part of. */
 	boost::shared_ptr<std::set<std::string> > get_groups();
 	/** Returns a std::set<std::string> containing the organizations
