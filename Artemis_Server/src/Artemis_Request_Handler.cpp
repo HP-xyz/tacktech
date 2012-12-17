@@ -313,34 +313,14 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received IDENTIFY command" << std::endl;
-		std::cout << "  - display_client_container.get() ---> " << display_client_container.get() << std::endl;
-		if (display_client_container.get() == 0)
-			std::cout << "  -> display_client_container == 0" << std::endl;
-		else
-			std::cout << "  -> display_client_container != 0" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 		pugi::xml_node indentification_node = tacktech.child("Identity");
-#ifdef _SHOW_DEBUG_OUTPUT
-		indentification_node.print(std::cout);
-#endif // _SHOW_DEBUG_OUTPUT
+
 		Display_Client_Ptr display_client(new Display_Client());
-#ifdef _SHOW_DEBUG_OUTPUT
-		if (display_client.get() == 0)
-			std::cout << " -> display_client == 0 " << std::endl;
-		else
-			std::cout << " -> display_client != 0" << std::endl;
-		std::cout << " - Calling add_display_client()" << std::endl;
-#endif // _SHOW_DEBUG_OUPTU
+
 		display_client->add_group(indentification_node.attribute("Organization_Name").as_string());
 		display_client->set_identification(indentification_node.attribute("Computer_Name").as_string());
 		display_client->set_last_ping(boost::posix_time::second_clock::universal_time());
-#ifdef _SHOW_DEBUG_OUTPUT
-		if (display_client.get() == 0)
-			std::cout << " -> display_client == 0 " << std::endl;
-		else
-			std::cout << " -> display_client != 0" << std::endl;
-		std::cout << " - Calling add_display_client()" << std::endl;
-#endif // _SHOW_DEBUG_OUPTU
 		display_client_container->add_display_client(display_client);
 
 		std::string upload_xml;

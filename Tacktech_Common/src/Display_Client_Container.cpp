@@ -14,6 +14,7 @@ struct xml_string_writer: pugi::xml_writer
 
 Display_Client_Container::Display_Client_Container(void)
 {
+	m_display_client_container.reset(new std::vector<Display_Client_Ptr>);
 }
 
 Display_Client_Container::Display_Client_Container( std::string display_client_container_str)
@@ -59,16 +60,16 @@ void Display_Client_Container::add_display_client( Display_Client_Ptr display_cl
 		find_display_client_by_ident(display_client->get_identification());
 	if (it != m_display_client_container->end())
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
 		std::cout << " $$ Updating: "<< display_client->get_identification() << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
+#endif // _IMPORTANT_OUTPUT
 		it->get()->set_last_ping(boost::posix_time::second_clock::universal_time());
 	}
 	else
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
 		std::cout << " ++ Adding: "<< display_client->get_identification() << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
+#endif // _IMPORTANT_OUTPUT
 		m_display_client_container->push_back(display_client);
 	}
 }
@@ -106,9 +107,11 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 
 		std::set<std::string>::iterator it2 =
 			get_display_client_container()->at(i)
-			->get_organizations().find(p_organization_name);
-		if(it2 != get_display_client_container()
-			->at(i)->get_organizations().end())
+			->get_organizations()->find(p_organization_name);
+		std::set<std::string>::iterator it3 =
+			get_display_client_container()->at(i)
+			->get_organizations()->end();
+		if(it2 != it3)
 		{
 			upload_xml += "<Display_Client_Item>";
 			upload_xml += get_display_client_container()

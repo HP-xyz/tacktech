@@ -14,6 +14,8 @@ struct xml_string_writer: pugi::xml_writer
 
 Display_Client::Display_Client(void)
 {
+	m_groups.reset(new std::set<std::string>);
+	m_organizations.reset(new std::set<std::string>);
 	m_playlist_container.reset(new Playlist_Container());
 	m_playlist_container->set_playlist_container_name("NONE");
 }
@@ -23,6 +25,8 @@ Display_Client::Display_Client( std::string display_client_str)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Display_Client(STRING)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+	m_groups.reset(new std::set<std::string> );
+	m_organizations.reset(new std::set<std::string>);
 	m_playlist_container.reset(new Playlist_Container());
 	pugi::xml_document disply_client_document;
 	disply_client_document.load(display_client_str.c_str());
@@ -36,7 +40,7 @@ Display_Client::Display_Client( std::string display_client_str)
 
 
 Display_Client::~Display_Client(void)
-{
+{	
 }
 
 std::string Display_Client::get_identification()
@@ -71,7 +75,7 @@ void Display_Client::set_groups(std::set<std::string> p_groups)
 }
 void Display_Client::set_organizations( std::set<std::string> p_organizations)
 {
-	m_organizations = p_organizations;
+	m_organizations.reset(new std::set<std::string>(p_organizations));
 }
 void Display_Client::set_playlist_container(Playlist_Container_Ptr p_playlist_container)
 {
@@ -91,7 +95,7 @@ bool Display_Client::add_group(std::string p_group_name)
 	}
 }
 
-std::set<std::string> Display_Client::get_organizations()
+boost::shared_ptr<std::set<std::string>> Display_Client::get_organizations()
 {
 	return m_organizations;
 }
@@ -99,14 +103,14 @@ std::set<std::string> Display_Client::get_organizations()
 bool Display_Client::add_organization( std::string p_organization_name)
 {
 	std::set<std::string>::iterator it =
-		get_organizations().find(p_organization_name);
-	if(it != get_organizations().end())
+		get_organizations()->find(p_organization_name);
+	if(it != get_organizations()->end())
 	{
 		return false;
 	}
 	else
 	{
-		m_organizations.insert(p_organization_name);
+		m_organizations->insert(p_organization_name);
 		return true;
 	}
 }
@@ -126,7 +130,7 @@ std::string Display_Client::get_display_client_xml()
 	display_client_root.append_attribute("Playlist_Container") =
 		get_playlist_container()->get_playlist_container_name().c_str();
 	display_client_root.append_attribute("Organizations") =
-		make_list(get_organizations()).c_str();
+		make_list(*get_organizations()).c_str();
 	display_client_root.append_attribute("Groups") =
 		make_list(*get_groups()).c_str();
 	xml_string_writer writer;

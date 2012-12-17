@@ -1,5 +1,8 @@
 #ifndef DISPLAY_CLIENT_CONTAINER_H
 #define DISPLAY_CLIENT_CONTAINER_H
+#ifdef _SHOW_DEBUG_OUTPUT
+#define _IMPORTANT_OUTPUT _SHOW_DEBUG_OUTPUT
+#endif // _SHOW_DEBUG_OUTPUT
 #include <set>
 #include <vector>
 #include <algorithm>
