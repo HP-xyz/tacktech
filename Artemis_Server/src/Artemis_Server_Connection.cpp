@@ -57,6 +57,9 @@ Artemis_Server_Connection::Artemis_Server_Connection(
 	Artemis_Server_Connection::playlist_container = p_playlist_container;
 	Artemis_Server_Connection::group_playlist = p_group_playlist;
 	Artemis_Server_Connection::display_client_container = p_display_client_container;
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - display_client_container.get() ---> " << display_client_container.get() <<  std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	received_size = 0;
 	return_xml.reset(new std::string());
 }

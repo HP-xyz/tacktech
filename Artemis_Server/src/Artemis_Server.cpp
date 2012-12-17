@@ -190,6 +190,10 @@ void Artemis_Server::run()
 //************************************
 void Artemis_Server::start_accept()
 {
+#ifdef _SHOW_DEBUG_OUPUT
+	std::cout << "=start_accept()" << std::endl;
+	std::cout << " - display_client_container.get() ---> " << display_client_container.get() << std::endl;
+#endif // _SHOW_DEBUG_OUPUT
 	new_connection.reset(
 			new Artemis_Server_Connection(io_service, parameters,
 					groups_and_computers, playlist_container, group_playlist, display_client_container));
