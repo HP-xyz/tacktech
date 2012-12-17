@@ -313,7 +313,8 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received IDENTIFY command" << std::endl;
-#endif // _DEBUG
+		std::cout << "  - display_client_container.get() ---> " << display_client_container.get() << std::endl;
+#endif // _SHOW_DEBUG_OUPTU
 		pugi::xml_node indentification_node = tacktech.child("Identity");
 		Display_Client_Ptr display_client(new Display_Client());
 		display_client->add_group(indentification_node.attribute("Organization_Name").as_string());
