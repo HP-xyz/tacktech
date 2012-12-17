@@ -69,7 +69,7 @@ bool Group_Container::add_computer_name(std::string group_name,
 bool Group_Container::add_computer_name( std::string computer_name )
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "==> Group_Container::add_computer_name" 
+	std::cout << "==> Group_Container::add_computer_name"
 		<< " --> For computer: " << computer_name << std::endl;
 #endif
 	Group_Multimap::iterator it =
@@ -83,16 +83,16 @@ bool Group_Container::add_computer_name( std::string computer_name )
 		groups_and_computers->insert(Group_Item("NONE", item));
 		return true;
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "   - Adding computer '" << computer_name 
+		std::cout << "   - Adding computer '" << computer_name
 			<< "' to group 'NONE'" << std::endl;
 #endif
 	}
 	else
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "   - Updating computer '" << it->second.first 
-			<< "' in group '" << it->first << "' to time '" 
-			<< boost::posix_time::second_clock::universal_time() 
+		std::cout << "   - Updating computer '" << it->second.first
+			<< "' in group '" << it->first << "' to time '"
+			<< boost::posix_time::second_clock::universal_time()
 			<< "'" << std::endl;
 #endif
 		/* We only update the time of the PC's last ping */
@@ -139,7 +139,7 @@ bool Group_Container::contains_group_name(std::string p_group_name)
 	Group_Multimap::iterator it = groups_and_computers->end();
 	for (it = groups_and_computers->begin();
 		it != groups_and_computers->end();
-		it++)
+		++it)
 	{
 		if (it->first == p_group_name)
 			return true;
@@ -155,7 +155,7 @@ void Group_Container::remove_group_name(std::string group_name_to_remove)
 #endif // _DEBUG
 	int remove_count = 0;
 	for (Group_Multimap::iterator it = groups_and_computers->begin();
-			it != groups_and_computers->end(); it++)
+			it != groups_and_computers->end(); ++it)
 	{
 		Group_Computer_Range range = groups_and_computers->equal_range(
 				it->first);
@@ -193,11 +193,11 @@ void Group_Container::remove_computer_name(std::string group_name,
 		Group_Multimap::iterator it2 = range.first;
 		for (it2; it2 != range.second; ++it2)
 		{
-			if (it2->first == group_name 
+			if (it2->first == group_name
 				&& it2->second.first == computer_name)
 			{
 #ifdef _SHOW_DEBUG_OUTPUT
-					std::cout << "  - " << it2->first 
+					std::cout << "  - " << it2->first
 						<< " : " << it2->second.first
 						<< std::endl;
 #endif // _DEBUG
@@ -225,7 +225,7 @@ Group_Multimap::iterator Group_Container::contains_computer_in_group(
 		Group_Multimap::iterator it2 = range.first;
 		for (it2; it2 != range.second; ++it2)
 		{
-			if (it2->first == group_name 
+			if (it2->first == group_name
 				&& it2->second.first == computer_name)
 			{
 				return it2;
@@ -261,7 +261,7 @@ Group_Multimap::iterator Group_Container::contains_computer_in_all_groups(
 		if (it->second.first == computer_name)
 		{
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " ----> Return iterator to computer: " 
+			std::cout << " ----> Return iterator to computer: "
 				<< it->second.first << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 			return it;
@@ -301,7 +301,7 @@ Group_Multimap Group_Container::get_unique_groups()
 std::string Group_Container::get_groups_and_computers_xml()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "== Group_Container::get_groups_and_computers_xml()" 
+	std::cout << "== Group_Container::get_groups_and_computers_xml()"
 		<< std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document groups_and_computers_document;

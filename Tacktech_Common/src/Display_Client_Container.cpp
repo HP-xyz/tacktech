@@ -75,7 +75,7 @@ void Display_Client_Container::add_display_client( Display_Client_Ptr display_cl
 
 void Display_Client_Container::remove_display_client( int index)
 {
-	m_display_client_container->erase(m_display_client_container->begin() 
+	m_display_client_container->erase(m_display_client_container->begin()
 		+ (index - 1));
 }
 
@@ -129,8 +129,8 @@ void Display_Client_Container::print_contents()
 	std::cout << "=Display_Client_Container::print_contents" << std::endl;
 	for (unsigned int i = 0; i < get_display_client_container()->size(); ++i)
 	{
-		std::cout << " -- Display_Name: " 
-			<< get_display_client_container()->at(i)->get_identification() 
+		std::cout << " -- Display_Name: "
+			<< get_display_client_container()->at(i)->get_identification()
 			<< std::endl;
 	}
 }
@@ -143,7 +143,7 @@ std::vector<std::string> Display_Client_Container::get_unique_group_names()
 	std::cout << "=Display_Client_Container::get_unique_group_names()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	std::vector<std::string> unique_groups;
-	for (int i = 0; i < m_display_client_container->size(); ++i)
+	for (unsigned int i = 0; i < m_display_client_container->size(); ++i)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Checking Display_Client: " << m_display_client_container->at(i)->get_identification() << std::endl;
@@ -169,5 +169,18 @@ std::vector<std::string> Display_Client_Container::get_unique_group_names()
 	return unique_groups;
 }
 
-
-
+void Display_Client_Container::update_groups_and_playlist(Display_Client_Container p_display_client_container)
+{
+    for(std::vector<Display_Client_Ptr>::iterator it
+        = p_display_client_container.get_display_client_container()->begin();
+        it != p_display_client_container.get_display_client_container()->end();
+        ++it)
+    {
+        std::vector<Display_Client_Ptr>::iterator it2 = find_display_client_by_ident(it->get()->get_identification());
+        if(it2 != p_display_client_container.get_display_client_container()->end())
+        {
+            it2->get()->set_groups(*it->get()->get_groups());
+            it2->get()->set_playlist_container(it->get()->get_playlist_container());
+        }
+    }
+}

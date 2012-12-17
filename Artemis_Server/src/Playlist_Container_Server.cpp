@@ -35,7 +35,7 @@ std::string Playlist_Container_Server::get_playlists_xml()
 	for (Playlist_Container_Server_Map::iterator it =
 		organization_map.begin();
 		it !=  organization_map.end();
-		it++)
+		++it)
 	{
 		return_str += "<Playlist_Container_Item Organization_Name=\"";
 		return_str += it->first;
@@ -66,7 +66,7 @@ void Playlist_Container_Server::construct_playlist(
 			item_node;
 			item_node = item_node.next_sibling("Item"))
 		{
-			
+
 //			if(organization_map[organization_name].add_filename(
 //				playlist_item.attribute("Playlist_Name").as_string(),
 //				item_node.child_value("Filename"),
@@ -81,7 +81,7 @@ void Playlist_Container_Server::construct_playlist(
 #endif // _DEBUG
 }
 
-void Playlist_Container_Server::construct_playlist( 
+void Playlist_Container_Server::construct_playlist(
 	const char* playlist_filename )
 {
 #ifdef _SHOW_DEBUG_OUTPUT

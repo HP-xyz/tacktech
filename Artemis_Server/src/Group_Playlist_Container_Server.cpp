@@ -24,7 +24,7 @@ bool Group_Playlist_Container_Server::add_organization(
 		return false;
 }
 
-Group_Playlist_Container_Server_Map& 
+Group_Playlist_Container_Server_Map&
 	Group_Playlist_Container_Server::get_organization_map()
 {
 	return organization_map;
@@ -37,7 +37,7 @@ std::string Group_Playlist_Container_Server::get_group_playlist_xml()
 	for (Group_Playlist_Container_Server_Map::iterator it =
 		organization_map.begin();
 		it !=  organization_map.end();
-	it++)
+        ++it)
 	{
 		return_str += "<Group_Playlist_Item Organization_Name=\"";
 		return_str += it->first;
@@ -70,7 +70,7 @@ void Group_Playlist_Container_Server::construct_group_playlist(
 	}
 }
 
-void Group_Playlist_Container_Server::construct_group_playlist( 
+void Group_Playlist_Container_Server::construct_group_playlist(
 	const char* group_playlist_filename )
 {
 #ifdef _SHOW_DEBUG_OUTPUT

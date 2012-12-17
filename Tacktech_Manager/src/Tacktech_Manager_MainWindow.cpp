@@ -113,7 +113,7 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 	std::cout << " =Tacktech_Manager_MainWindow::repopulate_ui" << std::endl;
 #endif // _DEBUG
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "  - Clearing the main_tree_widget" 
+	std::cout << "  - Clearing the main_tree_widget"
 		<< std::endl;
 #endif // _DEBUG
 	ui.main_tree_widget->clear();
@@ -124,9 +124,9 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 		++i)
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "   - Adding name: " 
+		std::cout << "   - Adding name: "
 			<< display_client_container->get_display_client_container()
-			->at(i)->get_identification() 
+			->at(i)->get_identification()
 			<< std::endl;
 #endif // _DEBUG
 		computer_item = new Typed_QTreeWidgetItem();
@@ -139,7 +139,7 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 			display_client_container->get_display_client_container()
 			->at(i)->get_groups_string()));
 		computer_item->set_type("COMPUTER");
-		computer_item->setText(0, 
+		computer_item->setText(0,
 			QString::fromStdString(display_client_container->
 			get_display_client_container()
 			->at(i)->get_identification()));
@@ -304,7 +304,7 @@ void Tacktech_Manager_MainWindow::upload_files_to_server( std::vector<std::strin
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager_MainWindow::upload_files_to_server" << std::endl;
 #endif // _DEBUG
-	if(items.size() > 0)
+	if(!items.empty())
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - There ARE items to upload" << std::endl;
@@ -343,7 +343,7 @@ void Tacktech_Manager_MainWindow::check_uploads_pending()
 		std::cout << " ## Upload time is: " << it->second.toString().toStdString() << std::endl;
 #endif // _DEBUG
 		QTime current_time(QTime::currentTime());
-		if (it->second == current_time.addSecs(180) 
+		if (it->second == current_time.addSecs(180)
 			|| it->second == current_time.addSecs(-180))
 		{//Checks if the time when the upload should start is
 		 //close to the actual time, with -+2 mins of discrepancy
@@ -378,7 +378,7 @@ void Tacktech_Manager_MainWindow::assign_group()
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Selected items count > 0" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT	
+#endif // _SHOW_DEBUG_OUTPUT
 		std::vector<std::string> selected_names;
 		foreach(QTreeWidgetItem *item, ui.main_tree_widget->selectedItems())
 		{
@@ -391,15 +391,31 @@ void Tacktech_Manager_MainWindow::assign_group()
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " --- Resetting assign_group_dialog "  << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-		if (assign_group_dialog.get() != nullptr)
+		if (assign_group_dialog.get() != 0)
 		{
 			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
+			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(group_assigned()));
 		}
 		assign_group_dialog.reset(new Assign_Group(display_client_container, selected_names));
 		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
+		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(group_assigned()));
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " ---- Showing assign_group_dialog "  << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 		assign_group_dialog->show();
 	}
+}
+
+void Tacktech_Manager_MainWindow::group_assigned()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << "=Tacktech_Manager_MainWindow::group_assigned()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+    temp_display_client_container = display_client_container;
+    upload_data.reset(new Upload_Data_Container(parameters));
+			connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+				SLOT(start_upload(std::string)));
+			upload_data->set_display_client_container(temp_display_client_container);
+			upload_data->set_command("SET_DISPLAY_CONTAINER");
+			upload_data->get_xml_upload();
 }

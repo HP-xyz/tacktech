@@ -34,6 +34,10 @@ public:
 	/** Return a std::vector<std::string> of all unique group_names in the display_container */
 	std::vector<std::string> get_unique_group_names();
 
+	/** Updates the Display_Client_Container with data from the Display_Client_Container
+	 ** in the parameter. Updates only Groups and Playlist_Container. */
+	 void update_groups_and_playlist(Display_Client_Container);
+
 	/** Searches the display_client_container for a Display_CLient
 	 ** identified by the string sent as parameter. Retuns iterator
 	 ** to the Dislpay_Client if found, else return iterator to

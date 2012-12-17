@@ -28,7 +28,7 @@ void Upload_Files_To_Server_Dialog::add_files()
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Adding " << qPrintable(filename) << std::endl;
 #endif // _DEBUG
-		if(std::find(selected_files.begin(), selected_files.end(), filename.toStdString()) 
+		if(std::find(selected_files.begin(), selected_files.end(), filename.toStdString())
 			!= selected_files.end())
 		{
 			QMessageBox msgBox;
@@ -55,7 +55,7 @@ void Upload_Files_To_Server_Dialog::repopulate_widget()
 
 void Upload_Files_To_Server_Dialog::ok_clicked()
 {
-	if (selected_files.size() > 0)
+	if (!selected_files.empty())
 	{
 		if (ui.checkBox->isChecked())
 		{
