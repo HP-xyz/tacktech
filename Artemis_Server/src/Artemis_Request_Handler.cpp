@@ -318,8 +318,11 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			std::cout << "  -> display_client_container == 0" << std::endl;
 		else
 			std::cout << "  -> display_client_container != 0" << std::endl;
-#endif // _SHOW_DEBUG_OUPTU
+#endif // _SHOW_DEBUG_OUTPUT
 		pugi::xml_node indentification_node = tacktech.child("Identity");
+#ifdef _SHOW_DEBUG_OUTPUT
+		tacktech.print(std::cout);
+#endif // _SHOW_DEBUG_OUTPUT
 		Display_Client_Ptr display_client(new Display_Client());
 		display_client->add_group(indentification_node.attribute("Organization_Name").as_string());
 		display_client->set_identification(indentification_node.attribute("Computer_Name").as_string());
