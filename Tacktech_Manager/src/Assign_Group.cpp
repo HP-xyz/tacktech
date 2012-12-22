@@ -8,7 +8,7 @@ Assign_Group::Assign_Group( Display_Client_Container_Ptr p_display_client_contai
 	m_display_client_container = p_display_client_container;
 	m_selected_names = p_selected_names;
 	ui.setupUi(this);
-	
+
 	std::vector<std::string> unique_group_names = m_display_client_container->get_unique_group_names();
 	for (unsigned int i = 0; i < unique_group_names.size(); ++i)
 	{
@@ -49,7 +49,7 @@ void Assign_Group::ok_clicked()
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Selected Name: " << m_selected_names[i] << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-		std::vector<Display_Client_Ptr>::iterator it = 
+		std::vector<Display_Client_Ptr>::iterator it =
 			m_display_client_container->find_display_client_by_ident(m_selected_names[i]);
 		if (it != m_display_client_container->get_display_client_container()->end())
 		{
@@ -57,6 +57,9 @@ void Assign_Group::ok_clicked()
 			std::cout << "  - Adding group '" << ui.group_combo_box->currentText().toStdString() << "' to display_client '" << it->get()->get_identification() << "'" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 			it->get()->add_group(ui.group_combo_box->currentText().toStdString());
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Display_Client groups: " << it->get()->get_groups_string() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		}
 	}
 	emit group_added();

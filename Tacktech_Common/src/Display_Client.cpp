@@ -40,7 +40,7 @@ Display_Client::Display_Client( std::string display_client_str)
 
 
 Display_Client::~Display_Client(void)
-{	
+{
 }
 
 std::string Display_Client::get_identification()
@@ -84,18 +84,27 @@ void Display_Client::set_playlist_container(Playlist_Container_Ptr p_playlist_co
 
 bool Display_Client::add_group(std::string p_group_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << "   -- Looking for '" << p_group_name << "'" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 	if(get_groups()->find(p_group_name) != get_groups()->end())
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << "   --- Group FOUND, NOT INSERTING"  << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 		return false;
 	}
 	else
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << "   --- Group NOT FOUND, INSERTING"  << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 		m_groups->insert(p_group_name);
 		return true;
 	}
 }
 
-boost::shared_ptr<std::set<std::string>> Display_Client::get_organizations()
+boost::shared_ptr<std::set<std::string> > Display_Client::get_organizations()
 {
 	return m_organizations;
 }
@@ -121,7 +130,7 @@ std::string Display_Client::get_display_client_xml()
 	std::cout << "=Display_Client::get_display_client_xml" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document disply_client_document;
-	pugi::xml_node display_client_root 
+	pugi::xml_node display_client_root
 		= disply_client_document.append_child("Display_Client");
 	display_client_root.append_attribute("Identification") =
 		get_identification().c_str();
@@ -201,4 +210,21 @@ std::string Display_Client::get_playlist_container_name()
 std::string Display_Client::get_groups_string()
 {
 	return make_list(*get_groups());
+}
+
+bool Display_Client::contains_organization(std::string p_organization_name)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << "  = Display_Client organizations: " << std::endl;
+        for(std::set<std::string>::iterator iter = get_organizations()->begin();
+        iter != get_organizations()->end(); ++iter)
+    {
+        std::cout << "   - " << *iter << std::endl;
+    }
+#endif // _SHOW_DEBUG_OUTPUT
+    std::set<std::string>::iterator iter = get_organizations()->find(p_organization_name);
+    if(iter != get_organizations()->end())
+        return true;
+    else
+        return false;
 }

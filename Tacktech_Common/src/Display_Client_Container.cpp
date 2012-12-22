@@ -98,20 +98,17 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Display_Client_Container::get_display_client_container_xml"<< std::endl;
+    std::cout << " - Container contains '" << get_display_client_container()->size() << "' items" << std::endl;
 	std::cout << " - For organization: " << p_organization_name << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	std::string upload_xml;
 	upload_xml += "<Display_Client_Container>";
 	for (unsigned int i = 0; i < get_display_client_container()->size(); ++i)
 	{
-
-		std::set<std::string>::iterator it2 =
-			get_display_client_container()->at(i)
-			->get_organizations()->find(p_organization_name);
-		std::set<std::string>::iterator it3 =
-			get_display_client_container()->at(i)
-			->get_organizations()->end();
-		if(it2 != it3)
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << "  - Checking name: " << get_display_client_container()->at(i)->get_identification() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		if(get_display_client_container()->at(i)->contains_organization(p_organization_name))
 		{
 			upload_xml += "<Display_Client_Item>";
 			upload_xml += get_display_client_container()
