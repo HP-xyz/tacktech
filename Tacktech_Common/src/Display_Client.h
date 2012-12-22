@@ -24,7 +24,7 @@ public:
 	boost::shared_ptr<std::set<std::string> > get_groups();
 	/** Returns a std::set<std::string> containing the organizations
 	 ** that the Display_Client belongs to. */
-	boost::shared_ptr<std::set<std::string>> get_organizations();
+	boost::shared_ptr<std::set<std::string> > get_organizations();
 	/** Returns a Playlist_Container_Ptr to the Dislpay_
 	 ** Client object. */
 	Playlist_Container_Ptr get_playlist_container();
@@ -63,6 +63,10 @@ public:
 
 	/** Returns a std::string representation of the Display_Client. */
 	std::string get_display_client_xml();
+
+	/** Returns true if the Dislpay_Client contains the organization_name
+	 ** supplied in the parameter. */
+	bool contains_organization(std::string);
 private:
 	std::string m_identification;
 	boost::posix_time::ptime m_last_ping;

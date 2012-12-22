@@ -416,9 +416,9 @@ void Tacktech_Manager_MainWindow::group_assigned()
 #endif // _SHOW_DEBUG_OUTPUT
     temp_display_client_container = display_client_container;
     upload_data.reset(new Upload_Data_Container(parameters));
-			connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
-				SLOT(start_upload(std::string)));
-			upload_data->set_display_client_container(temp_display_client_container);
-			upload_data->set_command("SET_DISPLAY_CONTAINER");
-			upload_data->get_xml_upload();
+    connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+        SLOT(start_upload(std::string)));
+    upload_data->set_display_client_container(temp_display_client_container);
+    upload_data->set_command("SET_DISPLAY_CONTAINER");
+    upload_data->get_xml_upload();
 }
