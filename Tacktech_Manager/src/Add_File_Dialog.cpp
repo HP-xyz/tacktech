@@ -13,14 +13,14 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 #endif // _DEBUG
 	QStringList headers;
 	headers << "Filename" << "Pause (s)";
-	ui.filename_tree_widget->setColumnCount(2);
-	ui.filename_tree_widget->setHeaderLabels(headers);
+	ui.playlist_filenames->setColumnCount(2);
+	ui.playlist_filenames->setHeaderLabels(headers);
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating node menu" << std::endl;
 #endif // _DEBUG
 	node_menu = new QMenu();
-	ui.filename_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
+	ui.playlist_filenames->setContextMenuPolicy(Qt::ActionsContextMenu);
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating add_pause_dialog pointer" << std::endl;
@@ -36,7 +36,7 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 	std::cout << " - Adding actions to tree widget" << std::endl;
 #endif // _DEBUG
 	/* Adding action to context menu */
-	ui.filename_tree_widget->addAction(remove_filename);
+	ui.playlist_filenames->addAction(remove_filename);
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Connecting primary signals" << std::endl;
@@ -44,11 +44,9 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 	/* Connecting the main GUI signals for this class */
 	connect(remove_filename, SIGNAL(triggered()), this,
 			SLOT(remove_filename_slot()));
-	connect(ui.filename_tree_widget,
+	connect(ui.playlist_filenames,
 			SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this,
 			SLOT(add_pause_slot(QTreeWidgetItem*, int)));
-	connect(ui.browse_button, SIGNAL(clicked()), this,
-			SLOT(add_filename_slot()));
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ok_clicked()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(cancel_clicked()));
 
@@ -63,6 +61,7 @@ Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - GUI setup complete" << std::endl;
 #endif // _DEBUG
+	repopulate_widget();
 }
 
 Add_File_Dialog::~Add_File_Dialog()
@@ -100,29 +99,36 @@ void Add_File_Dialog::repopulate_widget()
 	std::cout << "= Add_File_Dialog::repopulate_widget()" << std::endl;
 	playlist->print_contents();
 #endif // _DEBUG
-	ui.filename_tree_widget->clear();
-
-	Playlist_Range range = playlist->get_files_in_playlist(
-			playlist_name.toStdString());
-	Playlist_Multimap::iterator it = range.first;
-	for (it; it != range.second; ++it)
+	ui.playlist_filenames->clear();
+	for (Container::iterator it = playlist->get_playlist_container(playlist_organization.toStdString()).begin();
+		it != playlist->get_playlist_container(playlist_organization.toStdString()).end(); ++it)
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Adding: " << it->second.first << std::endl;
-#endif // _DEBUG
-		Typed_QTreeWidgetItem *new_item = new Typed_QTreeWidgetItem();
-		new_item->set_filename(QString::fromStdString(it->second.first));
-		new_item->set_pause(it->second.second);
-		new_item->setText(0, QString::fromStdString(it->second.first));
-		new_item->setText(1, QString::number(it->second.second));
-		ui.filename_tree_widget->addTopLevelItem(new_item);
+		if (it->first->get_playlist_name() == playlist_name.toStdString())
+		{
+			for (std::vector<std::pair<std::string, int> >::iterator it2 = it->first->get_playlist_items()->begin();
+				it2 != it->first->get_playlist_items()->end(); ++it2)
+			{
+				Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
+				item->set_filename(QString::fromStdString(it2->first));
+				item->setText(0, QString::fromStdString(it2->first));
+				item->setText(1, QString::fromStdString(boost::lexical_cast<std::string, int>(it2->second)));
+				ui.playlist_filenames->addTopLevelItem(item);
+			}
+		}
+	}
+	for (std::vector<std::string>::iterator it = filelist->get_filelist(playlist_organization.toStdString()).begin();
+		it != filelist->get_filelist(playlist_organization.toStdString()).end(); ++it)
+	{
+		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
+		item->set_filename(QString::fromStdString(*it));
+		ui.server_filenames->addTopLevelItem(item);
 	}
 }
 
 /** Removes selected filename from the playlist */
 void Add_File_Dialog::remove_filename_slot()
 {
-	if (ui.filename_tree_widget->selectedItems().count() != 0)
+	/*if (ui.filename_tree_widget->selectedItems().count() != 0)
 	{
 		foreach(QTreeWidgetItem* item,
 				ui.filename_tree_widget->selectedItems()){
@@ -138,7 +144,7 @@ else
 	QMessageBox msgBox;
 	msgBox.setText("Select a file first");
 	msgBox.exec();
-}
+}*/
 }
 
 /** Displays a file browser where the user can select a file to add to the
@@ -148,7 +154,7 @@ void Add_File_Dialog::add_filename_slot()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog::add_filename_slot()" << std::endl;
 #endif // _DEBUG
-	QStringList filenames = QFileDialog::getOpenFileNames(this,
+/*	QStringList filenames = QFileDialog::getOpenFileNames(this,
 			tr("Select file(s) to add to playlist"));
 	foreach(QString filename, filenames){
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -162,7 +168,7 @@ void Add_File_Dialog::add_filename_slot()
 		msgBox.setText(filename + " is already in the playlist");
 		msgBox.exec();
 	}
-}
+}*/
 	repopulate_widget();
 }
 
@@ -172,7 +178,7 @@ void Add_File_Dialog::add_filename_slot()
  ** */
 void Add_File_Dialog::add_pause_slot(QTreeWidgetItem *dud1, int dud2)
 {
-	if (ui.filename_tree_widget->selectedItems().count() == 1)
+	if (ui.playlist_filenames->selectedItems().count() == 1)
 	{
 		add_pause_dialog->show();
 	}
@@ -191,17 +197,17 @@ void Add_File_Dialog::pause_changed_slot(int new_pause)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Add_File_Dialog::pause_changed_slot()" << std::endl;
 #endif // _DEBUG
-	ui.filename_tree_widget->selectedItems().at(0)->setText(1,
+	ui.playlist_filenames->selectedItems().at(0)->setText(1,
 			QString::number(new_pause));
 
-	/* Removing the old item from the playlist */
-	playlist->remove_filename_from_playlist(playlist_name.toStdString(),
-			ui.filename_tree_widget->selectedItems().at(0)->text(0).toStdString());
+	///* Removing the old item from the playlist */
+	//playlist->remove_filename_from_playlist(playlist_name.toStdString(),
+	//		ui.filename_tree_widget->selectedItems().at(0)->text(0).toStdString());
 
-	/* Inserting the new item into the playlist */
-	playlist->add_filename(playlist_name.toStdString(),
-			ui.filename_tree_widget->selectedItems().at(0)->text(0).toStdString(),
-			new_pause);
+	///* Inserting the new item into the playlist */
+	//playlist->add_filename(playlist_name.toStdString(),
+	//		ui.filename_tree_widget->selectedItems().at(0)->text(0).toStdString(),
+	//		new_pause);
 	repopulate_widget();
 }
 
@@ -245,4 +251,14 @@ void Add_File_Dialog::keyPressEvent(QKeyEvent *event)
 	default:
 		QWidget::keyPressEvent(event);
 	}
+}
+
+void Add_File_Dialog::set_playlist_organization( QString p_playlist_organization)
+{
+	playlist_organization = p_playlist_organization;
+}
+
+void Add_File_Dialog::set_filelist( Filelist_Ptr p_filelist)
+{
+	filelist = p_filelist;
 }

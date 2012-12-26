@@ -16,10 +16,12 @@
 #include <Playlist_Container.h>
 #include <Display_Client_Container.h>
 #include <Tacktech_Network_Manager.h>
+#include <Filelist.h>
 #include "Upload_Data_Container.h"
 #include "Upload_Files_To_Server_Dialog.h"
 #include "Assign_Group.h"
 #include "Typed_QTreeWidgetItem.h"
+#include "Edit_Playlist.h"
 #include "ui_Tacktech_Manager_MainWindow.h"
 typedef boost::shared_ptr<Upload_Files_To_Server_Dialog> File_Upload_Dialog_Ptr;
 typedef boost::shared_ptr<Upload_Data_Container> Upload_Data_Container_Ptr;
@@ -38,6 +40,9 @@ private:
 
 	boost::shared_ptr<QMenu> node_menu;
 	boost::shared_ptr<QAction> add_to_group;
+	boost::shared_ptr<QAction> edit_playlist;
+
+    boost::shared_ptr<Edit_Playlist> edit_playlist_dialog;
 
 	/* Variable for the upload_data container */
 	Upload_Data_Container_Ptr upload_data;
@@ -46,6 +51,7 @@ private:
 	boost::shared_ptr<boost::asio::io_service> io_service;
 	Display_Client_Container_Ptr display_client_container;
 	Playlist_Container_Ptr playlist_container;
+	Filelist_Ptr filelist;
 
 	Display_Client_Container_Ptr temp_display_client_container;
 
@@ -68,6 +74,7 @@ private slots:
 	void start_upload(std::string);
 	void upload_files_to_server(std::vector<std::string>, QTime);
 	void data_recieved_slot(QString data_recieved);
+	void edit_playlist_slot();
 	void check_uploads_pending();
 	void assign_group();
 	void group_assigned();

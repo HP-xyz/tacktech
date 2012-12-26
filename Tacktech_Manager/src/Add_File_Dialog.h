@@ -4,6 +4,7 @@
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
+#include <vector>
 #include <QtGui/QMainWindow>
 #include <QMenu>
 #include <QAction>
@@ -11,11 +12,12 @@
 #include <QFileDialog>
 #include <QSpinBox>
 #include <QKeyEvent>
-#include "ui_Add_File_Dialog.h"
+#include <boost/lexical_cast.hpp>
 #include <Playlist_Container.h>
+#include <Filelist.h>
+#include "ui_Add_File_Dialog.h"
 #include "Typed_QTreeWidgetItem.h"
 #include "Add_Pause_Dialog.h"
-#include "Add_Playlist_Dialog.h"
 
 class Add_File_Dialog: public QMainWindow
 {
@@ -25,14 +27,19 @@ public:
 	Add_File_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Add_File_Dialog();
 	void set_playlist(Playlist_Container_Ptr);
+	void set_filelist(Filelist_Ptr);
 	void set_playlist_name(QString);
+	void set_playlist_organization(QString);
 private:
 	Ui::Add_File_DialogClass ui;
 	Playlist_Container *original_playlist;
 	Playlist_Container_Ptr playlist;
 
+	Filelist_Ptr filelist;
+
 	Add_Pause_Dialog *add_pause_dialog;
 	QString playlist_name;
+	QString playlist_organization;
 
 	QMenu *node_menu;
 	QAction *remove_filename;

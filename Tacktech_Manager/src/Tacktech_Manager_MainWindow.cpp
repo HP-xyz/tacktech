@@ -20,6 +20,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	display_client_container.reset(new Display_Client_Container());
 	file_upload_dialog.reset(new Upload_Files_To_Server_Dialog());
 	pending_uploads.reset(new std::vector<std::pair<std::vector<std::string>, QTime> >);
+	edit_playlist_dialog.reset(new Edit_Playlist());
 
 	ui.setupUi(this);
 	read_config();
@@ -27,6 +28,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	node_menu.reset(new QMenu());
 	ui.main_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
 	add_to_group.reset(new QAction("Add to group...", node_menu.get()));
+	edit_playlist.reset(new QAction("Edit Playlist...", node_menu.get()));
 
 	ui.main_tree_widget->addAction(add_to_group.get());
 
@@ -47,6 +49,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	connect(file_upload_dialog.get(), SIGNAL(selection_complete(std::vector<std::string>, QTime)),
 		this, SLOT(upload_files_to_server( std::vector<std::string>, QTime)));
 	connect(add_to_group.get(), SIGNAL(triggered()), this, SLOT(assign_group()));
+	connect(edit_playlist.get(), SIGNAL(triggered()), this, SLOT(edit_playlist_slot()));
 	refresh_timer->start(30000);
 }
 
@@ -226,64 +229,94 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 		/* We declare 2 strings that contain the variables */
 		std::string display_client_str = data_recieved.toStdString();
 		std::string playlist_str = data_recieved.toStdString();
+		std::string filelist_str = data_recieved.toStdString();
 
 		/* Now substring the recieved data, and assign only the needed data
 		 * to the appropraite string */
-		playlist_str = playlist_str.substr(
-			playlist_str.find("<Playlist_Container>"),
-			playlist_str.rfind("</Playlist_Container>") + 21);
-		display_client_str = display_client_str.substr(
-			display_client_str.find("<Display_Client_Container"),
-			display_client_str.rfind("</Display_Client_Container>") + 27);
+		if(playlist_str.find("<Playlist_Container>") != playlist_str.npos)
+		{
+			playlist_str = playlist_str.substr(
+				playlist_str.find("<Playlist_Container>"),
+				playlist_str.rfind("</Playlist_Container>") + 21);
 
-		pugi::xml_document playlist_container_doc;
-		playlist_container_doc.load(playlist_str.c_str());
+			pugi::xml_document playlist_container_doc;
+			playlist_container_doc.load(playlist_str.c_str());
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Playlist_Container RECIEVED Print: " << std::endl;
-		std::cout << "==================" << std::endl;
-		playlist_container_doc.print(std::cout);
-#endif
-
-		pugi::xml_document display_client_doc;
-		display_client_doc.load(display_client_str.c_str());
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Display_Client_Container RECIEVED Print: " << std::endl;
-		std::cout << "==================" << std::endl;
-		display_client_doc.print(std::cout);
+			std::cout << " - Playlist_Container RECIEVED Print: " << std::endl;
+			std::cout << "==================" << std::endl;
+			playlist_container_doc.print(std::cout);
 #endif
 
-		xml_string_writer playlist_container_writer;
-		playlist_container_doc.child("Playlist_Container")
-			.print(playlist_container_writer);
-		playlist_container.reset(
-			new Playlist_Container(playlist_container_writer.result));
+			xml_string_writer playlist_container_writer;
+			playlist_container_doc.child("Playlist_Container")
+				.print(playlist_container_writer);
+			playlist_container.reset(
+				new Playlist_Container(playlist_container_writer.result));
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Playlist_Container Print: " << std::endl;
-		std::cout << "==================" << std::endl;
-		playlist_container->print_contents();
+			std::cout << " - Playlist_Container Print: " << std::endl;
+			std::cout << "==================" << std::endl;
+			playlist_container->print_contents();
 #endif
-		xml_string_writer display_client_container_writer;
-		display_client_doc.child("Display_Client_Container")
-			.print(display_client_container_writer);
-		display_client_container.reset(new Display_Client_Container(display_client_container_writer.result));
+		}
+		else
+		{
+			playlist_container.reset(
+				new Playlist_Container());
+		}
+
+		if (display_client_str.find("<Display_Client_Container>") != display_client_str.npos)
+		{
+			display_client_str = display_client_str.substr(
+				display_client_str.find("<Display_Client_Container>"),
+				display_client_str.rfind("</Display_Client_Container>") + 27);
+
+			pugi::xml_document display_client_doc;
+			display_client_doc.load(display_client_str.c_str());
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Dislpay_Client_Container Print: " << std::endl;
-		std::cout << " ===============================" << std::endl;
-		display_client_container->print_contents();
+			std::cout << " - Display_Client_Container RECIEVED Print: " << std::endl;
+			std::cout << "==================" << std::endl;
+			display_client_doc.print(std::cout);
 #endif
-//
-//		xml_string_writer group_playlist_writer;
-//		group_playlist_doc.child("GROUPS_PLAYLIST_NODE")
-//			.child("Group_Playlist").print(	group_playlist_writer);
-//		group_playlist->reset_container();
-//		group_playlist->construct_group_playlist(
-//			group_playlist_writer.result);
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - group_playlist Print: " << std::endl;
-//		std::cout << "=========================" << std::endl;
-//		groups_and_computers->print_contents();
-//#endif
-//		status_msg += "Received variables successfully";
+
+			xml_string_writer display_client_container_writer;
+			display_client_doc.child("Display_Client_Container")
+				.print(display_client_container_writer);
+			display_client_container.reset(new Display_Client_Container(display_client_container_writer.result));
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Dislpay_Client_Container Print: " << std::endl;
+			std::cout << " ===============================" << std::endl;
+			display_client_container->print_contents();
+#endif
+		}
+		else
+		{
+			display_client_container.reset(new Display_Client_Container());
+		}
+		if (filelist_str.find("<Filelist>") != filelist_str.npos)
+		{
+			filelist_str = filelist_str.substr(
+				filelist_str.find("<Filelist>"),
+				filelist_str.rfind("</Filelist>") + 11);
+
+			pugi::xml_document filelist_doc;
+			filelist_doc.load(playlist_str.c_str());
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Filelist RECIEVED Print: " << std::endl;
+			std::cout << "==================" << std::endl;
+			filelist_doc.print(std::cout);
+#endif
+
+			xml_string_writer filelist_writer;
+			filelist_doc.child("Filelist")
+				.print(filelist_writer);
+			filelist.reset(new Filelist(filelist_writer.result));
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Filelist Print: " << std::endl;
+			std::cout << " ===============================" << std::endl;
+			filelist->print_contents();
+#endif
+		}
+		status_msg += "Received variables successfully";
 	}
 	else if(type_string == "UPLOAD_RESULT")
 	{
@@ -421,4 +454,12 @@ void Tacktech_Manager_MainWindow::group_assigned()
     upload_data->set_display_client_container(temp_display_client_container);
     upload_data->set_command("SET_DISPLAY_CONTAINER");
     upload_data->get_xml_upload();
+}
+
+void Tacktech_Manager_MainWindow::edit_playlist_slot()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << "=Tacktech_Manager_MainWindow::edit_playlist_slot()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+    edit_playlist_dialog.reset(new Edit_Playlist());
 }
