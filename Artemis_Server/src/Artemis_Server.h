@@ -21,9 +21,7 @@
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
 #include <Display_Client_Container.h>
-#include "Group_Container_Server.h"
-#include "Playlist_Container_Server.h"
-#include "Group_Playlist_Container_Server.h"
+#include <Filelist.h>
 #include "Artemis_Server_Connection.h"
 #include "Artemis_Request_Handler.h"
 
@@ -72,18 +70,12 @@ private:
 	 ** using xml storage*/
 	void store_variables();
 
-	/* Variable for computer names and group names
-	 * Note: Format is groups_and_computers[group_index][computer_index]
-	 * Note: This can be hostnames or IP addresses */
-	Group_Container_Server_Ptr groups_and_computers;
-
 	/* Variable for the playlist */
 	Playlist_Container_Ptr playlist_container;
 
-	/* Variable for the group_playlist container */
-	Group_Playlist_Container_Server_Ptr group_playlist;
-
 	Display_Client_Container_Ptr display_client_container;
+
+	Filelist_Ptr filelist;
 };
 }
 #endif //ARTEMIS_SERVER_H

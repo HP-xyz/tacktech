@@ -47,14 +47,8 @@ void Artemis_Server::initialize_variables()
 	std::cout << "= Artemis_Server::initialize_variables()" << std::endl;
 #endif // _DEBUG
 	playlist_container.reset(new Playlist_Container());
-	groups_and_computers.reset(new Group_Container_Server());
-	group_playlist.reset(new Group_Playlist_Container_Server());
 	display_client_container.reset(new Display_Client_Container());
-
-	//playlist->construct_playlist("./playlist.xml");
-	groups_and_computers->construct_groups_and_computers(
-			"./groups_and_computers.xml");
-	group_playlist->construct_group_playlist("./group_playlist.xml");
+	filelist.reset(new Filelist(parameters));
 }
 
 void Artemis_Server::store_variables()
@@ -70,23 +64,6 @@ void Artemis_Server::store_variables()
 	std::cout << " - Playlist stored successfully" << std::endl;
 #endif // _DEBUG
 
-	/* Save groups_and_computers to file */
-	pugi::xml_document groups_and_computers_document;
-	groups_and_computers_document.load(
-			groups_and_computers->get_groups_and_computers_xml().c_str());
-	groups_and_computers_document.save_file("./groups_and_computers.xml");
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Groups and Computers stored successfully" << std::endl;
-#endif // _DEBUG
-
-	/* Save group_playlist to file */
-	pugi::xml_document group_playlist_document;
-	group_playlist_document.load(
-			group_playlist->get_group_playlist_xml().c_str());
-	group_playlist_document.save_file("./group_playlist.xml");
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Group Playlist stored successfully" << std::endl;
-#endif // _DEBUG
 }
 
 //************************************
@@ -196,7 +173,7 @@ void Artemis_Server::start_accept()
 #endif // _SHOW_DEBUG_OUPUT
 	new_connection.reset(
 			new Artemis_Server_Connection(io_service, parameters,
-					groups_and_computers, playlist_container, group_playlist, display_client_container));
+					playlist_container, display_client_container, filelist));
 	acceptor.async_accept(new_connection->socket(),
 			boost::bind(&Artemis_Server::handle_accept, this,
 					boost::asio::placeholders::error));
