@@ -30,10 +30,7 @@
 #include <Playlist_Container.h>
 #include <Display_Client_Container.h>
 #include <Group_Playlist_Container.h>
-#include "Group_Container_Server.h"
-#include "Playlist_Container_Server.h"
-#include "Group_Playlist_Container_Server.h"
-#include "Artemis_Network_Sender_Connection.h"
+#include <Filelist.h>
 namespace Artemis
 {
 enum STATUS
@@ -45,10 +42,9 @@ class Artemis_Request_Handler: private boost::noncopyable
 public:
 	/** Construct Artemis_Request_Handler object */
 	explicit Artemis_Request_Handler(
-			Group_Container_Server_Ptr p_groups_and_computers,
 			Playlist_Container_Ptr p_playlist,
-			Group_Playlist_Container_Server_Ptr p_group_playlist,
-			Display_Client_Container_Ptr p_display_client_container);
+			Display_Client_Container_Ptr p_display_client_container,
+			Filelist_Ptr p_filelist);
 	~Artemis_Request_Handler();
 
 	/** Handle a request and produce a reply*/
@@ -71,17 +67,11 @@ private:
 	std::string get_binary_file(std::string filename);
 
 	std::map<std::string, std::string> parameters;
+	Filelist_Ptr filelist;
 
-	/* Variable for computer names and group names
-	 * Note: Format is groups_and_computers[group_index][computer_index]
-	 * Note: This can be hostnames or IP addresses */
-	Group_Container_Server_Ptr groups_and_computers;
 
 	/* Variable for the playlist */
 	Playlist_Container_Ptr playlist_container;
-
-	/* Variable for the group_playlist container */
-	Group_Playlist_Container_Server_Ptr group_playlist;
 
 	Display_Client_Container_Ptr display_client_container;
 };
