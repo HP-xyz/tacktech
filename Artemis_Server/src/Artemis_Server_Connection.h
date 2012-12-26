@@ -29,9 +29,7 @@
 #include <Playlist_Container.h>
 #include <Group_Playlist_Container.h>
 #include <Display_Client_Container.h>
-#include "Group_Container_Server.h"
-#include "Playlist_Container_Server.h"
-#include "Group_Playlist_Container_Server.h"
+#include <Filelist.h>
 #include "Artemis_Request_Handler.h"
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
@@ -48,10 +46,9 @@ public:
 	/** Constructs a connection withe the given io_service */
 	explicit Artemis_Server_Connection(boost::asio::io_service& io_service,
 			std::map<std::string, std::string>&,
-			Group_Container_Server_Ptr p_groups_and_computers,
 			Playlist_Container_Ptr p_playlist_container,
-			Group_Playlist_Container_Server_Ptr p_group_playlist,
-			Display_Client_Container_Ptr p_display_client_container);
+			Display_Client_Container_Ptr p_display_client_container,
+			Filelist_Ptr p_filelist);
 
 	/** Get the socket associated with the connection*/
 	boost::asio::ip::tcp::socket&
@@ -80,15 +77,12 @@ private:
 	long long received_size;
 	boost::shared_ptr<std::string> return_xml;
 
-	Group_Container_Server_Ptr groups_and_computers;
-
 	/* Variable for the playlist */
 	Playlist_Container_Ptr playlist_container;
 
-	/* Variable for the group_playlist container */
-	Group_Playlist_Container_Server_Ptr group_playlist;
-
 	Display_Client_Container_Ptr display_client_container;
+
+	Filelist_Ptr filelist;
 
 	std::string	get_binary_file(std::string filename);
 };
