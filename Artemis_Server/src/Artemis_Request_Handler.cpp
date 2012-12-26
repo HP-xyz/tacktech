@@ -29,19 +29,17 @@ struct xml_string_writer: pugi::xml_writer
 // Qualifier:
 //************************************
 Artemis_Request_Handler::Artemis_Request_Handler(
-		Group_Container_Server_Ptr p_groups_and_computers,
 		Playlist_Container_Ptr p_playlist,
-		Group_Playlist_Container_Server_Ptr p_group_playlist,
-		Display_Client_Container_Ptr p_display_client_container)
+		Display_Client_Container_Ptr p_display_client_container,
+		Filelist_Ptr p_filelist)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Artemis_Request_Handler::Artemis_Request_Handler()"
 			<< std::endl;
 #endif //_DEBUG
-	groups_and_computers = p_groups_and_computers;
 	playlist_container = p_playlist;
-	group_playlist = p_group_playlist;
 	display_client_container = p_display_client_container;
+	filelist = p_filelist;
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - display_client_container.get() ---> " << display_client_container.get() << std::endl;
 #endif // _SHOW_DEBUG_OUPTU
@@ -163,6 +161,10 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
             std::cout << "  - Adding display_client_container XML" << std::endl;
 #endif // _DEBUG
             upload_xml += display_client_container->get_display_client_container_xml(organization_name);
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Adding filelist XML" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			upload_xml += filelist->get_filelist_xml(organization_name);
             return_xml->append(upload_xml);
             result_status = SINGLE_RESULT;
         }
