@@ -2,6 +2,7 @@
 #define PLAYLIST_H
 #include <string>
 #include <vector>
+#include <set>
 #include <boost/date_time.hpp>
 #include <boost/shared_ptr.hpp>
 #include <pugixml.hpp>
@@ -20,7 +21,7 @@ public:
 	 ** NOTE: Pair is -> std::string to identify filename
 	 **               -> int to identify pause
 	 */
-	std::vector< std::pair<std::string,int> > get_playlist_items();
+	boost::shared_ptr<std::vector< std::pair<std::string,int> > > get_playlist_items();
 	/** Returns an int indicating the index of the file currently
 	 ** being played. */
 	int get_current_item_index();
@@ -68,10 +69,16 @@ public:
 	void set_end_time(boost::posix_time::ptime);
 	/** Returns a string representation of the Playlist. */
 	std::string get_playlist_xml();
+
+	void set_organizations(std::set<std::string>);
+	void add_organization(std::string);
+	boost::shared_ptr<std::set<std::string> > get_organizations();
+	bool contains_organization(std::string);
 private:
 	std::string m_playlist_name;
-	std::vector< std::pair<std::string,int> > m_playlist_items;
+	boost::shared_ptr<std::vector< std::pair<std::string,int> > > m_playlist_items;
 	int m_current_item_index;
+	boost::shared_ptr<std::set<std::string> > m_organizations;
 	boost::posix_time::ptime m_start_time;
 	boost::posix_time::ptime m_end_time;
 	//ADD START AND END TIME

@@ -17,6 +17,7 @@ public:
 	void set_playlist_name(QString);
 	void set_filename(QString);
 	void set_pause(int);
+	void set_playlist_item(QString);
 	QString get_group_name();
 	QString get_computer_name();
 	QString get_playlist_name();
@@ -28,6 +29,7 @@ private:
 	QString group_name;
 	QString playlist_name;
 	QString filename;
+	QString playlist_item;
 	int pause;
 };
 

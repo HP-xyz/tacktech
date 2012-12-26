@@ -14,6 +14,8 @@ struct xml_string_writer: pugi::xml_writer
 
 Playlist::Playlist(void)
 {
+	m_organizations.reset(new std::set<std::string>);
+	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
 }
 
 Playlist::Playlist( std::string playlist_str)
@@ -21,6 +23,7 @@ Playlist::Playlist( std::string playlist_str)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist::Playlist(STRING)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+	m_organizations.reset(new std::set<std::string>);
 	pugi::xml_document playlist_document;
 	playlist_document.load(playlist_str.c_str());
 	set_playlist_name(playlist_document.child("Playlist").attribute("Playlist_Name").as_string());
@@ -45,7 +48,7 @@ std::string Playlist::get_playlist_name()
 	return m_playlist_name;
 }
 
-std::vector< std::pair<std::string,int> > Playlist::get_playlist_items()
+boost::shared_ptr<std::vector< std::pair<std::string,int> > > Playlist::get_playlist_items()
 {
 	return m_playlist_items;
 }
@@ -72,17 +75,17 @@ void Playlist::set_playlist_name( std::string p_playlist_name)
 
 void Playlist::set_playlist_items( std::vector< std::pair<std::string,int> > p_playlist_items)
 {
-	m_playlist_items = p_playlist_items;
+	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >(p_playlist_items));
 }
 
 void Playlist::add_playlist_item( std::string filename, int pause)
 {
-	m_playlist_items.push_back(std::pair<std::string, int>(filename, pause));
+	m_playlist_items->push_back(std::pair<std::string, int>(filename, pause));
 }
 
 void Playlist::remove_playlist_item( int index)
 {
-	m_playlist_items.erase(m_playlist_items.begin() + (index-1));
+	m_playlist_items->erase(m_playlist_items->begin() + (index-1));
 }
 
 void Playlist::set_current_item_index( int p_current_item_index)
@@ -131,7 +134,7 @@ std::string Playlist::get_playlist_xml()
 	root_node.append_attribute("Start_Time") = boost::posix_time::to_iso_string(get_start_time()).c_str();
 	root_node.append_attribute("End_Time") = boost::posix_time::to_iso_string(get_end_time()).c_str();
 	for(std::vector< std::pair<std::string,int> >::iterator it =
-		m_playlist_items.begin(); it != m_playlist_items.end(); ++it)
+		m_playlist_items->begin(); it != m_playlist_items->end(); ++it)
 	{
 		pugi::xml_node playlist_item_node =
 			root_node.append_child("Playlist_Item");
@@ -141,5 +144,29 @@ std::string Playlist::get_playlist_xml()
 	xml_string_writer writer;
 	playlist_document.print(writer);
 	return writer.result;
+}
+
+void Playlist::set_organizations( std::set<std::string> p_organizations)
+{
+	m_organizations.reset(new std::set<std::string>(p_organizations));
+}
+
+void Playlist::add_organization( std::string p_organization)
+{
+	if (get_organizations()->find(p_organization) == get_organizations()->end())
+		m_organizations->insert(p_organization);
+}
+
+boost::shared_ptr<std::set<std::string> > Playlist::get_organizations()
+{
+	return m_organizations;
+}
+
+bool Playlist::contains_organization( std::string p_organization)
+{
+	if (get_organizations()->find(p_organization) != get_organizations()->end())
+		return true;
+	else
+		return false;
 }
 

@@ -4,6 +4,7 @@ Typed_QTreeWidgetItem::Typed_QTreeWidgetItem(QTreeWidgetItem *parent)
 {
 	group_name = "";
 	computer_name = "";
+	playlist_item = "";
 }
 
 Typed_QTreeWidgetItem::~Typed_QTreeWidgetItem(void)
@@ -23,7 +24,6 @@ QString Typed_QTreeWidgetItem::get_type()
 
 QPair<QTreeWidgetItem*, int> Typed_QTreeWidgetItem::get_index_and_item_of_selected()
 {
-
 	QTreeWidgetItem *parent_item = this->parent();
 	int index = parent_item->indexOfChild(this);
 	QPair<QTreeWidgetItem*, int> pair_item;
@@ -80,4 +80,9 @@ QString Typed_QTreeWidgetItem::get_filename()
 int Typed_QTreeWidgetItem::get_pause()
 {
 	return pause;
+}
+
+void Typed_QTreeWidgetItem::set_playlist_item(QString p_playlist_name)
+{
+	playlist_item = p_playlist_name;
 }
