@@ -21,15 +21,22 @@ Filelist::Filelist(std::map<std::string, std::string>& params)
 
 Filelist::Filelist( std::string xml_string)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Filelist()" << std::endl;
+	std::cout << "Recieved String: " << std::endl;
+	std::cout << xml_string << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	filelist.reset(new Filelist_Data());
 	pugi::xml_document doc;
 	doc.load(xml_string.c_str());
-	pugi::xml_node filelist_node = doc.child("Filelist");
-	std::string organization_name = doc.child("Organization").attribute("Organization_Name").as_string();
-	for (pugi::xml_attribute_iterator it = filelist_node.attributes_begin();
-		it != filelist_node.attributes_end(); ++it)
+	pugi::xml_node filelist_node = doc.child("Filelist").child("Filelist_Items");
+	std::string organization_name = doc.child("Filelist").child("Organization").attribute("Organization_Name").as_string();
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Organization_Name: " << organization_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	for (pugi::xml_attribute attr = filelist_node.first_attribute(); attr; attr = attr.next_attribute())
 	{
-		add_new_file_and_organization(it->as_string());
+			add_file(attr.value(), organization_name);
 	}
 }
 
@@ -65,9 +72,15 @@ void Filelist::scan_playlist_directory()
 
 Filelist_Data::iterator Filelist::get_iter_to_organization( std::string organization_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=get_iter_to_organization()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	for (Filelist_Data::iterator it = filelist->begin();
 		it != filelist->end(); ++it)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " -- " << it->second << " <-> " << organization_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		if(it->second == organization_name)
 			return it;
 	}
@@ -91,7 +104,7 @@ void Filelist::print_contents()
 	for (Filelist_Data::iterator it = filelist->begin();
 		it != filelist->end(); ++it)
 	{
-		std::cout << " - Group: " << it->second << std::endl;
+		std::cout << " - Organization: " << it->second << std::endl;
 		for (std::vector<std::string>::iterator it2 = it->first.begin();
 			it2 != it->first.end(); ++it2)
 		{
@@ -130,8 +143,9 @@ void Filelist::add_file( std::string filename, std::string organization_name)
 std::string Filelist::get_filelist_xml( std::string organization_name)
 {
 	pugi::xml_document doc;
-	pugi::xml_node filelist_node = doc.append_child("Filelist");
-	pugi::xml_node organization_node = doc.append_child("Organization");
+	pugi::xml_node root_node = doc.append_child("Filelist");
+	pugi::xml_node filelist_node = root_node.append_child("Filelist_Items");
+	pugi::xml_node organization_node = root_node.append_child("Organization");
 	organization_node.append_attribute("Organization_Name") = organization_name.c_str();
 	Filelist_Data::iterator it = get_iter_to_organization(parameters["general.playlist_directory"] + organization_name);
 	for (std::vector<std::string>::iterator it2 = it->first.begin();
@@ -146,12 +160,21 @@ std::string Filelist::get_filelist_xml( std::string organization_name)
 
 std::vector<std::string> Filelist::get_filelist( std::string organization_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=get_filelist()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::vector<std::string> return_vector;
 	Filelist_Data::iterator it = get_iter_to_organization(organization_name);
-	for (std::vector<std::string>::iterator it2 = it->first.begin();
-		it2 != it->first.end(); ++it2)
+	if (it != filelist->end())
 	{
-		return_vector.push_back(*it2);
+		for (std::vector<std::string>::iterator it2 = it->first.begin();
+			it2 != it->first.end(); ++it2)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Adding: " << *it2  << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			return_vector.push_back(*it2);
+		}
 	}
 	return return_vector;
 }

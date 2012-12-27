@@ -181,8 +181,9 @@ void Edit_Playlist::repopulate_widget()
 #ifdef _SHOW_DEBUG_OUTPUT
 	playlist->print_contents();
 #endif // _DEBUG
-	for (Container::iterator it = playlist->get_playlist_container(m_organization_name).begin();
-		it != playlist->get_playlist_container(m_organization_name).end(); ++it)
+	Container temp_container = playlist->get_playlist_container(m_organization_name);
+	for (Container::iterator it = temp_container.begin();
+		it != temp_container.end(); ++it)
 	{
 		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
 		item->set_playlist_name(QString::fromStdString(it->first->get_playlist_name()));
@@ -210,11 +211,7 @@ void Edit_Playlist::create_playlist_slot()
 {
 	if (ui.lineEdit->text() != "")
 	{
-		add_file_dialog.reset(new Add_File_Dialog());
-		add_file_dialog->set_filelist(filelist);
-		add_file_dialog->set_playlist(playlist);
-		add_file_dialog->set_playlist_name(ui.lineEdit->text());
-		add_file_dialog->set_playlist_organization(QString::fromStdString(m_organization_name));
+		add_file_dialog.reset(new Add_File_Dialog(playlist, filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name)));
 		add_file_dialog->show();
 	}
 	else
