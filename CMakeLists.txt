@@ -69,9 +69,9 @@ include ( ${QT_USE_FILE} )
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 # Hack from random mailist
-if (MINGW)
-	SET (Boost_COMPILER  "-mgw46")
-endif (MINGW)
+#if (MINGW)
+#	SET (Boost_COMPILER  "-mgw46")
+#endif (MINGW)
 if(BOOST_ROOT_DIR)
 	set(BOOST_ROOT ${BOOST_ROOT_DIR})
 endif(BOOST_ROOT_DIR)
