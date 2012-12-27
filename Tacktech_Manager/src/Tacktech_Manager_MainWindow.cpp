@@ -31,6 +31,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	edit_playlist.reset(new QAction("Edit Playlist...", node_menu.get()));
 
 	ui.main_tree_widget->addAction(add_to_group.get());
+	ui.main_tree_widget->addAction(edit_playlist.get());
 
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
@@ -299,7 +300,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 				filelist_str.rfind("</Filelist>") + 11);
 
 			pugi::xml_document filelist_doc;
-			filelist_doc.load(playlist_str.c_str());
+			filelist_doc.load(filelist_str.c_str());
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - Filelist RECIEVED Print: " << std::endl;
 			std::cout << "==================" << std::endl;
@@ -462,4 +463,8 @@ void Tacktech_Manager_MainWindow::edit_playlist_slot()
     std::cout << "=Tacktech_Manager_MainWindow::edit_playlist_slot()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     edit_playlist_dialog.reset(new Edit_Playlist());
+	edit_playlist_dialog->set_filelist(filelist);
+	edit_playlist_dialog->set_organization_name(parameters["general.organization_name"]);
+	edit_playlist_dialog->set_playlist_container(playlist_container);
+	edit_playlist_dialog->show();
 }

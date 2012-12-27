@@ -1,8 +1,12 @@
 #include "Add_File_Dialog.h"
 
-Add_File_Dialog::Add_File_Dialog(QWidget *parent, Qt::WFlags flags) :
+Add_File_Dialog::Add_File_Dialog(Playlist_Container_Ptr p_playlist, Filelist_Ptr p_filelist, QString p_playlist_name, QString p_playlist_organizaiton, QWidget *parent, Qt::WFlags flags) :
 		QMainWindow(parent, flags)
 {
+	set_playlist(p_playlist);
+	set_filelist(p_filelist);
+	set_playlist_name(p_playlist_name);
+	set_playlist_organization(p_playlist_organizaiton);
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog()" << std::endl;
 	std::cout << " - Setting up ui" << std::endl;
@@ -80,7 +84,6 @@ void Add_File_Dialog::set_playlist(Playlist_Container_Ptr p_playlist)
 #endif // _DEBUG
 	playlist = p_playlist;
 	original_playlist = new Playlist_Container(*p_playlist);
-	repopulate_widget();
 }
 
 /** Sets the class playlist_name variable to the one gained from checking
@@ -100,8 +103,9 @@ void Add_File_Dialog::repopulate_widget()
 	playlist->print_contents();
 #endif // _DEBUG
 	ui.playlist_filenames->clear();
-	for (Container::iterator it = playlist->get_playlist_container(playlist_organization.toStdString()).begin();
-		it != playlist->get_playlist_container(playlist_organization.toStdString()).end(); ++it)
+	Container temp_container = playlist->get_playlist_container(playlist_organization.toStdString());
+	for (Container::iterator it = temp_container.begin();
+		it != temp_container.end(); ++it)
 	{
 		if (it->first->get_playlist_name() == playlist_name.toStdString())
 		{
@@ -116,11 +120,19 @@ void Add_File_Dialog::repopulate_widget()
 			}
 		}
 	}
-	for (std::vector<std::string>::iterator it = filelist->get_filelist(playlist_organization.toStdString()).begin();
-		it != filelist->get_filelist(playlist_organization.toStdString()).end(); ++it)
+#ifdef _SHOW_DEBUG_OUTPUT
+	filelist->print_contents();
+#endif // _DEBUG
+	std::vector<std::string> temp_vector = filelist->get_filelist(playlist_organization.toStdString());
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Server contains '" << temp_vector.size() << "' files" << std::endl;
+#endif // _DEBUG
+	for (std::vector<std::string>::iterator it = temp_vector.begin();
+		it != temp_vector.end(); ++it)
 	{
 		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
 		item->set_filename(QString::fromStdString(*it));
+		item->setText(0, QString::fromStdString(*it));
 		ui.server_filenames->addTopLevelItem(item);
 	}
 }

@@ -24,7 +24,7 @@ class Add_File_Dialog: public QMainWindow
 Q_OBJECT
 
 public:
-	Add_File_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
+	Add_File_Dialog(Playlist_Container_Ptr, Filelist_Ptr, QString, QString, QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Add_File_Dialog();
 	void set_playlist(Playlist_Container_Ptr);
 	void set_filelist(Filelist_Ptr);
