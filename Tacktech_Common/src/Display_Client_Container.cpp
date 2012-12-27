@@ -177,7 +177,7 @@ void Display_Client_Container::update_groups_and_playlist(Display_Client_Contain
         ++it)
     {
         std::vector<Display_Client_Ptr>::iterator it2 = find_display_client_by_ident(it->get()->get_identification());
-        if(it2 != p_display_client_container.get_display_client_container()->end())
+        if(it2 != Display_Client_Container::get_display_client_container()->end())
         {
             it2->get()->set_groups(*it->get()->get_groups());
             it2->get()->set_playlist_container(it->get()->get_playlist_container());

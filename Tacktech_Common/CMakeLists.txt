@@ -37,7 +37,9 @@ set(TACKTECH_COMMON_SRCS
 	)
 
 QT4_WRAP_CPP(MOCS ${TACKTECH_COMMON_MOC_HDRS})
-	
+
+message(STATUS "Using BOOST libraries for COMMON: " ${Boost_LIBRARIES})
+
 if(BUILD_SHARED_LIBS)
     add_library(Tacktech_Common
 				SHARED
