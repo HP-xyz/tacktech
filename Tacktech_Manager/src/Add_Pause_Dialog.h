@@ -19,14 +19,11 @@ private:
 	void
 	keyPressEvent(QKeyEvent *event);
 private slots:
-	void
-	ok_clicked();
-	void
-	cancel_clicked();signals:
-	void
-	pause_changed(int);
-	void
-	pause_unchanged();
+	void ok_clicked();
+	void cancel_clicked();
+signals:
+	void pause_changed(int);
+	void pause_unchanged();
 };
 
 #endif // ADD_PAUSE_DIALOG_H

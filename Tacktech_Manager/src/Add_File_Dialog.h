@@ -18,6 +18,7 @@
 #include "ui_Add_File_Dialog.h"
 #include "Typed_QTreeWidgetItem.h"
 #include "Add_Pause_Dialog.h"
+#include "Edit_Times.h"
 
 class Add_File_Dialog: public QMainWindow
 {
@@ -32,7 +33,6 @@ public:
 	void set_playlist_organization(QString);
 private:
 	Ui::Add_File_DialogClass ui;
-	Playlist_Container *original_playlist;
 	Playlist_Container_Ptr playlist;
 
 	Filelist_Ptr filelist;
@@ -42,23 +42,25 @@ private:
 	QString playlist_organization;
 
 	QMenu *node_menu;
-	QAction *remove_filename;
+	QAction *add_pause;
 
 	void repopulate_widget();
+	void add_new_playlist();
 	void keyPressEvent(QKeyEvent *event);
+	std::string make_list(std::set<std::string>);
 private slots:
 	void ok_clicked();
 	void cancel_clicked();
-	void remove_filename_slot();
-	void add_filename_slot();
+	void add_file_slot();
+	void remove_file_slot();
+	void add_pause_slot();
 	void add_pause_slot(QTreeWidgetItem*, int);
 
 	/* Secondary slots, called by other class */
 	void pause_changed_slot(int);
 	void pause_unchanged_slot();
-
 signals:
-	void filelist_changed();
+	void playlist_edited();
 };
 
 #endif // ADD_FILE_DIALOG_H

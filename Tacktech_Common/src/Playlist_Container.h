@@ -16,7 +16,7 @@
 /** Container is the type that will hold the playlists. It consists of a 
  ** set, containing a pair where the first member of the pair is the 
  ** Playlist object, and the second member is a vector of strings, that will
- ** contain the groups that are able to use the aforementioned vector. */
+ ** contain the organizations that are able to use the aforementioned vector. */
 typedef std::pair<Playlist_Ptr, std::vector<std::string> > Playlist_Item;
 typedef std::set<Playlist_Item> Container;
 class Playlist_Container
@@ -52,9 +52,6 @@ private:
 	/** Takes a comma_separated_list and creates a
 	 ** std::vector of strings. */
 	std::vector<std::string> make_vector(std::string);
-
-	/** Creates a comma separated list from a std::set<std::string> */
-	std::string make_list(std::vector<std::string>);
 };
 typedef boost::shared_ptr<Playlist_Container> Playlist_Container_Ptr;
 #endif //PLAYLIST_CONTAINER_H

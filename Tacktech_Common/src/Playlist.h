@@ -70,15 +70,15 @@ public:
 	/** Returns a string representation of the Playlist. */
 	std::string get_playlist_xml();
 
-	void set_organizations(std::set<std::string>);
-	void add_organization(std::string);
-	boost::shared_ptr<std::set<std::string> > get_organizations();
-	bool contains_organization(std::string);
+	void set_groups(std::set<std::string>);
+	void add_group(std::string);
+	boost::shared_ptr<std::set<std::string> > get_groups();
+	bool contains_group(std::string);
 private:
 	std::string m_playlist_name;
 	boost::shared_ptr<std::vector< std::pair<std::string,int> > > m_playlist_items;
 	int m_current_item_index;
-	boost::shared_ptr<std::set<std::string> > m_organizations;
+	boost::shared_ptr<std::set<std::string> > m_groups;
 	boost::posix_time::ptime m_start_time;
 	boost::posix_time::ptime m_end_time;
 	//ADD START AND END TIME

@@ -14,7 +14,7 @@ struct xml_string_writer: pugi::xml_writer
 
 Playlist::Playlist(void)
 {
-	m_organizations.reset(new std::set<std::string>);
+	m_groups.reset(new std::set<std::string>);
 	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
 }
 
@@ -23,7 +23,7 @@ Playlist::Playlist( std::string playlist_str)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist::Playlist(STRING)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	m_organizations.reset(new std::set<std::string>);
+	m_groups.reset(new std::set<std::string>);
 	pugi::xml_document playlist_document;
 	playlist_document.load(playlist_str.c_str());
 	set_playlist_name(playlist_document.child("Playlist").attribute("Playlist_Name").as_string());
@@ -146,25 +146,25 @@ std::string Playlist::get_playlist_xml()
 	return writer.result;
 }
 
-void Playlist::set_organizations( std::set<std::string> p_organizations)
+void Playlist::set_groups( std::set<std::string> p_groups)
 {
-	m_organizations.reset(new std::set<std::string>(p_organizations));
+	m_groups.reset(new std::set<std::string>(p_groups));
 }
 
-void Playlist::add_organization( std::string p_organization)
+void Playlist::add_group( std::string p_group)
 {
-	if (get_organizations()->find(p_organization) == get_organizations()->end())
-		m_organizations->insert(p_organization);
+	if (get_groups()->find(p_group) == get_groups()->end())
+		m_groups->insert(p_group);
 }
 
-boost::shared_ptr<std::set<std::string> > Playlist::get_organizations()
+boost::shared_ptr<std::set<std::string> > Playlist::get_groups()
 {
-	return m_organizations;
+	return m_groups;
 }
 
-bool Playlist::contains_organization( std::string p_organization)
+bool Playlist::contains_group( std::string p_group)
 {
-	if (get_organizations()->find(p_organization) != get_organizations()->end())
+	if (get_groups()->find(p_group) != get_groups()->end())
 		return true;
 	else
 		return false;

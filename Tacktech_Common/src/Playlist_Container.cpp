@@ -11,6 +11,20 @@ struct xml_string_writer: pugi::xml_writer
 		result += std::string(static_cast<const char*>(data), size);
 	}
 };
+template <class T>
+std::string make_list( T p_vector)
+{
+	std::string comma_separated_list;
+	for (typename T::iterator it = p_vector.begin();
+		it != p_vector.end(); ++it)
+	{
+		comma_separated_list += *it;
+		comma_separated_list += ", ";
+	}
+	comma_separated_list =
+		comma_separated_list.substr(0, comma_separated_list.length() - 2);
+	return comma_separated_list;
+}
 
 Playlist_Container::Playlist_Container()
 {
@@ -39,7 +53,7 @@ Playlist_Container::~Playlist_Container()
 
 }
 
-Container Playlist_Container::get_playlist_container( std::string group_name)
+Container Playlist_Container::get_playlist_container( std::string organization_name)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::get_playlist_container()" << std::endl;
@@ -50,9 +64,9 @@ Container Playlist_Container::get_playlist_container( std::string group_name)
 		++it)
 	{
 		std::vector<std::string>::const_iterator it2 =
-			std::find(it->second.begin(), it->second.end(), group_name);
+			std::find(it->second.begin(), it->second.end(), organization_name);
 		if (it2 != it->second.end())
-		{//Found group_name in list, adding to return_container
+		{//Found organization_name in list, adding to return_container
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - Adding: "<< it->first->get_playlist_name() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -150,21 +164,8 @@ void Playlist_Container::print_contents()
 		it != m_playlist_container.end(); ++it)
 	{
 		std::cout << " - Playlist Name: " << it->first->get_playlist_name()
-			<< ", Pause: " << make_list(it->second) << std::endl;
+			<< ", Playlist Organizations: " << make_list(it->second)
+			<< ", Playlist Groups:" << make_list(*it->first->get_groups()) << std::endl;
 	}
 }
 #endif // _SHOW_DEBUG_OUTPUT
-
-std::string Playlist_Container::make_list( std::vector<std::string> p_vector)
-{
-	std::string comma_separated_list;
-	for (std::vector<std::string>::iterator it = p_vector.begin();
-		it != p_vector.end(); ++it)
-	{
-		comma_separated_list += *it;
-		comma_separated_list += ", ";
-	}
-	comma_separated_list =
-		comma_separated_list.substr(0, comma_separated_list.length() - 2);
-	return comma_separated_list;
-}
