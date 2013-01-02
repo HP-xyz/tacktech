@@ -211,7 +211,10 @@ void Edit_Playlist::create_playlist_slot()
 {
 	if (ui.lineEdit->text() != "")
 	{
+		if (add_file_dialog.get() != 0)
+			disconnect(add_file_dialog.get(), SIGNAL(playlist_edited()), this, SLOT(repopulate_widget()));
 		add_file_dialog.reset(new Add_File_Dialog(playlist, filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name)));
+		connect(add_file_dialog.get(), SIGNAL(playlist_edited()), this, SLOT(repopulate_widget()));
 		add_file_dialog->show();
 	}
 	else

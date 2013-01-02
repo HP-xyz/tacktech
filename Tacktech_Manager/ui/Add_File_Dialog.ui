@@ -36,6 +36,9 @@
       <property name="autoFillBackground">
        <bool>true</bool>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
       <column>
        <property name="text">
         <string notr="true">1</string>
@@ -51,6 +54,9 @@
         <height>20</height>
        </size>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
       <column>
        <property name="text">
         <string notr="true">1</string>
@@ -63,12 +69,12 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="add_button">
        <property name="text">
         <string>&lt;-</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="remove_button">
        <property name="text">
         <string>-&gt;</string>
        </property>

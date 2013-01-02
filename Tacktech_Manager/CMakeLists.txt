@@ -53,6 +53,7 @@ set ( Tacktech_Manager_SRCS
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Data_Container.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Assign_Group.cpp
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager_MainWindow.cpp
+		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Times.cpp
 	)
 set ( Tacktech_Manager_HDRS
 		#${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager.h
@@ -69,6 +70,7 @@ set ( Tacktech_Manager_HDRS
 		${Tacktech_Manager_SOURCE_DIR}/src/Assign_Group.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Upload_Files_To_Server_Dialog.h
 		${Tacktech_Manager_SOURCE_DIR}/src/Tacktech_Manager_MainWindow.h
+		${Tacktech_Manager_SOURCE_DIR}/src/Edit_Times.h
 	)
 #FOR NOW, THERE ARE NO RESOURCES
 set ( Tacktech_Manager_RSCS
@@ -96,6 +98,7 @@ set ( Tacktech_Manager_UI_FORMS
 		${Tacktech_Manager_SOURCE_DIR}/ui/Assign_Group.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Upload_Files_To_Server_Dialog.ui
 		${Tacktech_Manager_SOURCE_DIR}/ui/Tacktech_Manager_MainWindow.ui
+		${Tacktech_Manager_SOURCE_DIR}/ui/Edit_Times.ui
 	)
 QT4_ADD_RESOURCES(RSCS ${Tacktech_Manager_RSCS})
 QT4_WRAP_UI (UIS ${Tacktech_Manager_UI_FORMS})
