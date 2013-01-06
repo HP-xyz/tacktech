@@ -41,7 +41,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	/** Start network_manager thread */
 
 	QStringList manager_headers;
-	manager_headers << "Computer Name" << "Groups" << "Last Ping";
+	manager_headers << "Computer Name" << "Group" << "Last Ping" << "Playlist";
 	ui.main_tree_widget->setHeaderLabels(manager_headers);
 	refresh_timer = new QTimer(this);
 
@@ -124,46 +124,162 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 
 	if(display_client_container.get() != 0)
 	{
-		Typed_QTreeWidgetItem *computer_item;
-		for (unsigned int i = 0;
-			i < display_client_container->get_display_client_container()->size();
-			++i)
+		for (std::vector<Display_Client_Ptr>::iterator it = display_client_container->get_display_client_container()->begin();
+			it != display_client_container->get_display_client_container()->end(); ++it)
 		{
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "   - Adding name: "
-				<< display_client_container->get_display_client_container()
-				->at(i)->get_identification()
-				<< std::endl;
-#endif // _DEBUG
-			computer_item = new Typed_QTreeWidgetItem();
-			computer_item->set_computer_name(
-				QString::fromStdString(display_client_container->
-				get_display_client_container()
-				->at(i)->get_identification()));
+			/* Check if Display_Client's groups are empty, saving 2 nested loops
+			 * if it is indeed empty :) */
+			if (it->get()->get_groups()->size() == 0)
+			{
+				int i = 0;
+				bool group_none_found = false;
+				while (i < ui.main_tree_widget->topLevelItemCount() && !group_none_found)
+				{
+					if (static_cast<Typed_QTreeWidgetItem*>(ui.main_tree_widget->topLevelItem(i))->get_group_name() == "NONE")
+					{
+						group_none_found = true;
+					}
+					++i;
+				}
+				/* If the NONE group already exists, create a pointer to it, else
+				 * create a pointer to a new Typed_QTreeWidgetItem */
+				Typed_QTreeWidgetItem *group_item;
+				if (group_none_found)
+					group_item = static_cast<Typed_QTreeWidgetItem*>(ui.main_tree_widget->topLevelItem(i));
+				else
+					group_item = new Typed_QTreeWidgetItem();
+				group_item->set_group_name("NONE");
+				group_item->setText(1, "NONE");
+				ui.main_tree_widget->addTopLevelItem(group_item);
 
-			computer_item->set_group_name(QString::fromStdString(
-				display_client_container->get_display_client_container()
-				->at(i)->get_groups_string()));
-			computer_item->set_type("COMPUTER");
-			computer_item->setText(0,
-				QString::fromStdString(display_client_container->
-				get_display_client_container()
-				->at(i)->get_identification()));
-			computer_item->setText(1, QString::fromStdString(
-				display_client_container->get_display_client_container()
-				->at(i)->get_groups_string()));
+				Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+				computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
+				computer_item->set_group_name("NONE");
+				/** Here we get the elapsed time between now, and the last ping the
+				* remote screen has answered */
+				boost::posix_time::time_duration duration =
+					boost::posix_time::second_clock::universal_time()
+					- it->get()->get_last_ping();
+				std::string str_duration = boost::posix_time::to_simple_string(duration);
 
-			/** Here we get the elapsed time between now, and the last ping the
-			  * remote screen has answered */
-			boost::posix_time::time_duration duration =
-				boost::posix_time::second_clock::universal_time()
-				- display_client_container->get_display_client_container()->at(i)->get_last_ping();
-			std::string str_duration = boost::posix_time::to_simple_string(duration);
+				/* Set actual data to display */
+				computer_item->setText(0, computer_item->get_computer_name());
+				computer_item->setText(2, QString::fromStdString(str_duration));
 
-			computer_item->setText(2, QString::fromStdString(str_duration));
+				/* Last thing to do to the group item, we get the Playlist_Container
+					* name from the item we just added. */
+				group_item->set_playlist_name(
+					QString::fromStdString(
+					it->get()->get_playlist_container()->get_playlist_container_name()));
+				group_item->setText(3, group_item->get_playlist_name());
 
-			ui.main_tree_widget->addTopLevelItem(computer_item);
+				group_item->addChild(computer_item);
+			}
+			else
+			{
+				for (std::set<std::string>::iterator it2 = it->get()->get_groups()->begin();
+					it2 != it->get()->get_groups()->end(); ++it)
+				{
+					bool tree_contains_group = false;
+					int i = 0;
+					while(!tree_contains_group && i < ui.main_tree_widget->topLevelItemCount())
+					{
+						if (static_cast<Typed_QTreeWidgetItem*>(ui.main_tree_widget->topLevelItem(i))->get_group_name().toStdString()
+							== *it2)
+						{//There already exists a Group TopLevelItem, so add to its child
+							Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+							computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
+							computer_item->set_group_name(QString::fromStdString(*it2));
+							/** Here we get the elapsed time between now, and the last ping the
+							* remote screen has answered */
+							boost::posix_time::time_duration duration =
+								boost::posix_time::second_clock::universal_time()
+								- it->get()->get_last_ping();
+							std::string str_duration = boost::posix_time::to_simple_string(duration);
+
+							/* Set actual data to display */
+							computer_item->setText(0, computer_item->get_computer_name());
+							computer_item->setText(2, QString::fromStdString(str_duration));
+							ui.main_tree_widget->topLevelItem(i)->addChild(computer_item);
+							tree_contains_group = true;
+						}
+						++i;
+					}
+					/* Check if there was already a Group TopLevelItem */
+					if (tree_contains_group == false)
+					{//We need to create a new TopLevelItem for the Group now
+						Typed_QTreeWidgetItem *group_item = new Typed_QTreeWidgetItem();
+						group_item->set_group_name(QString::fromStdString(*it2));
+						group_item->setText(1, QString::fromStdString(*it2));
+						ui.main_tree_widget->addTopLevelItem(group_item);
+
+						Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+						computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
+						computer_item->set_group_name(QString::fromStdString(*it2));
+						/** Here we get the elapsed time between now, and the last ping the
+						* remote screen has answered */
+						boost::posix_time::time_duration duration =
+							boost::posix_time::second_clock::universal_time()
+							- it->get()->get_last_ping();
+						std::string str_duration = boost::posix_time::to_simple_string(duration);
+
+						/* Set actual data to display */
+						computer_item->setText(0, computer_item->get_computer_name());
+						computer_item->setText(2, QString::fromStdString(str_duration));
+
+						/* Last thing to do to the group item, we get the Playlist_Container
+						 * name from the item we just added. */
+						group_item->set_playlist_name(
+							QString::fromStdString(
+							it->get()->get_playlist_container()->get_playlist_container_name()));
+						group_item->setText(3, group_item->get_playlist_name());
+
+						group_item->addChild(computer_item);
+					}
+				}
+			}
 		}
+//		Typed_QTreeWidgetItem *group_item;
+//		Typed_QTreeWidgetItem *computer_item;
+//		for (unsigned int i = 0;
+//			i < display_client_container->get_display_client_container()->size();
+//			++i)
+//		{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//			std::cout << "   - Adding name: "
+//				<< display_client_container->get_display_client_container()
+//				->at(i)->get_identification()
+//				<< std::endl;
+//#endif // _DEBUG
+//			computer_item = new Typed_QTreeWidgetItem();
+//			computer_item->set_computer_name(
+//				QString::fromStdString(display_client_container->
+//				get_display_client_container()
+//				->at(i)->get_identification()));
+//
+//			computer_item->set_group_name(QString::fromStdString(
+//				display_client_container->get_display_client_container()
+//				->at(i)->get_groups_string()));
+//			computer_item->set_type("COMPUTER");
+//			computer_item->setText(0,
+//				QString::fromStdString(display_client_container->
+//				get_display_client_container()
+//				->at(i)->get_identification()));
+//			computer_item->setText(1, QString::fromStdString(
+//				display_client_container->get_display_client_container()
+//				->at(i)->get_groups_string()));
+//
+//			/** Here we get the elapsed time between now, and the last ping the
+//			  * remote screen has answered */
+//			boost::posix_time::time_duration duration =
+//				boost::posix_time::second_clock::universal_time()
+//				- display_client_container->get_display_client_container()->at(i)->get_last_ping();
+//			std::string str_duration = boost::posix_time::to_simple_string(duration);
+//
+//			computer_item->setText(2, QString::fromStdString(str_duration));
+//
+//			ui.main_tree_widget->addTopLevelItem(computer_item);
+//		}
 	}
 }
 
@@ -448,7 +564,7 @@ void Tacktech_Manager_MainWindow::group_assigned()
 #ifdef _SHOW_DEBUG_OUTPUT
     std::cout << "=Tacktech_Manager_MainWindow::group_assigned()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-    temp_display_client_container = display_client_container;
+    temp_display_client_container.reset(new Display_Client_Container(*display_client_container));
     upload_data.reset(new Upload_Data_Container(parameters));
     connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
         SLOT(start_upload(std::string)));
@@ -462,9 +578,28 @@ void Tacktech_Manager_MainWindow::edit_playlist_slot()
 #ifdef _SHOW_DEBUG_OUTPUT
     std::cout << "=Tacktech_Manager_MainWindow::edit_playlist_slot()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+	if (edit_playlist_dialog.get() != 0)
+		disconnect(edit_playlist_dialog.get(), SIGNAL(playlist_changed()), this, SLOT(playlist_changed()));
+
     edit_playlist_dialog.reset(new Edit_Playlist());
 	edit_playlist_dialog->set_filelist(filelist);
 	edit_playlist_dialog->set_organization_name(parameters["general.organization_name"]);
 	edit_playlist_dialog->set_playlist_container(playlist_container);
+
+	connect(edit_playlist_dialog.get(), SIGNAL(playlist_changed()), this, SLOT(playlist_changed()));
 	edit_playlist_dialog->show();
+}
+
+void Tacktech_Manager_MainWindow::playlist_changed()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tacktech_Manager_MainWindow::playlist_changed()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	temp_playlist_container.reset(new Playlist_Container(*playlist_container));
+	upload_data.reset(new Upload_Data_Container(parameters));
+	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+		SLOT(start_upload(std::string)));
+	upload_data->set_playlist_container(temp_playlist_container);
+	upload_data->set_command("SET_PLAYLIST_CONTAINER");
+	upload_data->get_xml_upload();
 }
