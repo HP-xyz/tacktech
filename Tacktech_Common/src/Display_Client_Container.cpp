@@ -61,14 +61,14 @@ void Display_Client_Container::add_display_client( Display_Client_Ptr display_cl
 	if (it != m_display_client_container->end())
 	{
 #ifdef _IMPORTANT_OUTPUT
-		std::cout << " $$ Updating: "<< display_client->get_identification() << std::endl;
+		std::cout << " $$ Updating display_client: "<< display_client->get_identification() << std::endl;
 #endif // _IMPORTANT_OUTPUT
 		it->get()->set_last_ping(boost::posix_time::second_clock::universal_time());
 	}
 	else
 	{
 #ifdef _IMPORTANT_OUTPUT
-		std::cout << " ++ Adding: "<< display_client->get_identification() << std::endl;
+		std::cout << " ++ Adding display_client: "<< display_client->get_identification() << std::endl;
 #endif // _IMPORTANT_OUTPUT
 		m_display_client_container->push_back(display_client);
 	}

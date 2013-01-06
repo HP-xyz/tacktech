@@ -1,5 +1,8 @@
 #ifndef PLAYLIST_CONTAINER_H
 #define PLAYLIST_CONTAINER_H
+#ifdef _SHOW_DEBUG_OUTPUT
+#define _IMPORTANT_OUTPUT _SHOW_DEBUG_OUTPUT
+#endif // _SHOW_DEBUG_OUTPUT
 #include <set>
 #include <vector>
 #include <algorithm>
@@ -41,6 +44,8 @@ public:
 
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
+	void update_playlist(Playlist_Container, std::string);
+
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
@@ -52,6 +57,7 @@ private:
 	/** Takes a comma_separated_list and creates a
 	 ** std::vector of strings. */
 	std::vector<std::string> make_vector(std::string);
+	Playlist_Ptr get_playlist_ptr(std::string, std::string);
 };
 typedef boost::shared_ptr<Playlist_Container> Playlist_Container_Ptr;
 #endif //PLAYLIST_CONTAINER_H

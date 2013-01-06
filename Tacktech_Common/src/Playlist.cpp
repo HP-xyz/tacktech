@@ -16,6 +16,8 @@ Playlist::Playlist(void)
 {
 	m_groups.reset(new std::set<std::string>);
 	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
+	m_start_time = ALL_DAY_TIME;
+	m_end_time = ALL_DAY_TIME;
 }
 
 Playlist::Playlist( std::string playlist_str)
@@ -24,13 +26,33 @@ Playlist::Playlist( std::string playlist_str)
 	std::cout << "=Playlist::Playlist(STRING)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	m_groups.reset(new std::set<std::string>);
+	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
+	m_start_time = ALL_DAY_TIME;
+	m_end_time = ALL_DAY_TIME;
+
 	pugi::xml_document playlist_document;
 	playlist_document.load(playlist_str.c_str());
-	set_playlist_name(playlist_document.child("Playlist").attribute("Playlist_Name").as_string());
-	set_current_item_index(playlist_document.child("Playlist").attribute("Current_Item_Index").as_int());
-	set_start_time(boost::posix_time::from_iso_string(playlist_document.child("Playlist").attribute("Start_Time").as_string()));
-	set_end_time(boost::posix_time::from_iso_string(playlist_document.child("Playlist").attribute("End_Time").as_string()));
-	for (pugi::xml_node playlist_item_node = playlist_document.child("Playlist").child("Playlist_Item");
+	pugi::xml_node playlist_node = playlist_document.child("Playlist_Node");
+	set_playlist_name(playlist_node.child("Playlist").attribute("Playlist_Name").as_string());
+	set_current_item_index(playlist_node.child("Playlist").attribute("Current_Item_Index").as_int());
+
+	/* Create time_duration objects for start and end time using substrings */
+	std::string start_time_str = playlist_node.child("Playlist").attribute("Start_Time").as_string();
+	std::string end_time_str = playlist_node.child("Playlist").attribute("End_Time").as_string();
+	boost::posix_time::time_duration start_time(
+		boost::lexical_cast<int,std::string>(start_time_str.substr(0, 2)),
+		boost::lexical_cast<int,std::string>(start_time_str.substr(2, 2)),
+		boost::lexical_cast<int,std::string>(start_time_str.substr(4)),
+		0);
+	boost::posix_time::time_duration end_time(
+		boost::lexical_cast<int,std::string>(end_time_str.substr(0, 2)),
+		boost::lexical_cast<int,std::string>(end_time_str.substr(2, 2)),
+		boost::lexical_cast<int,std::string>(end_time_str.substr(4)),
+		0);
+
+	set_start_time(start_time);
+	set_end_time(end_time);
+	for (pugi::xml_node playlist_item_node = playlist_node.child("Playlist").child("Playlist_Item");
 		playlist_item_node; playlist_item_node = playlist_item_node.next_sibling("Playlist_Item"))
 	{
 		add_playlist_item(playlist_item_node.attribute("Filename").as_string(),
@@ -95,29 +117,51 @@ void Playlist::set_current_item_index( int p_current_item_index)
 
 void Playlist::set_start_time( boost::posix_time::time_duration p_time_of_day)
 {//This is so ugly... I suppose I should've used gregorian dates or something
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist::set_start_time(TIME_DURATION)" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::string new_start_time = boost::posix_time::to_iso_string(p_time_of_day);
 	std::string old_date_time = boost::posix_time::to_iso_string(m_start_time);
 	std::string true_new_start_time = old_date_time.substr(0, 9);
 	true_new_start_time += new_start_time.substr(0, 6);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - New_Start_Date: " << new_start_time << std::endl;
+	std::cout << " - Old Date_Time: " << old_date_time << std::endl;
+	std::cout << " - True_New_Start_Time:" << true_new_start_time << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	m_start_time = boost::posix_time::ptime(boost::posix_time::from_iso_string(true_new_start_time));
 }
 
 void Playlist::set_start_time( boost::posix_time::ptime p_time)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist::set_start_time(PTIME)" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	m_start_time = p_time;
 }
 
 void Playlist::set_end_time( boost::posix_time::time_duration p_time_of_day)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist::set_end_time(TIME_DURATION)" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::string new_end_time = boost::posix_time::to_iso_string(p_time_of_day);
 	std::string old_date_time = boost::posix_time::to_iso_string(m_end_time);
 	std::string true_new_end_time = old_date_time.substr(0, 9);
 	true_new_end_time += new_end_time.substr(0, 6);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - New_Start_Date: " << new_end_time << std::endl;
+	std::cout << " - Old Date_Time: " << old_date_time << std::endl;
+	std::cout << " - True_New_Start_Time:" << true_new_end_time << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	m_end_time = boost::posix_time::ptime(boost::posix_time::from_iso_string(true_new_end_time));
 }
 
 void Playlist::set_end_time( boost::posix_time::ptime p_time)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist::set_end_time(PTIME)" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	m_end_time = p_time;
 }
 

@@ -54,6 +54,7 @@ private:
 	Filelist_Ptr filelist;
 
 	Display_Client_Container_Ptr temp_display_client_container;
+	Playlist_Container_Ptr temp_playlist_container;
 
 	/** Holds the pending uploads that will go to the server. Consists
 	 ** of a std::vector of pairs, where the pair consists of a std::vector
@@ -78,6 +79,7 @@ private slots:
 	void check_uploads_pending();
 	void assign_group();
 	void group_assigned();
+	void playlist_changed();
 };
 
 #endif //TACKTECH_MANAGER_MAINWINDOW_H
