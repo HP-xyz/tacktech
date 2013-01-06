@@ -178,7 +178,7 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 			else
 			{
 				for (std::set<std::string>::iterator it2 = it->get()->get_groups()->begin();
-					it2 != it->get()->get_groups()->end(); ++it)
+					it2 != it->get()->get_groups()->end(); ++it2)
 				{
 					bool tree_contains_group = false;
 					int i = 0;
