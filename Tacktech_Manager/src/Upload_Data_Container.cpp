@@ -174,6 +174,10 @@ void Upload_Data_Container::get_xml_upload()
 		emit xml_creation_complete(
 				Upload_Data_Container::get_update_display_container_xml());
 	}
+	else if (command == "SET_PLAYLIST_CONTAINER")
+	{
+		emit xml_creation_complete(Upload_Data_Container::get_update_playlist_container_xml());
+	}
 	else if (command == "FILE_UPLOAD")
 	{
 		emit xml_creation_complete(Upload_Data_Container::upload_file());
@@ -350,4 +354,33 @@ void Upload_Data_Container::set_display_client_container( Display_Client_Contain
 void Upload_Data_Container::set_upload_items( std::vector<std::string> p_items)
 {
 	upload_items = p_items;
+}
+
+void Upload_Data_Container::set_playlist_container( Playlist_Container_Ptr p_playlist_container)
+{
+	playlist_container = p_playlist_container;
+}
+
+std::string Upload_Data_Container::get_update_playlist_container_xml()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Upload_Data_Container::get_update_playlist_container_xml()"
+		<< std::endl;
+	std::cout << " -> ORGANIZATION = "
+		<< parameters["general.organization_name"].c_str() << std::endl;
+#endif // _DEBUG
+	std::string return_str;
+	return_str += "<Tacktech>";
+	return_str += "<Type TYPE=\"UPDATE_PLAYLIST_CONTAINER\" />";
+	return_str += "<Organization ORGANIZATION_NAME=\"";
+	return_str += parameters["general.organization_name"].c_str();
+	return_str += "\"/>";
+	return_str += "<CONTAINER>";
+	return_str += playlist_container->get_playlist_container_xml(parameters["general.organization_name"]);
+	return_str += "</CONTAINER>";
+	return_str += "</Tacktech>";
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "  - Set variable command: " << return_str << std::endl;
+#endif // _DEBUG
+	return return_str;
 }

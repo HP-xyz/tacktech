@@ -86,7 +86,8 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 #endif
 			result_status = NO_RESULT;
 		}
-	} catch (std::exception &e)
+	} 
+	catch (std::exception &e)
 	{
 		std::cerr << "Handle Request exception: " << e.what() << std::endl;
 	}
@@ -180,6 +181,18 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
         Display_Client_Container container(writer.result);
         display_client_container->update_groups_and_playlist(container);
     }
+	else if (type_string == "UPDATE_PLAYLIST_CONTAINER")
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received UPDATE_PLAYLIST_CONTAINER command" << std::endl;
+#endif // _DEBUG
+		xml_string_writer writer;
+		pugi::xml_node container_node = tacktech.child("CONTAINER").child("Playlist_Container");
+		container_node.print(writer);
+		Playlist_Container container(writer.result);
+		playlist_container->update_playlist(container,
+			tacktech.child("Organization").attribute("ORGANIZATION_NAME").as_string());
+	}
 	else if (type_string == "SET_VARIABLES")
 	{
 //#ifdef _SHOW_DEBUG_OUTPUT

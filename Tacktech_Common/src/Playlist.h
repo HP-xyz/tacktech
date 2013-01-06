@@ -6,6 +6,8 @@
 #include <boost/date_time.hpp>
 #include <boost/shared_ptr.hpp>
 #include <pugixml.hpp>
+
+const boost::posix_time::ptime ALL_DAY_TIME = boost::posix_time::from_iso_string("20020131T235959");
 class Playlist
 {
 public:
@@ -81,7 +83,6 @@ private:
 	boost::shared_ptr<std::set<std::string> > m_groups;
 	boost::posix_time::ptime m_start_time;
 	boost::posix_time::ptime m_end_time;
-	//ADD START AND END TIME
 };
 typedef boost::shared_ptr<Playlist> Playlist_Ptr;
 #endif //PLAYLIST_H

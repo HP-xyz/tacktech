@@ -8,7 +8,7 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags) :
 #endif // _DEBUG
 	ui.setupUi(this);
 	QStringList headers;
-	headers << "Playlist";
+	headers << "Filename" << "Pause" << "Start Time" << "End Time";
 	ui.playlist_tree_widget->setHeaderLabels(headers);
 
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -49,7 +49,6 @@ Edit_Playlist::~Edit_Playlist()
 void Edit_Playlist::set_playlist_container(Playlist_Container_Ptr p_playlist)
 {
 	playlist = p_playlist;
-	original_playlist = new Playlist_Container(*p_playlist);
 	repopulate_widget();
 }
 
@@ -145,7 +144,6 @@ void Edit_Playlist::remove_playlist_slot()
 void Edit_Playlist::ok_clicked()
 {
 	emit playlist_changed();
-	delete original_playlist;
 	this->close();
 }
 
@@ -188,6 +186,8 @@ void Edit_Playlist::repopulate_widget()
 		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
 		item->set_playlist_name(QString::fromStdString(it->first->get_playlist_name()));
 		item->setText(0, QString::fromStdString(it->first->get_playlist_name()));
+		item->setText(2, QString::fromStdString(boost::posix_time::to_iso_string(it->first->get_start_time())));
+		item->setText(3, QString::fromStdString(boost::posix_time::to_iso_string(it->first->get_end_time())));
 		ui.playlist_tree_widget->addTopLevelItem(item);
 		for (std::vector<std::pair<std::string, int> >::iterator it2 = it->first->get_playlist_items()->begin();
 			it2 != it->first->get_playlist_items()->end(); ++it2)

@@ -32,6 +32,7 @@ public:
 	~Upload_Data_Container();
 	void set_playlist(Playlist_Container_Ptr);
 	void set_display_client_container(Display_Client_Container_Ptr);
+	void set_playlist_container(Playlist_Container_Ptr);
 	void set_groups(Group_Container_Ptr);
 	void set_group_playlist(Group_Playlist_Container_Ptr);
 	void set_upload_items(std::vector<std::string>);
@@ -59,6 +60,7 @@ private:
 
 	std::string get_variables_request_xml();
 	std::string	get_update_display_container_xml();
+	std::string get_update_playlist_container_xml();
 	std::string	upload_file();
 signals:
 	void xml_creation_complete(std::string);

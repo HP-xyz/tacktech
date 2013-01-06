@@ -33,17 +33,23 @@ Playlist_Container::Playlist_Container()
 Playlist_Container::Playlist_Container( std::string playlist_container_str)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "=Playlist_Container(STRING)" << std::endl;
+	std::cout << "=Playlist_Container::Playlist_Container(STRING)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	pugi::xml_document playlist_container_doc;
 	playlist_container_doc.load(playlist_container_str.c_str());
 	pugi::xml_node root_node = playlist_container_doc.child("Playlist_Container");
 	for (pugi::xml_node playlist_group = root_node.child("Playlist_Group");
-		playlist_group; playlist_group.next_sibling("Playlist_Group"))
+		playlist_group; playlist_group = playlist_group.next_sibling("Playlist_Group"))
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Creating Playlist" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		xml_string_writer writer;
 		playlist_group.child("Playlist_Node").print(writer);
 		Playlist_Ptr playlist(new Playlist(writer.result));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " -- Adding Playlist" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		add_playlist(playlist, make_vector(playlist_group.attribute("GROUPLIST").as_string()));
 	}
 }
@@ -154,6 +160,60 @@ std::vector<std::string> Playlist_Container::make_vector( std::string comma_sepa
 #endif // _SHOW_DEBUG_OUTPUT
 	vector_from_string.push_back(comma_separated_list);
 	return vector_from_string;
+}
+
+void Playlist_Container::update_playlist( Playlist_Container p_playlist_container, std::string p_organization_name)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist_Container::update_playlist" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	Container container_to_search = p_playlist_container.get_playlist_container(p_organization_name);
+	for (Container::iterator it = container_to_search.begin(); 
+		it != container_to_search.end(); ++it)
+	{
+		Playlist_Ptr playlist_ptr = get_playlist_ptr(it->first->get_playlist_name(), p_organization_name);
+		if (playlist_ptr != 0)
+		{//Playlist_Item not found, therefore adding it
+#ifdef _IMPORTANT_OUTPUT
+			std::cout << " + ADDING NEW playlist: '" << it->first->get_playlist_name() 
+				<< "' to organization: '" << p_organization_name << "'" << std::endl;
+#endif // _IMPORTANT_OUTPUT
+			add_playlist(it->first, it->second);
+		}
+		else
+		{//Updating playlist items
+#ifdef _IMPORTANT_OUTPUT
+			std::cout << " $ UPDATING playlist: '" << it->first->get_playlist_name() 
+				<< "' to organization: '" << p_organization_name << "'" << std::endl;
+#endif // _IMPORTANT_OUTPUT
+			playlist_ptr->set_current_item_index(it->first->get_current_item_index());
+			playlist_ptr->set_end_time(it->first->get_end_time());
+			playlist_ptr->set_groups(*it->first->get_groups());
+			playlist_ptr->set_playlist_items(*it->first->get_playlist_items());
+			playlist_ptr->set_playlist_name(it->first->get_playlist_name());
+			playlist_ptr->set_start_time(it->first->get_start_time());
+		}
+	}
+}
+
+Playlist_Ptr Playlist_Container::get_playlist_ptr( std::string p_playlist_name, std::string p_organization_name)
+{
+	boost::shared_ptr<Playlist> temp_playlist;
+	for (Container::iterator it = m_playlist_container.begin(); 
+		it != m_playlist_container.end(); ++it)
+	{
+		if (it->first->get_playlist_name() == p_playlist_name)
+		{
+			for (unsigned int i = 0; i < it->second.size(); ++i)
+			{
+				if (it->second[i] == p_organization_name)
+				{
+					return it->first;
+				}
+			}
+		}
+	}
+	return temp_playlist;
 }
 
 #ifdef _SHOW_DEBUG_OUTPUT
