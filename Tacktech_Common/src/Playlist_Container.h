@@ -34,6 +34,9 @@ public:
 	 ** are allowed to be used by the std::string supplied in the parameter.
 	 ** This string should be a group_name. */
 	Container get_playlist_container(std::string);
+
+	boost::shared_ptr<Container> get_playlist_container();
+
 	/** Adds a Playlist to the Container, including a std::vector of strings
 	 ** to identify which groups have access to it. */
 	void add_playlist(Playlist_Ptr, std::vector<std::string>);
@@ -41,6 +44,9 @@ public:
 	 ** containing only the playlists that can be used by the group,
 	 ** identified by the parameter string. */
 	std::string get_playlist_container_xml(std::string);
+
+	/** Returns a std::string representation of a playlist_container */
+	std::string get_playlist_container_xml();
 
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
@@ -51,7 +57,7 @@ public:
 	void print_contents();
 #endif // _SHOW_DEBUG_OUTPUT
 private:
-	Container m_playlist_container;
+	boost::shared_ptr<Container> m_playlist_container;
 	std::string m_playlist_container_name;
 
 	/** Takes a comma_separated_list and creates a

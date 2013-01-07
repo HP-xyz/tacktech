@@ -12,6 +12,7 @@
 #include <boost/lexical_cast.hpp>
 #include <Playlist_Container.h>
 #include <Filelist.h>
+#include <Display_Client_Container.h>
 #include "ui_Edit_Playlist.h"
 #include "Typed_QTreeWidgetItem.h"
 #include "Add_File_Dialog.h"
@@ -25,12 +26,16 @@ public:
 	~Edit_Playlist();
 	void set_playlist_container(Playlist_Container_Ptr);
 	void set_organization_name(std::string);
+	void set_group_name(std::string);
 	void set_filelist(Filelist_Ptr);
+	void set_display_client_container(Display_Client_Container_Ptr);
 private:
 	Ui::Edit_PlaylistClass ui;
 	Playlist_Container_Ptr playlist;
 	Playlist_Container *original_playlist;
 	Filelist_Ptr filelist;
+	Display_Client_Container_Ptr display_client_container;
+
 
 	boost::shared_ptr<Add_File_Dialog> add_file_dialog;
 
@@ -42,6 +47,7 @@ private:
 	QAction *remove_file;
 
 	std::string m_organization_name;
+	std::string m_group_name;
 
 	void keyPressEvent(QKeyEvent *event);
 private slots:
@@ -52,12 +58,10 @@ private slots:
 	void ok_clicked();
 	void cancel_clicked();
 	void create_playlist_slot();
+	void update_display_client_container();
 
 	/* Seconday slots */
 	void repopulate_widget();
-signals:
-	void playlist_changed();
-
 };
 
 #endif // EDIT_PLAYLIST_H

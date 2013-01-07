@@ -157,7 +157,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #endif // _DEBUG
             upload_xml += "<Tacktech>";
             upload_xml += "<Type TYPE=\"SET_VARIABLES\" />";
-            upload_xml += playlist_container->get_playlist_container_xml(organization_name);
+            //upload_xml += playlist_container->get_playlist_container_xml(organization_name);
 #ifdef _SHOW_DEBUG_OUTPUT
             std::cout << "  - Adding display_client_container XML" << std::endl;
 #endif // _DEBUG

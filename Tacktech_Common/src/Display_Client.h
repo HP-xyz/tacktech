@@ -47,6 +47,8 @@ public:
 	 ** the current playlist container of the Display_Client. */
 	void set_playlist_container(Playlist_Container_Ptr);
 
+	void set_playlist_container(std::string);
+
 	/** Receives a std::string that will be added to the groups
 	 ** the Display_Client is part of. */
 	bool add_group(std::string);
