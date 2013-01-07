@@ -547,11 +547,11 @@ void Tacktech_Manager_MainWindow::assign_group()
 		if (assign_group_dialog.get() != 0)
 		{
 			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
-			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(group_assigned()));
+			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(display_container_changed()));
 		}
 		assign_group_dialog.reset(new Assign_Group(display_client_container, selected_names));
 		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
-		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(group_assigned()));
+		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(display_container_changed()));
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " ---- Showing assign_group_dialog "  << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -559,10 +559,10 @@ void Tacktech_Manager_MainWindow::assign_group()
 	}
 }
 
-void Tacktech_Manager_MainWindow::group_assigned()
+void Tacktech_Manager_MainWindow::display_container_changed()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-    std::cout << "=Tacktech_Manager_MainWindow::group_assigned()" << std::endl;
+    std::cout << "=Tacktech_Manager_MainWindow::display_container_changed()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     temp_display_client_container.reset(new Display_Client_Container(*display_client_container));
     upload_data.reset(new Upload_Data_Container(parameters));
@@ -578,28 +578,11 @@ void Tacktech_Manager_MainWindow::edit_playlist_slot()
 #ifdef _SHOW_DEBUG_OUTPUT
     std::cout << "=Tacktech_Manager_MainWindow::edit_playlist_slot()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	if (edit_playlist_dialog.get() != 0)
-		disconnect(edit_playlist_dialog.get(), SIGNAL(playlist_changed()), this, SLOT(playlist_changed()));
-
     edit_playlist_dialog.reset(new Edit_Playlist());
 	edit_playlist_dialog->set_filelist(filelist);
 	edit_playlist_dialog->set_organization_name(parameters["general.organization_name"]);
 	edit_playlist_dialog->set_playlist_container(playlist_container);
-
-	connect(edit_playlist_dialog.get(), SIGNAL(playlist_changed()), this, SLOT(playlist_changed()));
+	edit_playlist_dialog->set_display_client_container(display_client_container);
+	edit_playlist_dialog->set_group_name(ui.main_tree_widget->selectedItems().at(0)->text(1).toStdString());
 	edit_playlist_dialog->show();
-}
-
-void Tacktech_Manager_MainWindow::playlist_changed()
-{
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "=Tacktech_Manager_MainWindow::playlist_changed()" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-	temp_playlist_container.reset(new Playlist_Container(*playlist_container));
-	upload_data.reset(new Upload_Data_Container(parameters));
-	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
-		SLOT(start_upload(std::string)));
-	upload_data->set_playlist_container(temp_playlist_container);
-	upload_data->set_command("SET_PLAYLIST_CONTAINER");
-	upload_data->get_xml_upload();
 }

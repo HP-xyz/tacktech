@@ -10,6 +10,7 @@
 #include <set>
 #include <vector>
 #include <utility>
+#include <algorithm>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/date_time.hpp>
@@ -78,8 +79,7 @@ private slots:
 	void edit_playlist_slot();
 	void check_uploads_pending();
 	void assign_group();
-	void group_assigned();
-	void playlist_changed();
+	void display_container_changed();
 };
 
 #endif //TACKTECH_MANAGER_MAINWINDOW_H

@@ -143,7 +143,7 @@ void Edit_Playlist::remove_playlist_slot()
 
 void Edit_Playlist::ok_clicked()
 {
-	emit playlist_changed();
+	update_display_client_container();
 	this->close();
 }
 
@@ -213,7 +213,7 @@ void Edit_Playlist::create_playlist_slot()
 	{
 		if (add_file_dialog.get() != 0)
 			disconnect(add_file_dialog.get(), SIGNAL(playlist_edited()), this, SLOT(repopulate_widget()));
-		add_file_dialog.reset(new Add_File_Dialog(playlist, filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name)));
+		add_file_dialog.reset(new Add_File_Dialog(playlist, filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
 		connect(add_file_dialog.get(), SIGNAL(playlist_edited()), this, SLOT(repopulate_widget()));
 		add_file_dialog->show();
 	}
@@ -228,4 +228,31 @@ void Edit_Playlist::create_playlist_slot()
 void Edit_Playlist::set_filelist( Filelist_Ptr p_filelist)
 {
 	filelist = p_filelist;
+}
+
+void Edit_Playlist::set_group_name( std::string p_group_name)
+{
+	m_group_name = p_group_name;
+}
+
+void Edit_Playlist::set_display_client_container( Display_Client_Container_Ptr p_display_client_container)
+{
+	display_client_container = p_display_client_container;
+}
+
+void Edit_Playlist::update_display_client_container()
+{
+	for (std::vector<Display_Client_Ptr>::iterator it = display_client_container->get_display_client_container()->begin();
+		it != display_client_container->get_display_client_container()->end(); ++it)
+	{
+		std::set<std::string>::const_iterator group_found = 
+			std::find(
+			it->get()->get_groups()->begin(),
+			it->get()->get_groups()->begin(),
+			m_group_name);
+		if (group_found != it->get()->get_groups()->end())
+		{//Group is found
+			it->get()->set_playlist_container(playlist);
+		}
+	}
 }
