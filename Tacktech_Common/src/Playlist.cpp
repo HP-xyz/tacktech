@@ -18,6 +18,7 @@ Playlist::Playlist(void)
 	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
 	m_start_time = ALL_DAY_TIME;
 	m_end_time = ALL_DAY_TIME;
+	set_current_item_index(-1);
 }
 
 Playlist::Playlist( std::string playlist_str)
@@ -29,6 +30,7 @@ Playlist::Playlist( std::string playlist_str)
 	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
 	m_start_time = ALL_DAY_TIME;
 	m_end_time = ALL_DAY_TIME;
+	set_current_item_index(-1);
 
 	pugi::xml_document playlist_document;
 	playlist_document.load(playlist_str.c_str());

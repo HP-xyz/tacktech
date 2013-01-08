@@ -250,3 +250,49 @@ bool Display_Client::contains_organization(std::string p_organization_name)
     else
         return false;
 }
+
+bool Display_Client::contains_group( std::string p_group_name)
+{
+	std::set<std::string>::iterator iter = get_groups()->find(p_group_name);
+	if(iter != get_groups()->end())
+		return true;
+	else
+		return false;
+}
+
+void Display_Client::update_playlist_container( Playlist_Container_Ptr p_playlist_container, std::string organization_name, std::string group_name)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client::update_playlist_container()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	std::set<Playlist_Ptr> parameter_playlist = *p_playlist_container->get_playlists_of_group(group_name);
+	for (std::set<Playlist_Ptr>::iterator it2 = parameter_playlist.begin();
+		it2 != parameter_playlist.end(); ++it2)
+	{
+		bool playlist_exists = false;
+		std::set<Playlist_Ptr> this_playlist = *get_playlist_container()->get_playlists_of_group(group_name);
+		for (std::set<Playlist_Ptr>::iterator it = this_playlist.begin();
+			it != this_playlist.end(); ++it)
+		{
+			if (it->get()->get_playlist_name() == it2->get()->get_playlist_name())
+			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << " - Updating playlist:" << it->get()->get_playlist_name() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+				Playlist *pointer_to_delete = it->get();
+				*it->get() = *it2->get();
+				delete pointer_to_delete;
+				playlist_exists = true;
+			}
+		}
+		if (!playlist_exists)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Adding new playlist:" << it2->get()->get_playlist_name() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			std::vector<std::string> organization_vector;
+			organization_vector.push_back(organization_name);
+			get_playlist_container()->add_playlist(*it2, organization_vector);
+		}
+	}
+}

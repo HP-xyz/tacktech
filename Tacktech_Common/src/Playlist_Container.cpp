@@ -84,14 +84,32 @@ Container Playlist_Container::get_playlist_container( std::string organization_n
 	return return_container;
 }
 
+Playlist_Container Playlist_Container::get_playlist_container( std::string organization_name, std::string group_name)
+{
+	Playlist_Container return_playlist;
+	/** First we get only the Playlists that can be used by the organization_name */
+	Container organization_container = get_playlist_container(organization_name);
+	/* Then we find only the playlists that can be used by the group_name */
+	for(Container::iterator it = organization_container.begin();
+		it!= organization_container.end();
+		++it)
+	{
+		if (it->first->contains_group(group_name))
+		{
+			return_playlist.add_playlist(it->first, it->second);
+		}
+	}
+	return return_playlist;
+}
+
 boost::shared_ptr<Container> Playlist_Container::get_playlist_container()
 {
 	return m_playlist_container;
 }
 
-void Playlist_Container::add_playlist( Playlist_Ptr playlist, std::vector<std::string> groups)
+void Playlist_Container::add_playlist( Playlist_Ptr playlist, std::vector<std::string> organizations)
 {
-	m_playlist_container->insert(Playlist_Item(playlist, groups));
+	m_playlist_container->insert(Playlist_Item(playlist, organizations));
 }
 
 std::string Playlist_Container::get_playlist_container_xml( std::string group_name)
@@ -264,6 +282,67 @@ Playlist_Ptr Playlist_Container::get_playlist_ptr( std::string p_playlist_name, 
 		}
 	}
 	return temp_playlist;
+}
+
+std::string Playlist_Container::get_current_playing_item()
+{
+	if (get_playlist_container()->size() == 0)
+	{
+		return "PLAYLIST EMPTY";
+	}
+	else
+	{
+		for (Container::iterator it = get_playlist_container()->begin();
+			it != get_playlist_container()->end(); ++it)
+		{
+			//std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
+			//boost::posix_time::time_duration current_time(
+			//	boost::lexical_cast<int,std::string>(current_time_str.substr(0, 2)),
+			//	boost::lexical_cast<int,std::string>(current_time_str.substr(2, 2)),
+			//	boost::lexical_cast<int,std::string>(current_time_str.substr(4)),
+			//	0);
+			///* Get time_durations so we can calculate if the current playlist should,
+			//   be playing now */
+			//std::string start_time_str = boost::posix_time::to_iso_string(it->first->get_start_time());
+			//std::string end_time_str = boost::posix_time::to_iso_string(it->first->get_end_time());
+			//boost::posix_time::time_duration start_time(
+			//	boost::lexical_cast<int,std::string>(start_time_str.substr(0, 2)),
+			//	boost::lexical_cast<int,std::string>(start_time_str.substr(2, 2)),
+			//	boost::lexical_cast<int,std::string>(start_time_str.substr(4)),
+			//	0);
+			//boost::posix_time::time_duration end_time(
+			//	boost::lexical_cast<int,std::string>(end_time_str.substr(0, 2)),
+			//	boost::lexical_cast<int,std::string>(end_time_str.substr(2, 2)),
+			//	boost::lexical_cast<int,std::string>(end_time_str.substr(4)),
+			//	0);
+			//if (current_time > start_time && current_time < end_time)
+			//{
+			//}
+			if (it->first->currently_active)
+			{
+				if (it->first->get_current_item_index() == -1)
+					return "NONE PLAYING";
+				else
+					return it->first->get_playlist_items()->at(
+					it->first->get_current_item_index()).first;
+			}
+		}
+		return "COULD NOT GET PLAYLIST ITEM";
+	}
+}
+
+boost::shared_ptr<std::set<Playlist_Ptr> > Playlist_Container::get_playlists_of_group( std::string group_name)
+{
+	boost::shared_ptr<std::set<Playlist_Ptr> > return_set(new std::set<Playlist_Ptr>);
+	for (Container::iterator it = get_playlist_container()->begin();
+		it != get_playlist_container()->end(); ++it)
+	{
+		if (it->first->contains_group(group_name))
+		{
+			return_set->insert(it->first);
+		}
+	}
+	return return_set;
 }
 
 #ifdef _SHOW_DEBUG_OUTPUT
