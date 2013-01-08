@@ -24,9 +24,11 @@ Q_OBJECT
 public:
 	Edit_Playlist(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Edit_Playlist();
-	void set_playlist_container(Playlist_Container_Ptr);
 	void set_organization_name(std::string);
+
+	/* MUST be called before set_display_client_container */
 	void set_group_name(std::string);
+
 	void set_filelist(Filelist_Ptr);
 	void set_display_client_container(Display_Client_Container_Ptr);
 private:
@@ -62,6 +64,8 @@ private slots:
 
 	/* Seconday slots */
 	void repopulate_widget();
+signals:
+	void playlist_changed();
 };
 
 #endif // EDIT_PLAYLIST_H

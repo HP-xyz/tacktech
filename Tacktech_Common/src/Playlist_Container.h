@@ -32,13 +32,20 @@ public:
 	~Playlist_Container();
 	/** Returns a Container that will contain only the Playlist's that
 	 ** are allowed to be used by the std::string supplied in the parameter.
-	 ** This string should be a group_name. */
+	 ** This string should be a ORGNIZATION NAME. */
 	Container get_playlist_container(std::string);
+
+	/** Returns a Playlist_Container that will contain only the Playlist's that
+	 ** are allowed to be used by the std::string supplied in the parameter.
+	 ** This string should be a GROUP NAME. */
+	Playlist_Container get_playlist_container(std::string, std::string);
 
 	boost::shared_ptr<Container> get_playlist_container();
 
+	boost::shared_ptr<std::set<Playlist_Ptr> > get_playlists_of_group(std::string);
+
 	/** Adds a Playlist to the Container, including a std::vector of strings
-	 ** to identify which groups have access to it. */
+	 ** to identify which ORGANIZAITONS have access to it. */
 	void add_playlist(Playlist_Ptr, std::vector<std::string>);
 	/** Returns a std::string representation of a playlist_container,
 	 ** containing only the playlists that can be used by the group,
@@ -52,6 +59,7 @@ public:
 	std::string get_playlist_container_name();
 	void update_playlist(Playlist_Container, std::string);
 
+	std::string get_current_playing_item();
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();

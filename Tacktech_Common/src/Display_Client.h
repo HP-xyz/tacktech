@@ -69,6 +69,13 @@ public:
 	/** Returns true if the Dislpay_Client contains the organization_name
 	 ** supplied in the parameter. */
 	bool contains_organization(std::string);
+
+	/** Returns true if the Display_client contains the group_name
+	 ** supplied in the parameter */
+	bool contains_group(std::string);
+
+	/** Consolidates the current playlist, with that in the parameter */
+	void update_playlist_container(Playlist_Container_Ptr, std::string, std::string);
 private:
 	std::string m_identification;
 	boost::posix_time::ptime m_last_ping;

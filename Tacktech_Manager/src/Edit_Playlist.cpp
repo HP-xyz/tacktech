@@ -44,13 +44,6 @@ Edit_Playlist::~Edit_Playlist()
 	delete remove_file;
 	delete node_menu;
 }
-/** Function to set the playlist variable to that the calling class
- ** provides */
-void Edit_Playlist::set_playlist_container(Playlist_Container_Ptr p_playlist)
-{
-	playlist = p_playlist;
-	repopulate_widget();
-}
 
 /** Slot gets fired when the context menu item connected to it is
  ** activated. Removes a filename from the widget and global playlist
@@ -144,6 +137,7 @@ void Edit_Playlist::remove_playlist_slot()
 void Edit_Playlist::ok_clicked()
 {
 	update_display_client_container();
+	emit playlist_changed();
 	this->close();
 }
 
@@ -176,6 +170,7 @@ void Edit_Playlist::cancel_clicked()
 void Edit_Playlist::repopulate_widget()
 {
 	ui.playlist_tree_widget->clear();
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	playlist->print_contents();
 #endif // _DEBUG
@@ -237,7 +232,30 @@ void Edit_Playlist::set_group_name( std::string p_group_name)
 
 void Edit_Playlist::set_display_client_container( Display_Client_Container_Ptr p_display_client_container)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Edit_Playlist::set_display_client_container" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 	display_client_container = p_display_client_container;
+
+	bool group_found = false;
+	std::vector<Display_Client_Ptr>::iterator it = display_client_container->get_display_client_container()->begin();
+	while (!group_found && it != display_client_container->get_display_client_container()->end())
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Checking if display_clien contains group: " << m_group_name << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+		if (it->get()->contains_group(m_group_name))
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " -- TRUE " << std::endl;
+			std::cout << " - Creting new playlist" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+			playlist.reset(new Playlist_Container(
+				it->get()->get_playlist_container()->get_playlist_container(m_organization_name, m_group_name)));
+			group_found = true;
+		}
+		++it;
+	}
 }
 
 void Edit_Playlist::update_display_client_container()
@@ -252,7 +270,7 @@ void Edit_Playlist::update_display_client_container()
 			m_group_name);
 		if (group_found != it->get()->get_groups()->end())
 		{//Group is found
-			it->get()->set_playlist_container(playlist);
+			it->get()->update_playlist_container(playlist, m_organization_name, m_group_name);
 		}
 	}
 }
