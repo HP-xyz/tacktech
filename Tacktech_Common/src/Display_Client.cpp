@@ -34,14 +34,18 @@ Display_Client::Display_Client( std::string display_client_str)
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating Display_Client: " << root_node.child_value("Identification") << std::endl;
-#endif _SHOW_DEBUG_OUTPUT
+#endif //_SHOW_DEBUG_OUTPUT
 
 	set_identification(root_node.child_value("Identification"));
 	set_last_ping(boost::posix_time::from_iso_string(root_node.child_value("Last_Ping")));
 	set_groups(make_set(root_node.child_value("Groups")));
 	set_organizations(make_set(root_node.child_value("Organizations")));
 	set_playlist_container_name(root_node.child_value("Playlist_Container"));
-	set_playlist_container(root_node.child_value("Display_Playlist_Container"));
+
+	xml_string_writer writer;
+	root_node.child("Display_Playlist_Container").child("Playlist_Container").print(writer);
+
+	set_playlist_container(writer.result);
 }
 
 
@@ -140,29 +144,13 @@ std::string Display_Client::get_display_client_xml()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Display_Client::get_display_client_xml" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	//pugi::xml_document disply_client_document;
-	//pugi::xml_node display_client_root
-	//	= disply_client_document.append_child("Display_Client");
-	//display_client_root.append_attribute("Identification") =
-	//	get_identification().c_str();
-	//display_client_root.append_attribute("Last_Ping") =
-	//	boost::posix_time::to_iso_string(get_last_ping()).c_str();
-	//pugi::xml_node playlist_node = display_client_root.append_child("Playlist_Node");
-	//playlist_node.append_child(pugi::node_pcdata).set_value(
-	//	get_playlist_container().get()->get_playlist_container_xml().c_str());
-	//display_client_root.append_attribute("Playlist_Container") =
-	//	get_playlist_container()->get_playlist_container_name().c_str();
-	//display_client_root.append_attribute("Organizations") =
-	//	make_list(*get_organizations()).c_str();
-	//display_client_root.append_attribute("Groups") =
-	//	make_list(*get_groups()).c_str();
-	//xml_string_writer writer;
-	//disply_client_document.print(writer);
-	//return writer.result;
 	std::string return_string = "<Display_Client>";
 	return_string += "<Identification>" + get_identification() + "</Identification>";
 	return_string += "<Last_Ping>" + boost::posix_time::to_iso_string(get_last_ping()) + "</Last_Ping>";
 	return_string += "<Display_Playlist_Container>" + get_playlist_container().get()->get_playlist_container_xml() + "</Display_Playlist_Container>";
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Adding groups and organizations" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return_string += "<Organizations>" + make_list(*get_organizations()) + "</Organizations>";
 	return_string += "<Groups>" + make_list(*get_groups()) + "</Groups>";
 	return_string += "</Display_Client>";

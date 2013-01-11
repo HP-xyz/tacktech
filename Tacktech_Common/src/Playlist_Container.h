@@ -16,8 +16,8 @@
 #ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
-/** Container is the type that will hold the playlists. It consists of a 
- ** set, containing a pair where the first member of the pair is the 
+/** Container is the type that will hold the playlists. It consists of a
+ ** set, containing a pair where the first member of the pair is the
  ** Playlist object, and the second member is a vector of strings, that will
  ** contain the organizations that are able to use the aforementioned vector. */
 typedef std::pair<Playlist_Ptr, std::vector<std::string> > Playlist_Item;
@@ -60,6 +60,8 @@ public:
 	void update_playlist(Playlist_Container, std::string);
 
 	std::string get_current_playing_item();
+
+	std::pair<std::string,int> get_next_item();
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();

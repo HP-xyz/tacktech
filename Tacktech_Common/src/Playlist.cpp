@@ -19,6 +19,7 @@ Playlist::Playlist(void)
 	m_start_time = ALL_DAY_TIME;
 	m_end_time = ALL_DAY_TIME;
 	set_current_item_index(-1);
+	currently_active = false;
 }
 
 Playlist::Playlist( std::string playlist_str)
@@ -31,6 +32,7 @@ Playlist::Playlist( std::string playlist_str)
 	m_start_time = ALL_DAY_TIME;
 	m_end_time = ALL_DAY_TIME;
 	set_current_item_index(-1);
+	currently_active = false;
 
 	pugi::xml_document playlist_document;
 	playlist_document.load(playlist_str.c_str());

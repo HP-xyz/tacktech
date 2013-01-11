@@ -17,11 +17,9 @@ include_directories (
 					)
 set ( Tacktech_Display_SRCS
 	${Tacktech_Display_SOURCE_DIR}/src/Tactek_Display.cpp
-        ${Tacktech_Display_SOURCE_DIR}/src/Playlist.cpp
 	)
 set ( Tacktech_Display_HDRS
 		${Tacktech_Display_SOURCE_DIR}/src/Tactek_Display.h
-        ${Tacktech_Display_SOURCE_DIR}/src/Playlist.h
 	)
 set ( Tacktech_Display_RSCS
 		${Tacktech_Display_SOURCE_DIR}/resources/Tactek_Display.qrc

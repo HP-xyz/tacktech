@@ -30,16 +30,17 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <b64/decode.h>
 #include <pugixml.hpp>
 #include <Tacktech_Network_Manager.h>
-
-#include "Playlist.h"
+#include <Display_Client.h>
 #include "ui_Tactek_Display.h"
 
 namespace Ui
@@ -63,14 +64,15 @@ public:
 private slots:
 	void check_media_state();
 	void check_for_updates();
-	void send_identity_to_server();
+	void update_display_client();
 	void play_next_media_in_queue();
 	void open_and_play(QString);
 	void handle_recieved_data(QString data);
 	void handle_new_file_added(QString, int);
+	void check_file_directory();
 private:
 	Ui::Tactek_Display *ui;
-	Playlist *playlist;
+	Display_Client_Ptr display_client;
 	QTimer *update_timer;
 	QTimer *check_update_timer;
 	QTimer *identify_timer;
@@ -82,6 +84,7 @@ private:
 	boost::shared_ptr<boost::asio::io_service> io_service;
 
 	QString playlist_name;
+	std::vector<std::string> filelist;
 
 	/** Variables for the config file */
 	std::map<std::string, std::string> parameters;
