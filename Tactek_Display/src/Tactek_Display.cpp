@@ -37,11 +37,15 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 		QMainWindow(parent), ui(new Ui::Tactek_Display), m_vlc_media(0)
 {
 	ui->setupUi(this);
+	display_client.reset(new Display_Client());
 	read_config();
+
+	display_client->set_identification(parameters["general.computer_name"]);
+	display_client->add_organization(parameters["general.computer_name"]);
+
 	Tactek_Display::update_timer = new QTimer(this);
 	Tactek_Display::check_update_timer = new QTimer(this);
 	Tactek_Display::identify_timer = new QTimer(this);
-	Tactek_Display::playlist = new Playlist();
 
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
@@ -55,7 +59,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 
 	connect(update_timer, SIGNAL(timeout()), this, SLOT(check_media_state()));
 	connect(check_update_timer, SIGNAL(timeout()), this, SLOT(check_for_updates()));
-	connect(identify_timer, SIGNAL(timeout()), this, SLOT(send_identity_to_server()));
+	connect(identify_timer, SIGNAL(timeout()), this, SLOT(update_display_client()));
 	connect(this, SIGNAL(start_next_media()), this,
 			SLOT(play_next_media_in_queue()));
 	connect(this, SIGNAL(new_file_added(QString, int)), this,
@@ -126,57 +130,93 @@ void Tactek_Display::check_for_updates()
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::check_for_updates()" << std::endl;
 #endif // _DEBUG
-	pugi::xml_document document;
-	pugi::xml_node tacktech_node = document.append_child("Tacktech");
-	pugi::xml_node type_node = tacktech_node.append_child("Type");
-	type_node.append_attribute("TYPE") = "GET_UPDATES";
-	pugi::xml_node files_node = tacktech_node.append_child("Files");
-	pugi::xml_node playlist_node = tacktech_node.append_child("Playlist");
-	playlist_name = "Playlist 1";
-	playlist_node.append_attribute("PLAYLIST") = playlist_name.toStdString().c_str();
-	for (int i = 0; i < playlist->get_playlist().size(); i++)
-	{
-		files_node.append_attribute("FILE") =
-				playlist->get_playlist().at(i).first.toStdString().c_str();
-	}
-	xml_string_writer writer;
-	document.save(writer);
-	document.print(std::cout);
+    /* First, we check what files we have... */
+    std::vector<std::string> files_needed;
+    for(Container::iterator it = display_client->get_playlist_container()->get_playlist_container()->begin();
+        it != display_client->get_playlist_container()->get_playlist_container()->end(); ++it)
+    {
+        for(std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
+            it2 != it->first->get_playlist_items()->end(); ++it2)
+        {
+            std::vector<std::string>::iterator item_found = std::find(filelist.begin(), filelist.end(), it2->first);
+            if(item_found == filelist.end())
+            {//We do not have the needed file
+                files_needed.push_back(it2->first);
+            }
+        }
+    }
+    if(files_needed.size() > 0)
+    {
+        pugi::xml_document document;
+        pugi::xml_node tacktech_node = document.append_child("Tacktech");
+        pugi::xml_node type_node = tacktech_node.append_child("Type");
+        type_node.append_attribute("TYPE") = "GET_UPDATES";
+        pugi::xml_node identification_node = tacktech_node.append_child("Identification_Node");
+        identification_node.append_attribute("Identification") = display_client->get_identification().c_str();
+        identification_node.append_attribute("Organization") = parameters["general.computer_name"].c_str();
+        pugi::xml_node file_node = tacktech_node.append_child("File_Node");
+        for(std::vector<std::string>::iterator it = files_needed.begin(); it != files_needed.end(); ++it)
+            file_node.append_attribute("File") = it->c_str();
+        xml_string_writer writer;
+        document.save(writer);
+        document.print(std::cout);
 
-	boost::shared_ptr<std::string> string_to_send;
-	string_to_send.reset(new std::string(writer.result));
+        boost::shared_ptr<std::string> string_to_send;
+        string_to_send.reset(new std::string(writer.result));
 
-	io_service->reset();
-	network_manager.reset(
-			new Tacktech_Network_Manager(*io_service, parameters));
-	network_manager->connect(parameters["general.server_ip"],
-			parameters["general.server_port"]);
-	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-				SLOT(handle_recieved_data(QString)));
-	network_manager->start_write(string_to_send);
-	boost::thread t(
-		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
-	t.join();
+        io_service->reset();
+        network_manager.reset(
+                new Tacktech_Network_Manager(*io_service, parameters));
+        network_manager->connect(parameters["general.server_ip"],
+                parameters["general.server_port"]);
+        connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+                    SLOT(handle_recieved_data(QString)));
+        network_manager->start_write(string_to_send);
+        boost::thread t(
+            boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+        t.join();
+    }
+//	pugi::xml_document document;
+//	pugi::xml_node tacktech_node = document.append_child("Tacktech");
+//	pugi::xml_node type_node = tacktech_node.append_child("Type");
+//	type_node.append_attribute("TYPE") = "GET_UPDATES";
+//	pugi::xml_node files_node = tacktech_node.append_child("Files");
+//	pugi::xml_node playlist_node = tacktech_node.append_child("Playlist");
+//	playlist_name = "Playlist 1";
+//	playlist_node.append_attribute("PLAYLIST") = playlist_name.toStdString().c_str();
+//	for (int i = 0; i < playlist->get_playlist().size(); i++)
+//	{
+//		files_node.append_attribute("FILE") =
+//				playlist->get_playlist().at(i).first.toStdString().c_str();
+//	}
+//	xml_string_writer writer;
+//	document.save(writer);
+//	document.print(std::cout);
+//
+//	boost::shared_ptr<std::string> string_to_send;
+//	string_to_send.reset(new std::string(writer.result));
+//
+//	io_service->reset();
+//	network_manager.reset(
+//			new Tacktech_Network_Manager(*io_service, parameters));
+//	network_manager->connect(parameters["general.server_ip"],
+//			parameters["general.server_port"]);
+//	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+//				SLOT(handle_recieved_data(QString)));
+//	network_manager->start_write(string_to_send);
+//	boost::thread t(
+//		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+//	t.join();
 }
-void Tactek_Display::send_identity_to_server()
+void Tactek_Display::update_display_client()
 {
 #ifdef _DEBUG
 	std::cout << "= Tacktech_Manager::send_identity_to_server()" << std::endl;
 #endif // _DEBUG
-	pugi::xml_document document;
-	pugi::xml_node tacktech_node = document.append_child("Tacktech");
-	pugi::xml_node type_node = tacktech_node.append_child("Type");
-		type_node.append_attribute("TYPE") = "IDENTIFY";
-	pugi::xml_node identity_node = tacktech_node.append_child("Identity");
-	identity_node.append_attribute("Organization_Name") = parameters["general.organization_name"].c_str();
-	identity_node.append_attribute("Computer_Name") = parameters["general.computer_name"].c_str();
-
-	xml_string_writer writer;
-	document.save(writer);
-	document.print(std::cout);
+    display_client->get_display_client_xml();
 
 	boost::shared_ptr<std::string> string_to_send;
-	string_to_send.reset(new std::string(writer.result));
+	string_to_send.reset(new std::string(display_client->get_display_client_xml()));
 
 	io_service->reset();
 	network_manager.reset(
@@ -192,7 +232,7 @@ void Tactek_Display::send_identity_to_server()
 }
 
 /**
- * Opens and plays the file specified in the filepath parameter.
+ * Opens and plays the file specified in the filepath parameter.send_identity_to_server
  * @param filepath Path to the file that needs to be played
  */
 void Tactek_Display::open_and_play(QString filepath)
@@ -220,24 +260,20 @@ void Tactek_Display::check_media_state()
  */
 void Tactek_Display::play_next_media_in_queue()
 {
-	if (playlist->get_playlist().size() > 0)
+    std::pair<std::string, int> next_item = display_client->get_playlist_container()->get_next_item();
+	if (next_item.first != "NO ITEMS")
 	{
-		if (playlist->current_index_of_queue == playlist->get_playlist().size())
-			playlist->current_index_of_queue = 0;
-		QPair<QString, int> queue_item =
-				playlist->get_playlist()[playlist->current_index_of_queue];
-		if (queue_item.second == 0)
+		if (next_item.second == 0)
 		{
-			open_and_play(queue_item.first);
+			open_and_play(QString::fromStdString(next_item.first));
 		}
 		else
 		{
-			std::cout << "Pausing for: " << queue_item.second * 1000
+			std::cout << "Pausing for: " << next_item.second * 1000
 					<< std::endl;
-			QTimer::singleShot((queue_item.second * 1000), this, NULL);
-			open_and_play(queue_item.first);
+			QTimer::singleShot((next_item.second * 1000), this, NULL);
+			open_and_play(QString::fromStdString(next_item.first));
 		}
-		playlist->current_index_of_queue += 1;
 	}
 	else
 	{
@@ -322,8 +358,23 @@ void Tactek_Display::handle_new_file_added(QString new_filename, int pause)
 #ifdef _DEBUG
 	std::cout << "= Tactek_Display::handle_new_file_added()" << std::endl;
 #endif
-	QPair<QString, int> playlist_item;
-	playlist_item.first = new_filename;
-	playlist_item.second = pause;
-	playlist->add_to_playlist(playlist_item);
+	//QPair<QString, int> playlist_item;
+	//playlist_item.first = new_filename;
+	//playlist_item.second = pause;
+//	playlist->add_to_playlist(playlist_item);
+}
+
+void Tactek_Display::check_file_directory()
+{
+#ifdef _DEBUG
+	std::cout << "= Tactek_Display::check_file_directory()" << std::endl;
+#endif
+    boost::filesystem::path current_dir(parameters["general.playlist_directory"]);
+	for (boost::filesystem::recursive_directory_iterator iter(current_dir), end;
+		iter != end;
+		++iter)
+	{
+		std::string name = iter->path().generic_string();
+		filelist.push_back(name);
+	}
 }

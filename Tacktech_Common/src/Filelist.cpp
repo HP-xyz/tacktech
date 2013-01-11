@@ -53,7 +53,7 @@ void Filelist::scan_playlist_directory()
 		++iter)
 	{
 		std::string name = iter->path().generic_string();
-		Filelist_Data::iterator it 
+		Filelist_Data::iterator it
 			= get_iter_to_organization(name.substr(0, name.find("_")));
 		if (it == filelist->end())
 		{//Group does not exist in filelist
@@ -148,10 +148,13 @@ std::string Filelist::get_filelist_xml( std::string organization_name)
 	pugi::xml_node organization_node = root_node.append_child("Organization");
 	organization_node.append_attribute("Organization_Name") = organization_name.c_str();
 	Filelist_Data::iterator it = get_iter_to_organization(parameters["general.playlist_directory"] + organization_name);
-	for (std::vector<std::string>::iterator it2 = it->first.begin();
-		it2 != it->first.end(); ++it2)
+	if(it != filelist->end())
 	{
-		filelist_node.append_attribute("Filename") = it2->substr(it2->find("_") + 1).c_str();
+        for (std::vector<std::string>::iterator it2 = it->first.begin();
+            it2 != it->first.end(); ++it2)
+        {
+            filelist_node.append_attribute("Filename") = it2->substr(it2->find("_") + 1).c_str();
+        }
 	}
 	xml_string_writer writer;
 	doc.print(writer);

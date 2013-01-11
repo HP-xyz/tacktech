@@ -35,6 +35,8 @@ Playlist_Container::Playlist_Container( std::string playlist_container_str)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::Playlist_Container(STRING)" << std::endl;
+	std::cout << " - Creating from str:" << std::endl;
+	std::cout << playlist_container_str << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	m_playlist_container.reset(new Container());
 	pugi::xml_document playlist_container_doc;
@@ -145,9 +147,9 @@ std::string Playlist_Container::get_playlist_container_xml( std::string group_na
 			upload_xml += "<Playlist_Node>";
 			upload_xml += it->first->get_playlist_xml();
 			upload_xml += "</Playlist_Node>";
-			upload_xml += "</Playlist_Group";
+			upload_xml += "</Playlist_Group>";
 		}
-	}	
+	}
 	upload_xml += "</Playlist_Container>";
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Sending: " << std::endl;
@@ -184,8 +186,8 @@ std::string Playlist_Container::get_playlist_container_xml()
 		upload_xml += "<Playlist_Node>";
 		upload_xml += it->first->get_playlist_xml();
 		upload_xml += "</Playlist_Node>";
-		upload_xml += "</Playlist_Group";
-	}	
+		upload_xml += "</Playlist_Group>";
+	}
 	upload_xml += "</Playlist_Container>";
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Sending: " << std::endl;
@@ -230,7 +232,7 @@ void Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::update_playlist" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	for (Container::iterator it = m_playlist_container->begin(); 
+	for (Container::iterator it = m_playlist_container->begin();
 		it != m_playlist_container->end(); ++it)
 	{
 		std::vector<std::string> organizations_vector = it->second;
@@ -242,7 +244,7 @@ void Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 			if (playlist_ptr != 0)
 			{//Playlist_Item not found, therefore adding it
 	#ifdef _IMPORTANT_OUTPUT
-				std::cout << " + ADDING NEW playlist: '" << it->first->get_playlist_name() 
+				std::cout << " + ADDING NEW playlist: '" << it->first->get_playlist_name()
 					<< "' to organization: '" << p_organization_name << "'" << std::endl;
 	#endif // _IMPORTANT_OUTPUT
 				add_playlist(it->first, it->second);
@@ -250,7 +252,7 @@ void Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 			else
 			{//Updating playlist items
 	#ifdef _IMPORTANT_OUTPUT
-				std::cout << " $ UPDATING playlist: '" << it->first->get_playlist_name() 
+				std::cout << " $ UPDATING playlist: '" << it->first->get_playlist_name()
 					<< "' to organization: '" << p_organization_name << "'" << std::endl;
 	#endif // _IMPORTANT_OUTPUT
 				playlist_ptr->set_current_item_index(it->first->get_current_item_index());
@@ -267,7 +269,7 @@ void Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 Playlist_Ptr Playlist_Container::get_playlist_ptr( std::string p_playlist_name, std::string p_organization_name)
 {
 	boost::shared_ptr<Playlist> temp_playlist;
-	for (Container::iterator it = m_playlist_container->begin(); 
+	for (Container::iterator it = m_playlist_container->begin();
 		it != m_playlist_container->end(); ++it)
 	{
 		if (it->first->get_playlist_name() == p_playlist_name)
@@ -343,6 +345,50 @@ boost::shared_ptr<std::set<Playlist_Ptr> > Playlist_Container::get_playlists_of_
 		}
 	}
 	return return_set;
+}
+
+//TODO
+//IF MORE THAN 1 PLAYLIST MATCHES THE TIME TO PLAY, WHAT SHOULD HAPPEN?
+std::pair<std::string,int> Playlist_Container::get_next_item()
+{
+    std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
+    boost::posix_time::time_duration current_time(
+    	boost::lexical_cast<int,std::string>(current_time_str.substr(0, 2)),
+    	boost::lexical_cast<int,std::string>(current_time_str.substr(2, 2)),
+    	boost::lexical_cast<int,std::string>(current_time_str.substr(4)),
+    	0);
+    for(Container::iterator it = get_playlist_container()->begin();
+        it != get_playlist_container()->end(); ++it)
+    {
+        if(it->first->get_start_time() < current_time &&
+            it ->first->get_end_time() > current_time)
+        {
+            if (it->first->get_current_item_index() == -1)
+            {//First time the playlist is being played
+                it->first->currently_active = true;
+                it->first->set_current_item_index(0);
+                return it->first->get_playlist_items()->at(0);
+            }
+            else if(it->first->get_current_item_index() == it->first->get_playlist_items()->size())
+            {//Looping playlist
+                it->first->currently_active = true;
+                it->first->set_current_item_index(0);
+                return it->first->get_playlist_items()->at(0);
+            }
+            else
+            {//Playing next item normally
+                it->first->currently_active = true;
+                it->first->set_current_item_index(it->first->get_current_item_index() + 1);
+                return it->first->get_playlist_items()->at(it->first->get_current_item_index());
+            }
+        }
+        else
+        {//Making sure that the playlist is set to not be currently active
+            it->first->currently_active = false;
+            it->first->set_current_item_index(-1);
+        }
+    }
+    return std::pair<std::string,int>("NO ITEMS", 0);
 }
 
 #ifdef _SHOW_DEBUG_OUTPUT

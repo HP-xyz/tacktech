@@ -86,7 +86,7 @@ void Artemis_Request_Handler::handle_request(const std::string &request,
 #endif
 			result_status = NO_RESULT;
 		}
-	} 
+	}
 	catch (std::exception &e)
 	{
 		std::cerr << "Handle Request exception: " << e.what() << std::endl;
