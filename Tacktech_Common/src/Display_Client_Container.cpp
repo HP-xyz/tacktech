@@ -184,3 +184,17 @@ void Display_Client_Container::update_groups_and_playlist(Display_Client_Contain
         }
     }
 }
+
+Display_Client_Ptr Display_Client_Container::get_display_client( std::string organization_name, std::string identification)
+{
+	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container()->begin();
+		it != get_display_client_container()->end(); ++it)
+	{
+		if (it->get()->contains_organization(organization_name) 
+			&& it->get()->get_identification() == identification)
+		{// Correct Display_Client found
+			return *it;
+		}
+	}
+	return Display_Client_Ptr();
+}

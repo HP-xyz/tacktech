@@ -30,6 +30,7 @@ Display_Client::Display_Client( std::string display_client_str)
 	m_playlist_container.reset(new Playlist_Container());
 	pugi::xml_document disply_client_document;
 	disply_client_document.load(display_client_str.c_str());
+	disply_client_document.print(std::cout);
 	pugi::xml_node root_node = disply_client_document.child("Display_Client_Item").child("Display_Client");
 
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -78,6 +79,12 @@ void Display_Client::set_last_ping(boost::posix_time::ptime p_last_ping)
 {
 	m_last_ping = p_last_ping;
 }
+
+void Display_Client::set_last_ping()
+{
+	set_last_ping(boost::posix_time::second_clock::universal_time());
+}
+
 void Display_Client::set_groups(std::set<std::string> p_groups)
 {
 	boost::shared_ptr<std::set<std::string> > new_groups(new std::set<std::string>(p_groups));

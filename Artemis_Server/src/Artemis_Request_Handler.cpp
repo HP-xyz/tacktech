@@ -193,72 +193,93 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		playlist_container->update_playlist(container,
 			tacktech.child("Organization").attribute("ORGANIZATION_NAME").as_string());
 	}
-	else if (type_string == "SET_VARIABLES")
+	else if (type_string == "UPDATE_DISPLAY_CLIENT")
 	{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Received SET_VARIABLES command" << std::endl;
-//#endif // _DEBUG
-//		xml_string_writer playlist_writer;
-//		std::string organization_name =
-//			tacktech.child("Organization")
-//			.attribute("ORGANIZATION_NAME").as_string();
-//		tacktech.child("Variables").
-//			child("Playlist").print(playlist_writer);
-//		playlist->construct_playlist(organization_name,
-//			playlist_writer.result);
-//
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << "  - ORGANIZATION: " << organization_name <<std::endl;
-//		std::cout << "  - Printing new variables on server" << std::endl;
-//		std::cout << "  ==================================" << std::endl;
-//		std::cout << "   - Playlist" << std::endl;
-//		std::cout << "   ==========" << std::endl;
-//#endif // _DEBUG
-//		playlist->get_organization_map()
-//			[organization_name].print_contents();
-//
-//		xml_string_writer groups_and_computers_writer;
-//		tacktech.child("Variables").child("Groups_And_Computers").print(
-//				groups_and_computers_writer);
-//		groups_and_computers->construct_groups_and_computers(
-//			organization_name, groups_and_computers_writer.result);
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << "   - Groups_And_Computers" << std::endl;
-//		std::cout << "   ======================" << std::endl;
-//#endif // _DEBUG
-//		groups_and_computers->get_organization_map()
-//			[organization_name].print_contents();
-//
-//		xml_string_writer group_playlist_writer;
-//		tacktech.child("Variables").child("Group_Playlist").print(
-//				group_playlist_writer);
-//		group_playlist->construct_group_playlist(organization_name,
-//			group_playlist_writer.result);
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received UPDATE_DISPLAY_CLIENT command" << std::endl;
+#endif // _DEBUG
+		std::string organization_name = tacktech.child("Identification").attribute("ORGANIZATION").as_string();
+		xml_string_writer writer;
+		tacktech.child("CONTAINER").child("Display_Client_Item").print(writer);
+		Display_Client client(writer.result);
+
+		Display_Client_Ptr client_to_send = 
+			display_client_container->get_display_client(organization_name, client.get_identification());
+
+		std::string upload_string = "<Tacktech>";
+		upload_string += "<Type TYPE=\"UPDATE\" />";
+		upload_string += "<Identification GROUPS=\"" + client_to_send->get_groups_string() + "\" />";
+		upload_string += "<CONTAINER>";
+		upload_string += "<Display_Client_Item>";
+		upload_string += client_to_send->get_display_client_xml();
+		upload_string += "<Display_Client_Item>";
+		upload_string += "</CONTAINER>";
+		upload_string += "</Tacktech>";
+		return_xml->append(upload_string);
+		result_status = SINGLE_RESULT;
 	}
 	else if (type_string == "GET_UPDATES")
 	{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Received GET_UPDATES command" << std::endl;
-//#endif // _DEBUG
-//		std::string organization_name =
-//			tacktech.child("Organization").attribute("Organization_Name").as_string();
-//		pugi::xml_node has_files_node = tacktech.child("Files");
-//		pugi::xml_node playlist_node = tacktech.child("Playlist");
-//		std::map<std::string, std::string> filemap;
-//#ifdef _SHOW_DEBUG_OUTPUT
-//		std::cout << " - Remote has files: " << std::endl;
-//#endif // _DEBUG
-//		for (pugi::xml_attribute_iterator it =
-//				has_files_node.attributes().begin();
-//				it != has_files_node.attributes().end(); it++)
-//		{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//			std::cout << "  - " << it->value() << std::endl;
-//#endif // _DEBUG
-//			filemap.insert(
-//					std::pair<std::string, std::string>(it->value(),
-//							"FILE"));
-//		}
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Received GET_UPDATES command" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		std::string identification =
+			tacktech.child("Identification_Node").attribute("Identification").as_string();
+		std::string organization_name =
+			tacktech.child("Identification_Node").attribute("Organization").as_string();
+		std::vector<std::string> remote_files;
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Remote has files: " << std::endl;
+#endif // _DEBUG
+		for (pugi::xml_attribute_iterator it =
+				tacktech.child("File_Node").attributes().begin();
+				it != tacktech.child("File_Node").attributes().end(); it++)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - " << it->value() << std::endl;
+#endif // _DEBUG
+			remote_files.push_back(it->value());
+		}
+		Display_Client_Ptr identified_display =
+			display_client_container->get_display_client(organization_name, identification);
+		if (identified_display.get() != 0)
+		{
+			std::vector<std::string> items_to_upload =
+				identified_display->get_playlist_container()->get_needed_items(remote_files);
+			if (items_to_upload.size() > 0)
+			{//There are items to upload
+				pugi::xml_document upload_document;
+				pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
+				pugi::xml_node type_node = tacktech_node.append_child("Type");
+				type_node.append_attribute("TYPE") = "UPLOAD";
+				pugi::xml_node items_node = tacktech.append_child("Items_Node");
+
+				for (std::vector<std::string>::iterator it = items_to_upload.begin();
+					it != items_to_upload.end(); ++it)
+				{
+					pugi::xml_node item_node = items_node.append_child("Item");
+					pugi::xml_node filename_node = item_node.append_child("Filename");
+					pugi::xml_node file_data_node = item_node.append_child("File_Data");
+
+					pugi::xml_node filename_pcdata = filename_node.append_child(
+												pugi::node_pcdata);
+					pugi::xml_node file_data_pcdata = file_data_node.append_child(
+												pugi::node_pcdata);
+
+					filename_pcdata.set_value(it->c_str());
+					file_data_pcdata.set_value(
+						filelist->get_binary_file(organization_name, *it).c_str());
+				}
+				xml_string_writer writer;
+				upload_document.print(writer);
+				return_xml->append(writer.result);
+				result_status = SINGLE_RESULT;
+			}
+		}
+		else
+#ifdef _IMPORTANT_OUTPUT
+			std::cout << " CRITICAL ERROR: Could not find display '" << identification << "'" << std::endl;
+#endif // _IMPORTANT_OUTPUT
 //		Playlist_Range range = playlist->get_organization_map()
 //			[organization_name].get_files_in_playlist(
 //			playlist_node.attribute("PLAYLIST").as_string());
@@ -354,43 +375,43 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
  *
  * Reads a file into memory and returns a std::string to
  * the read file
- */
-std::string Artemis_Request_Handler::get_binary_file(std::string filename)
-{
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Artemis_Request_Handler::get_binary_file()" << std::endl;
-	std::cout << " - Getting file: " << filename << std::endl;
-#endif // _DEBUG
-	std::string file_encoded;
-	std::string test;
-	std::ifstream file(filename.c_str(), std::ios::binary);
-	if (file.is_open())
-	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - File is open" << std::endl;
-		file.seekg(0, std::ios::end);
-		std::cout << " - Tellg(): " << file.tellg() << std::endl;
-		file.seekg(0, std::ios::beg);
-#endif // _DEBUG
-		std::stringstream *file_in = new std::stringstream();
-		*file_in << file.rdbuf();
-		std::cout << "file_in size: " << file_in->str().size() << std::endl;
-		*file_in << std::ends;
-		base64::encoder E;
-		std::stringstream file_out;
-		E.encode(*file_in, file_out);
-		delete file_in;
-		file_out << std::ends;
-		std::cout << "file_out size: " << file_out.str().size() << std::endl;
-		file_encoded = file_out.str();
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Encoded filesize: " << file_encoded.size()
-				<< std::endl;
-#endif // _DEBUG
-		file.close();
-	}
-	return (file_encoded);
-}
+// */
+//std::string Artemis_Request_Handler::get_binary_file(std::string filename)
+//{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//	std::cout << "= Artemis_Request_Handler::get_binary_file()" << std::endl;
+//	std::cout << " - Getting file: " << filename << std::endl;
+//#endif // _DEBUG
+//	std::string file_encoded;
+//	std::string test;
+//	std::ifstream file(filename.c_str(), std::ios::binary);
+//	if (file.is_open())
+//	{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << " - File is open" << std::endl;
+//		file.seekg(0, std::ios::end);
+//		std::cout << " - Tellg(): " << file.tellg() << std::endl;
+//		file.seekg(0, std::ios::beg);
+//#endif // _DEBUG
+//		std::stringstream *file_in = new std::stringstream();
+//		*file_in << file.rdbuf();
+//		std::cout << "file_in size: " << file_in->str().size() << std::endl;
+//		*file_in << std::ends;
+//		base64::encoder E;
+//		std::stringstream file_out;
+//		E.encode(*file_in, file_out);
+//		delete file_in;
+//		file_out << std::ends;
+//		std::cout << "file_out size: " << file_out.str().size() << std::endl;
+//		file_encoded = file_out.str();
+//#ifdef _SHOW_DEBUG_OUTPUT
+//		std::cout << " - Encoded filesize: " << file_encoded.size()
+//				<< std::endl;
+//#endif // _DEBUG
+//		file.close();
+//	}
+//	return (file_encoded);
+//}
 
 /** Function handles the upload of data to a IP. Receives
  ** the xml to upload in parameter, as well as the ip to that the upload

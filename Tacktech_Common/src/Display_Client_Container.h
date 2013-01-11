@@ -30,6 +30,10 @@ public:
 	/** Removes a Display_Client at a certain index */
 	void remove_display_client(int);
 
+	/** Returns a boost::shared_ptr to the Display_Client in the organization identified by
+	 ** the first parameter and identified by the second string in the parameter */
+	Display_Client_Ptr get_display_client(std::string, std::string);
+
 	/** Returns a std::string representation of the Display_Client_Container,
 	 ** containing only the Display_Clients that belong to a certain organization. */
 	std::string get_display_client_container_xml(std::string);

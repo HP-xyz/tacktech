@@ -28,6 +28,21 @@ struct xml_string_writer: pugi::xml_writer
 	}
 };
 
+template <class T>
+std::string make_list( T p_vector)
+{
+	std::string comma_separated_list;
+	for (typename T::iterator it = p_vector.begin();
+		it != p_vector.end(); ++it)
+	{
+		comma_separated_list += *it;
+		comma_separated_list += ", ";
+	}
+	comma_separated_list =
+		comma_separated_list.substr(0, comma_separated_list.length() - 2);
+	return comma_separated_list;
+}
+
 /**
  * Initiates and sets up the class for usage. Connects the check_media_state and
  * play_next_media_in_queue signals to their respective slots.
@@ -36,39 +51,69 @@ struct xml_string_writer: pugi::xml_writer
 Tactek_Display::Tactek_Display(QWidget *parent) :
 		QMainWindow(parent), ui(new Ui::Tactek_Display), m_vlc_media(0)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Tacktech_Manager()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	ui->setupUi(this);
 	display_client.reset(new Display_Client());
 	read_config();
 
-	display_client->set_identification(parameters["general.computer_name"]);
-	display_client->add_organization(parameters["general.computer_name"]);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Chekcing file directory" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+    check_file_directory();
 
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Assigning Computer_name and Organization_name" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	display_client->set_identification(parameters["general.computer_name"]);
+	display_client->add_organization(parameters["general.organization_name"]);
+	display_client->set_last_ping();
+
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Setting up timers" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	Tactek_Display::update_timer = new QTimer(this);
 	Tactek_Display::check_update_timer = new QTimer(this);
 	Tactek_Display::identify_timer = new QTimer(this);
+	Tactek_Display::update_display_client_timer = new QTimer(this);
 
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Setting up Network_Manager" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
 		new Tacktech_Network_Manager(*io_service, parameters));
 
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Setting up VLC" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
 	m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
 	m_vlc_player->setVideoWidget(ui->vlc_video_widget);
 
 	ui->vlc_video_widget->setMediaPlayer(m_vlc_player);
 
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Connecting Signals" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+    connect(update_display_client_timer, SIGNAL(timeout()), this, SLOT(check_display_container()));
 	connect(update_timer, SIGNAL(timeout()), this, SLOT(check_media_state()));
-	connect(check_update_timer, SIGNAL(timeout()), this, SLOT(check_for_updates()));
+	connect(check_update_timer, SIGNAL(timeout()), this, SLOT(check_playlist_items_downloaded()));
 	connect(identify_timer, SIGNAL(timeout()), this, SLOT(update_display_client()));
 	connect(this, SIGNAL(start_next_media()), this,
 			SLOT(play_next_media_in_queue()));
 	connect(this, SIGNAL(new_file_added(QString, int)), this,
 			SLOT(handle_new_file_added(QString, int)));
 
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Starting Timers" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	update_timer->start(1000);
 	check_update_timer->start(180000);
+	update_display_client_timer->start(60000);
 	identify_timer->start(30000);
-	check_for_updates();
+	check_playlist_items_downloaded();
 }
 
 Tactek_Display::~Tactek_Display()
@@ -80,38 +125,39 @@ Tactek_Display::~Tactek_Display()
 	delete update_timer;
 	delete check_update_timer;
 	delete identify_timer;
+	delete update_display_client_timer;
 }
 
 void Tactek_Display::read_config()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::read_config()" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_DEBUG_OUTPUT
 	std::ifstream config("config.ini");
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Created config ifstream" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_DEBUG_OUTPUT
 	if (!config)
 	{
 		std::cerr << " == Error -> No config found" << std::endl;
 		;
 	}
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating options.insert" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_DEBUG_OUTPUT
 	options.insert("*");
 
 	try
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << "Config file read: " << std::endl << "==================="
 				<< std::endl;
 #endif
 		for (boost::program_options::detail::config_file_iterator i(config,
 				options), e; i != e; ++i)
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << i->string_key << " " << i->value[0] << std::endl;
 #endif
 			parameters[i->string_key] = i->value[0];
@@ -125,19 +171,25 @@ void Tactek_Display::read_config()
 	}
 }
 
-void Tactek_Display::check_for_updates()
+void Tactek_Display::check_playlist_items_downloaded()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::check_for_updates()" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_DEBUG_OUTPUT
     /* First, we check what files we have... */
     std::vector<std::string> files_needed;
     for(Container::iterator it = display_client->get_playlist_container()->get_playlist_container()->begin();
         it != display_client->get_playlist_container()->get_playlist_container()->end(); ++it)
     {
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " - Checking: " << it->first->get_playlist_name() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
         for(std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
             it2 != it->first->get_playlist_items()->end(); ++it2)
         {
+#ifdef _SHOW_DEBUG_OUTPUT
+            std::cout << "  - Playlist Item: " << it2->first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
             std::vector<std::string>::iterator item_found = std::find(filelist.begin(), filelist.end(), it2->first);
             if(item_found == filelist.end())
             {//We do not have the needed file
@@ -210,13 +262,23 @@ void Tactek_Display::check_for_updates()
 }
 void Tactek_Display::update_display_client()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::send_identity_to_server()" << std::endl;
-#endif // _DEBUG
-    display_client->get_display_client_xml();
+#endif // _SHOW_DEBUG_OUTPUT
+   	pugi::xml_document document;
+ 	pugi::xml_node tacktech_node = document.append_child("Tacktech");
+	pugi::xml_node type_node = tacktech_node.append_child("Type");
+ 	type_node.append_attribute("TYPE") = "IDENTIFY";
+ 	pugi::xml_node identity_node = tacktech_node.append_child("Identity");
+ 	identity_node.append_attribute("Organization_Name") = parameters["general.organization_name"].c_str();
+ 	identity_node.append_attribute("Computer_Name") = parameters["general.computer_name"].c_str();
+
+	xml_string_writer writer;
+	document.save(writer);
+	document.print(std::cout);
 
 	boost::shared_ptr<std::string> string_to_send;
-	string_to_send.reset(new std::string(display_client->get_display_client_xml()));
+	string_to_send.reset(new std::string(writer.result));
 
 	io_service->reset();
 	network_manager.reset(
@@ -287,10 +349,10 @@ void Tactek_Display::play_next_media_in_queue()
  ** the commands specified in the xml */
 void Tactek_Display::handle_recieved_data(QString data)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
 	std::cout << " - Received data size: " << data.size() << std::endl;
-#endif //_DEBUG
+#endif //_SHOW_DEBUG_OUTPUT
 	/** Disconnect allows the network_manager smart pointer to be deleted
 	 *  as no further reference to it exists */
 	disconnect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
@@ -301,20 +363,20 @@ void Tactek_Display::handle_recieved_data(QString data)
 	std::string type_string = tacktech_node.child("Type").attribute("TYPE").as_string();
 	if (type_string == "UPLOAD")
 	{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved UPLOAD command" << std::endl;
-#endif //_DEBUG
-		pugi::xml_node computer_node = tacktech_node.child("Computer");
+#endif //_SHOW_DEBUG_OUTPUT
+		pugi::xml_node computer_node = tacktech_node.child("Items_Node");
 		for (pugi::xml_node file_data_node = computer_node.child("Item");
 				file_data_node;
 				file_data_node = file_data_node.next_sibling("Item"))
 		{
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "Filename: " << file_data_node.child_value("Filename")
 					<< std::endl;
 			std::cout << "Pause: " << file_data_node.child_value("Pause")
 					<< std::endl;
-#endif //_DEBUG
+#endif //_SHOW_DEBUG_OUTPUT
 			std::string filename = file_data_node.child_value("Filename");
 			std::string file_data = file_data_node.child_value("File_Data");
 			std::stringstream encoded_stream;
@@ -325,7 +387,7 @@ void Tactek_Display::handle_recieved_data(QString data)
 			D.decode(encoded_stream, decoded_stream);
 			file_data = decoded_stream.str();
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "File_Data size: " << file_data.size() << std::endl;
 #endif
 
@@ -333,29 +395,58 @@ void Tactek_Display::handle_recieved_data(QString data)
 			out_file << file_data;
 			out_file.close();
 
-			std::string pause = file_data_node.child_value("Pause");
-			if (pause == "")
-				pause = "0";
-
-			emit new_file_added(QString::fromStdString(filename),
-					boost::lexical_cast<int>(pause));
+//			std::string pause = file_data_node.child_value("Pause");
+//			if (pause == "")
+//				pause = "0";
+//
+//			emit new_file_added(QString::fromStdString(filename),
+//					boost::lexical_cast<int>(pause));
 		}
 	}
+	else if (type_string == "UPDATE")
+    {
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " - Recieved UPDATE command" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+        std::string groups_string = tacktech.child("Identification").attribute("GROUPS").as_string();
+        std::set<std::string> groups_set = make_set(groups_string);
+        /* Update the groups of the display_container */
+        display_client->set_groups(groups_set);
+
+        pugi::xml_node container_node = tacktech_node.child("CONTAINER").child("Display_Client_Item");
+        xml_string_writer writer;
+        container_node.print(writer);
+        container_node.print(std::cout);
+
+        Display_Client client(writer.result);
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << "  - Display_Container groups count: " << display_client->get_groups()->size() << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+        for(std::set<std::string>::iterator it = display_client->get_groups()->begin();
+            it != display_client->get_groups()->end(); ++it)
+        {
+            display_client->update_playlist_container(
+                    client.get_playlist_container(),
+                    parameters["general.organization"],
+                    *it);
+        }
+        display_client->get_playlist_container()->print_contents();
+    }
 	else if(type_string == "IDENTIFY")
 	{
 		/** This return is just to notify the display that its
 		 *  identity has been sent to the server. It does nothing
 		 *  more at this moment.
 		 */
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved IDENTIFY command" << std::endl;
-#endif //_DEBUG
+#endif //_SHOW_DEBUG_OUTPUT
 	}
 	//tacktech.print(std::cout);
 }
 void Tactek_Display::handle_new_file_added(QString new_filename, int pause)
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tactek_Display::handle_new_file_added()" << std::endl;
 #endif
 	//QPair<QString, int> playlist_item;
@@ -366,9 +457,10 @@ void Tactek_Display::handle_new_file_added(QString new_filename, int pause)
 
 void Tactek_Display::check_file_directory()
 {
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tactek_Display::check_file_directory()" << std::endl;
 #endif
+    filelist.clear();
     boost::filesystem::path current_dir(parameters["general.playlist_directory"]);
 	for (boost::filesystem::recursive_directory_iterator iter(current_dir), end;
 		iter != end;
@@ -377,4 +469,59 @@ void Tactek_Display::check_file_directory()
 		std::string name = iter->path().generic_string();
 		filelist.push_back(name);
 	}
+}
+
+
+std::set<std::string> Tactek_Display::make_set( std::string comma_separated_list)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tactek_Display::make_vector" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	std::set<std::string> vector_from_string;
+	while(comma_separated_list.find(",") != std::string::npos)
+	{
+		vector_from_string.insert(comma_separated_list.substr(0, comma_separated_list.find(",")));
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " ++ " << comma_separated_list.substr(0, comma_separated_list.find(",")) << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		comma_separated_list = comma_separated_list.substr(comma_separated_list.find(",") + 1);
+	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " ++ " << comma_separated_list << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	vector_from_string.insert(comma_separated_list);
+	return vector_from_string;
+}
+
+void Tactek_Display::check_display_container()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tactek_Display::make_vector" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+    std::string upload_string = "<Tacktech>";
+    upload_string += "<Type TYPE=\"UPDATE_DISPLAY_CLIENT\" />";
+    upload_string += "<Identification ORGANIZATION=\"";
+    upload_string += parameters["general.organization_name"];
+    upload_string += "\" />";
+    upload_string += "<CONTAINER>";
+    upload_string += "<Display_Client_Item>";
+    upload_string += display_client->get_display_client_xml();
+    upload_string += "</Display_Client_Item>";
+    upload_string += "</CONTAINER>";
+    upload_string += "</Tacktech>";
+
+    boost::shared_ptr<std::string> string_to_send;
+	string_to_send.reset(new std::string(upload_string));
+
+	io_service->reset();
+	network_manager.reset(
+				new Tacktech_Network_Manager(*io_service, parameters));
+	network_manager->connect(parameters["general.server_ip"],
+			parameters["general.server_port"]);
+	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
+				SLOT(handle_recieved_data(QString)));
+	network_manager->start_write(string_to_send);
+	boost::thread t(
+		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+	t.join();
 }

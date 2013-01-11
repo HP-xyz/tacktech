@@ -4,11 +4,12 @@ cmake_minimum_required(VERSION 2.8)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared instead of static library")
 
 link_libraries(${QT_LIBRARIES})
-include_directories (${QT_INCLUDES})
 
 include_directories(
 		${Boost_INCLUDE_DIRS}
 		${PUGIXML_INCLUDE_DIR}
+		${QT_INCLUDES}
+		${LIBB64_INCLUDE_DIR}
 		)
 
 set (TACKTECH_COMMON_MOC_HDRS
@@ -52,6 +53,7 @@ if(BUILD_SHARED_LIBS)
 				pugixml
 				${Boost_LIBRARIES}
 				${QT_LIBRARIES}
+				libb64
 				)
 else(BUILD_SHARED_LIBS)
     add_library(Tacktech_Common
@@ -65,5 +67,6 @@ else(BUILD_SHARED_LIBS)
 				pugixml
 				${Boost_LIBRARIES}
 				${QT_LIBRARIES}
+				libb64
 				)
 endif(BUILD_SHARED_LIBS)
