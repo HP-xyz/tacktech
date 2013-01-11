@@ -63,6 +63,8 @@ public:
 
 	std::pair<std::string,int> get_next_item();
 
+	std::vector<std::string> get_needed_items(std::vector<std::string>);
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
 #endif // _SHOW_DEBUG_OUTPUT

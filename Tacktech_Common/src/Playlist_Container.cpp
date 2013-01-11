@@ -231,15 +231,22 @@ void Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::update_playlist" << std::endl;
+	std::cout << " - Playlist_Container size: " << m_playlist_container->size() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	for (Container::iterator it = m_playlist_container->begin();
 		it != m_playlist_container->end(); ++it)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Checking playlist: " << it->first->get_playlist_name() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		std::vector<std::string> organizations_vector = it->second;
 		std::vector<std::string>::iterator it2 =
 			std::find(organizations_vector.begin(), organizations_vector.end(), p_organization_name);
 		if (it2 != organizations_vector.end())
 		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Organization Found" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 			Playlist_Ptr playlist_ptr = get_playlist_ptr(it->first->get_playlist_name(), p_organization_name);
 			if (playlist_ptr != 0)
 			{//Playlist_Item not found, therefore adding it
@@ -263,6 +270,9 @@ void Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 				playlist_ptr->set_start_time(it->first->get_start_time());
 			}
 		}
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Organization NOT Found" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	}
 }
 
@@ -329,7 +339,7 @@ std::string Playlist_Container::get_current_playing_item()
 					it->first->get_current_item_index()).first;
 			}
 		}
-		return "COULD NOT GET PLAYLIST ITEM";
+		return "NOTHING CURRENTLY PLAYING";
 	}
 }
 
@@ -352,6 +362,10 @@ boost::shared_ptr<std::set<Playlist_Ptr> > Playlist_Container::get_playlists_of_
 std::pair<std::string,int> Playlist_Container::get_next_item()
 {
     std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
+    current_time_str = current_time_str.substr(current_time_str.find("T") + 1);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Current Time: " << current_time_str << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
     boost::posix_time::time_duration current_time(
     	boost::lexical_cast<int,std::string>(current_time_str.substr(0, 2)),
     	boost::lexical_cast<int,std::string>(current_time_str.substr(2, 2)),
@@ -389,6 +403,27 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
         }
     }
     return std::pair<std::string,int>("NO ITEMS", 0);
+}
+
+
+std::vector<std::string> Playlist_Container::get_needed_items( std::vector<std::string> dislpay_files)
+{
+	std::vector<std::string> needed_items;
+	for (Container::iterator it = get_playlist_container()->begin();
+		it != get_playlist_container()->end(); ++it)
+	{//Iterating through playlists
+		for (std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
+			it2 != it->first->get_playlist_items()->end(); ++it2)
+		{//Iterating through playlist items
+			std::vector<std::string>::iterator file_found =
+				std::find(dislpay_files.begin(), dislpay_files.end(), it2->first);
+			if (file_found == dislpay_files.end())
+			{//File needs to be uploaded
+				needed_items.push_back(it2->first);
+			}
+		}
+	}
+	return needed_items;
 }
 
 #ifdef _SHOW_DEBUG_OUTPUT

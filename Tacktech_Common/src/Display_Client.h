@@ -35,6 +35,10 @@ public:
 	/** Receives a boost::posix_time::ptime that will
 	 ** indicate the last successful ping the Display_
 	 ** Client sent. */
+
+	/**Sets the last ping to NOW */
+	void set_last_ping();
+
 	void set_last_ping(boost::posix_time::ptime);
 	/** Receives a std::set<std::string> that will
 	 ** replace the current groups the Dislay_Client

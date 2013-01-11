@@ -164,13 +164,12 @@ if (LOCAL_PUGIXML)
 	set (PUGIXML_INCLUDE_DIR ${Tacktech_SOURCE_DIR}/pugixml/src)
 endif (LOCAL_PUGIXML)
 add_subdirectory(${Tacktech_SOURCE_DIR}/libb64)
+set(LIBB64_INCLUDE_DIR ${Tacktech_SOURCE_DIR}/libb64/include)
 
 add_subdirectory(${Tacktech_SOURCE_DIR}/Tacktech_Common)
 set(Tacktech_Common_INCLUDE_DIR
 	${Tacktech_SOURCE_DIR}/Tacktech_Common/src
 	)
-
-set(LIBB64_INCLUDE_DIR ${Tacktech_SOURCE_DIR}/libb64/include)
 
 message("")
 message (STATUS "Qt include dir	: ${QT_INCLUDE_DIR}")

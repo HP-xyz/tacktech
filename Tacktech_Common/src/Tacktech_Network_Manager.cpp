@@ -30,9 +30,9 @@ void Tacktech_Network_Manager::start_write(
 void Tacktech_Network_Manager::do_write()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " =Tacktech_Network_Manager::do_write()" 
+	std::cout << " =Tacktech_Network_Manager::do_write()"
 		<< std::endl;
-	std::cout << " ->>> Socket is currently open: " 
+	std::cout << " ->>> Socket is currently open: "
 		<< m_socket->is_open() << std::endl;
 	std::cout << " - Writing size: " << xml_string->size() << std::endl;
 #endif //_DEBUG
@@ -49,15 +49,15 @@ void Tacktech_Network_Manager::handle_write(
 		std::size_t bytes_transferred)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " == Tacktech_Network_Manager::Handle Write" 
+	std::cout << " == Tacktech_Network_Manager::Handle Write"
 		<< std::endl << " ==============="
 			<< std::endl;
-	std::cout << " - Bytes_Transferred: " << bytes_transferred 
+	std::cout << " - Bytes_Transferred: " << bytes_transferred
 		<< std::endl;
 #endif
 	if (error)
 	{
-		std::cerr << " - Error encountered: " << error.message() 
+		std::cerr << " - Error encountered: " << error.message()
 			<< std::endl;
 	}
 	else
@@ -72,7 +72,7 @@ void Tacktech_Network_Manager::connect(std::string dest_ip,
 	try
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << "= Tacktech_Network_Manager::connect()" 
+		std::cout << "= Tacktech_Network_Manager::connect()"
 			<< std::endl;
 		std::cout << " ->> Dest IP:   " << dest_ip << std::endl;
 		std::cout << " ->> Dest PORT: " << dest_port << std::endl;
@@ -140,7 +140,7 @@ void Tacktech_Network_Manager::handle_connect(
 void Tacktech_Network_Manager::do_close()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Tacktech_Network_Manager::do_close()" 
+	std::cout << "= Tacktech_Network_Manager::do_close()"
 		<< std::endl;
 #endif // _DEBUG
 	m_socket->close();
@@ -164,8 +164,8 @@ void Tacktech_Network_Manager::handle_read(
 	std::cout << " == Tacktech_Network_Manager::Handle Read" << std::endl << " =============="
 		<< std::endl << " - Bytes transferred before error check: "
 		<< bytes_transferred << std::endl;
-	std::cout << " --> Recieved from IP: " 
-		<< m_socket->remote_endpoint().address().to_string() 
+	std::cout << " --> Recieved from IP: "
+		<< m_socket->remote_endpoint().address().to_string()
 		<< std::endl;
 #endif // _DEBUG
 	/** Constructing the recieved message to std::string*/
@@ -175,7 +175,7 @@ void Tacktech_Network_Manager::handle_read(
 	{
 		xml.push_back('5');
 	}
-	xml.push_back(NULL);
+	xml.push_back(0);
 	buffer.sgetn(&xml[0], bytes_transferred);
 	std::string received_xml;
 	for (unsigned int i = 0; i < bytes_transferred; i++)

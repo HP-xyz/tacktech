@@ -31,7 +31,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
@@ -63,19 +63,21 @@ public:
 	void set_playlist_name(QString);
 private slots:
 	void check_media_state();
-	void check_for_updates();
+	void check_playlist_items_downloaded();
 	void update_display_client();
 	void play_next_media_in_queue();
 	void open_and_play(QString);
 	void handle_recieved_data(QString data);
 	void handle_new_file_added(QString, int);
 	void check_file_directory();
+	void check_display_container();
 private:
 	Ui::Tactek_Display *ui;
 	Display_Client_Ptr display_client;
 	QTimer *update_timer;
 	QTimer *check_update_timer;
 	QTimer *identify_timer;
+	QTimer *update_display_client_timer;
 	VlcInstance *m_vlc_instance;
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
@@ -92,6 +94,8 @@ private:
 
 	/** Reads a config file*/
 	void read_config();
+
+	std::set<std::string> make_set(std::string);
 };
 
 #endif // TACTEK_DISPLAY_H

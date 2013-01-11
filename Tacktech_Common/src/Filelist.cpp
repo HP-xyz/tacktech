@@ -182,3 +182,45 @@ std::vector<std::string> Filelist::get_filelist( std::string organization_name)
 	return return_vector;
 }
 
+std::string Filelist::get_binary_file( std::string organization_name, std::string filename)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Filelist::get_binary_file()" << std::endl;
+	std::cout << " - Getting file: " << filename << std::endl;
+#endif // _DEBUG
+	std::string file_encoded;
+	std::string test;
+	std::ifstream file(filename.c_str(), std::ios::binary);
+	if (file.is_open())
+	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - File is open" << std::endl;
+		file.seekg(0, std::ios::end);
+		std::cout << " - Tellg(): " << file.tellg() << std::endl;
+		file.seekg(0, std::ios::beg);
+#endif // _DEBUG
+		std::stringstream *file_in = new std::stringstream();
+		*file_in << file.rdbuf();
+		std::cout << "file_in size: " << file_in->str().size() << std::endl;
+		*file_in << std::ends;
+		base64::encoder E;
+		std::stringstream file_out;
+		E.encode(*file_in, file_out);
+		delete file_in;
+		file_out << std::ends;
+		std::cout << "file_out size: " << file_out.str().size() << std::endl;
+		file_encoded = file_out.str();
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Encoded filesize: " << file_encoded.size()
+			<< std::endl;
+#endif // _DEBUG
+		file.close();
+	}
+	return (file_encoded);
+}
+
+std::string Filelist::get_true_filename( std::string organization_name, std::string filename)
+{
+	return organization_name + "_" + filename;
+}
+
