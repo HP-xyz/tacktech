@@ -23,7 +23,7 @@ void Tacktech_Network_Manager::start_write(
 	std::cout << " =Tacktech_Network_Manager::start_write()"
 		<< std::endl;
 #endif //_DEBUG
-	xml_string.reset();
+	xml_string.reset(new std::string());
 	xml_string = _xml_string;
 }
 
