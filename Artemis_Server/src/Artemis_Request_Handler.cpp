@@ -165,6 +165,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "  - Adding filelist XML" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+			filelist->scan_playlist_directory();
 			upload_xml += filelist->get_filelist_xml(organization_name);
             return_xml->append(upload_xml);
             result_status = SINGLE_RESULT;

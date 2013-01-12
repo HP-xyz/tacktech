@@ -22,6 +22,7 @@ public:
 	void add_file(std::string, std::string);
 	std::string get_filelist_xml(std::string);
 	std::vector<std::string> get_filelist(std::string);
+	void scan_playlist_directory();
 
 	/* Returns a std::string representation of a binary file,
 	 * belonging to an organization identified by the first parameter
@@ -35,7 +36,6 @@ private:
 	boost::shared_ptr<Filelist_Data> filelist;
 	std::map<std::string, std::string> parameters;
 
-	void scan_playlist_directory();
 	Filelist_Data::iterator get_iter_to_organization(std::string);
 	void add_new_file_and_organization(std::string);
 
