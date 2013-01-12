@@ -8,6 +8,7 @@
 #include <pugixml.hpp>
 
 const boost::posix_time::ptime ALL_DAY_TIME = boost::posix_time::from_iso_string("20020131T235959");
+const boost::posix_time::time_duration ALL_DAY_TIME_DURATION(23,59,59,0);
 class Playlist
 {
 public:

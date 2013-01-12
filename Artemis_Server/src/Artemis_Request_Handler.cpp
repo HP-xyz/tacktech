@@ -229,7 +229,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			tacktech.child("Identification_Node").attribute("Organization").as_string();
 		std::vector<std::string> remote_files;
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Remote has files: " << std::endl;
+		std::cout << " - Remote needs files: " << std::endl;
 #endif // _DEBUG
 		for (pugi::xml_attribute_iterator it =
 				tacktech.child("File_Node").attributes().begin();
@@ -246,13 +246,16 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		{
 			std::vector<std::string> items_to_upload =
 				identified_display->get_playlist_container()->get_needed_items(remote_files);
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "   - Need to upload '" << items_to_upload.size() << "' items" << std::endl; 
+#endif // _SHOW_DEBUG_OUTPUT
 			if (items_to_upload.size() > 0)
 			{//There are items to upload
 				pugi::xml_document upload_document;
 				pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
 				pugi::xml_node type_node = tacktech_node.append_child("Type");
 				type_node.append_attribute("TYPE") = "UPLOAD";
-				pugi::xml_node items_node = tacktech.append_child("Items_Node");
+				pugi::xml_node items_node = tacktech_node.append_child("Items_Node");
 
 				for (std::vector<std::string>::iterator it = items_to_upload.begin();
 					it != items_to_upload.end(); ++it)

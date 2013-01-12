@@ -364,7 +364,7 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
     std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
     current_time_str = current_time_str.substr(current_time_str.find("T") + 1);
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Current Time: " << current_time_str << std::endl;
+	std::cout << "[" << current_time_str.substr(0, 2) << ":" << current_time_str.substr(2,2) << ":" << current_time_str.substr(4) << "]" << " => ";
 #endif // _SHOW_DEBUG_OUTPUT
     boost::posix_time::time_duration current_time(
     	boost::lexical_cast<int,std::string>(current_time_str.substr(0, 2)),
@@ -374,20 +374,26 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
     for(Container::iterator it = get_playlist_container()->begin();
         it != get_playlist_container()->end(); ++it)
     {
-        if(it->first->get_start_time() < current_time &&
-            it ->first->get_end_time() > current_time)
+        if((it->first->get_start_time() < current_time &&
+            it ->first->get_end_time() > current_time) ||
+			(it->first->get_start_time() == ALL_DAY_TIME_DURATION &&
+			it->first->get_end_time() == ALL_DAY_TIME_DURATION))
         {
+#ifdef _SHOW_DEBUG_OUTPUT
+            std::cout << "INDEX: " << it->first->get_current_item_index() << " <-> ";
+#endif // _SHOW_DEBUG_OUTPUT
             if (it->first->get_current_item_index() == -1)
             {//First time the playlist is being played
                 it->first->currently_active = true;
                 it->first->set_current_item_index(0);
                 return it->first->get_playlist_items()->at(0);
             }
-            else if(it->first->get_current_item_index() == it->first->get_playlist_items()->size())
+            else if(it->first->get_current_item_index() == (it->first->get_playlist_items()->size() - 1) )
             {//Looping playlist
                 it->first->currently_active = true;
+                int index = it->first->get_current_item_index();
                 it->first->set_current_item_index(0);
-                return it->first->get_playlist_items()->at(0);
+                return it->first->get_playlist_items()->at(index);
             }
             else
             {//Playing next item normally
@@ -408,17 +414,30 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
 
 std::vector<std::string> Playlist_Container::get_needed_items( std::vector<std::string> dislpay_files)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist_Container::get_needed_items()" << std::endl;
+	print_contents();
+#endif // _SHOW_DEBUG_OUTPUT
 	std::vector<std::string> needed_items;
 	for (Container::iterator it = get_playlist_container()->begin();
 		it != get_playlist_container()->end(); ++it)
 	{//Iterating through playlists
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Playlist: " << it->first->get_playlist_name() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		for (std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
 			it2 != it->first->get_playlist_items()->end(); ++it2)
 		{//Iterating through playlist items
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Playlist_Item: " << it2->first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 			std::vector<std::string>::iterator file_found =
 				std::find(dislpay_files.begin(), dislpay_files.end(), it2->first);
-			if (file_found == dislpay_files.end())
+			if (file_found != dislpay_files.end())
 			{//File needs to be uploaded
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << "   - ADDING: " << it2->first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 				needed_items.push_back(it2->first);
 			}
 		}
