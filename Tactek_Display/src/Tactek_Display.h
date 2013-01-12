@@ -73,7 +73,7 @@ private slots:
 	void check_display_container();
 private:
 	Ui::Tactek_Display *ui;
-	Display_Client_Ptr display_client;
+	Display_Client_Ptr m_display_client;
 	QTimer *update_timer;
 	QTimer *check_update_timer;
 	QTimer *identify_timer;

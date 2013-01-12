@@ -190,7 +190,7 @@ std::string Filelist::get_binary_file( std::string organization_name, std::strin
 #endif // _DEBUG
 	std::string file_encoded;
 	std::string test;
-	std::ifstream file(filename.c_str(), std::ios::binary);
+	std::ifstream file(get_true_filename(organization_name, filename).c_str(), std::ios::binary);
 	if (file.is_open())
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -221,6 +221,6 @@ std::string Filelist::get_binary_file( std::string organization_name, std::strin
 
 std::string Filelist::get_true_filename( std::string organization_name, std::string filename)
 {
-	return organization_name + "_" + filename;
+	return parameters["general.playlist_directory"] + organization_name + "_" + filename;
 }
 

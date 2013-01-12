@@ -55,7 +55,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	std::cout << "= Tacktech_Manager()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	ui->setupUi(this);
-	display_client.reset(new Display_Client());
+	m_display_client.reset(new Display_Client());
 	read_config();
 
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -66,9 +66,9 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Assigning Computer_name and Organization_name" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	display_client->set_identification(parameters["general.computer_name"]);
-	display_client->add_organization(parameters["general.organization_name"]);
-	display_client->set_last_ping();
+	m_display_client->set_identification(parameters["general.computer_name"]);
+	m_display_client->add_organization(parameters["general.organization_name"]);
+	m_display_client->set_last_ping();
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up timers" << std::endl;
@@ -178,8 +178,8 @@ void Tactek_Display::check_playlist_items_downloaded()
 #endif // _SHOW_DEBUG_OUTPUT
     /* First, we check what files we have... */
     std::vector<std::string> files_needed;
-    for(Container::iterator it = display_client->get_playlist_container()->get_playlist_container()->begin();
-        it != display_client->get_playlist_container()->get_playlist_container()->end(); ++it)
+    for(Container::iterator it = m_display_client->get_playlist_container()->get_playlist_container()->begin();
+        it != m_display_client->get_playlist_container()->get_playlist_container()->end(); ++it)
     {
 #ifdef _SHOW_DEBUG_OUTPUT
         std::cout << " - Checking: " << it->first->get_playlist_name() << std::endl;
@@ -204,8 +204,8 @@ void Tactek_Display::check_playlist_items_downloaded()
         pugi::xml_node type_node = tacktech_node.append_child("Type");
         type_node.append_attribute("TYPE") = "GET_UPDATES";
         pugi::xml_node identification_node = tacktech_node.append_child("Identification_Node");
-        identification_node.append_attribute("Identification") = display_client->get_identification().c_str();
-        identification_node.append_attribute("Organization") = parameters["general.computer_name"].c_str();
+        identification_node.append_attribute("Identification") = m_display_client->get_identification().c_str();
+        identification_node.append_attribute("Organization") = parameters["general.organization_name"].c_str();
         pugi::xml_node file_node = tacktech_node.append_child("File_Node");
         for(std::vector<std::string>::iterator it = files_needed.begin(); it != files_needed.end(); ++it)
             file_node.append_attribute("File") = it->c_str();
@@ -322,8 +322,9 @@ void Tactek_Display::check_media_state()
  */
 void Tactek_Display::play_next_media_in_queue()
 {
-    std::pair<std::string, int> next_item = display_client->get_playlist_container()->get_next_item();
-	if (next_item.first != "NO ITEMS")
+    std::pair<std::string, int> next_item = m_display_client->get_playlist_container()->get_next_item();
+    std::ifstream file(next_item.first.c_str());
+	if (next_item.first != "NO ITEMS" && file.good())
 	{
 		if (next_item.second == 0)
 		{
@@ -411,7 +412,7 @@ void Tactek_Display::handle_recieved_data(QString data)
         std::string groups_string = tacktech.child("Identification").attribute("GROUPS").as_string();
         std::set<std::string> groups_set = make_set(groups_string);
         /* Update the groups of the display_container */
-        display_client->set_groups(groups_set);
+        m_display_client->set_groups(groups_set);
 
         pugi::xml_node container_node = tacktech_node.child("CONTAINER").child("Display_Client_Item");
         xml_string_writer writer;
@@ -419,18 +420,19 @@ void Tactek_Display::handle_recieved_data(QString data)
         container_node.print(std::cout);
 
         Display_Client client(writer.result);
-#ifdef _SHOW_DEBUG_OUTPUT
-        std::cout << "  - Display_Container groups count: " << display_client->get_groups()->size() << std::endl;
-#endif //_SHOW_DEBUG_OUTPUT
-        for(std::set<std::string>::iterator it = display_client->get_groups()->begin();
-            it != display_client->get_groups()->end(); ++it)
-        {
-            display_client->update_playlist_container(
-                    client.get_playlist_container(),
-                    parameters["general.organization"],
-                    *it);
-        }
-        display_client->get_playlist_container()->print_contents();
+        m_display_client->set_playlist_container(client.get_playlist_container());
+//#ifdef _SHOW_DEBUG_OUTPUT
+//        std::cout << "  - Display_Container groups count: " << display_client->get_groups()->size() << std::endl;
+//#endif //_SHOW_DEBUG_OUTPUT
+//        for(std::set<std::string>::iterator it = display_client->get_groups()->begin();
+//            it != display_client->get_groups()->end(); ++it)
+//        {
+//            display_client->update_playlist_container(
+//                    client.get_playlist_container(),
+//                    parameters["general.organization"],
+//                    *it);
+//        }
+        m_display_client->get_playlist_container()->print_contents();
     }
 	else if(type_string == "IDENTIFY")
 	{
@@ -505,7 +507,7 @@ void Tactek_Display::check_display_container()
     upload_string += "\" />";
     upload_string += "<CONTAINER>";
     upload_string += "<Display_Client_Item>";
-    upload_string += display_client->get_display_client_xml();
+    upload_string += m_display_client->get_display_client_xml();
     upload_string += "</Display_Client_Item>";
     upload_string += "</CONTAINER>";
     upload_string += "</Tacktech>";

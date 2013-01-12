@@ -187,10 +187,18 @@ void Display_Client_Container::update_groups_and_playlist(Display_Client_Contain
 
 Display_Client_Ptr Display_Client_Container::get_display_client( std::string organization_name, std::string identification)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client_Container::get_display_client()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container()->begin();
 		it != get_display_client_container()->end(); ++it)
 	{
-		if (it->get()->contains_organization(organization_name) 
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Checking: " << std::endl;
+		std::cout << "  - Display_Client contains organization '" << organization_name << "': " << it->get()->contains_organization(organization_name) << std::endl;
+		std::cout << "  - " << it->get()->get_identification() << " == " << identification << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		if (it->get()->contains_organization(organization_name)
 			&& it->get()->get_identification() == identification)
 		{// Correct Display_Client found
 			return *it;
