@@ -110,10 +110,10 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	std::cout << " - Starting Timers" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	update_timer->start(1000);
-	check_update_timer->start(180000);
+	check_update_timer->start(80000);
 	update_display_client_timer->start(60000);
 	identify_timer->start(30000);
-	check_playlist_items_downloaded();
+	update_display_client();
 }
 
 Tactek_Display::~Tactek_Display()
@@ -420,7 +420,9 @@ void Tactek_Display::handle_recieved_data(QString data)
         container_node.print(std::cout);
 
         Display_Client client(writer.result);
-        m_display_client->set_playlist_container(client.get_playlist_container());
+        bool playlist_container_changed = m_display_client->get_playlist_container()->update_playlist(*client.get_playlist_container(), parameters["general.organization_name"]);
+//        if(playlist_container_changed)
+//            check_playlist_items_downloaded();
 //#ifdef _SHOW_DEBUG_OUTPUT
 //        std::cout << "  - Display_Container groups count: " << display_client->get_groups()->size() << std::endl;
 //#endif //_SHOW_DEBUG_OUTPUT

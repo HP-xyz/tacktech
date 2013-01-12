@@ -227,53 +227,94 @@ std::vector<std::string> Playlist_Container::make_vector( std::string comma_sepa
 	return vector_from_string;
 }
 
-void Playlist_Container::update_playlist( Playlist_Container p_playlist_container, std::string p_organization_name)
+bool Playlist_Container::update_playlist( Playlist_Container p_playlist_container, std::string p_organization_name)
 {
+	bool changed = false;
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::update_playlist" << std::endl;
 	std::cout << " - Playlist_Container size: " << m_playlist_container->size() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	for (Container::iterator it = m_playlist_container->begin();
-		it != m_playlist_container->end(); ++it)
+	if (m_playlist_container->size() == 0)
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Checking playlist: " << it->first->get_playlist_name() << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-		std::vector<std::string> organizations_vector = it->second;
-		std::vector<std::string>::iterator it2 =
-			std::find(organizations_vector.begin(), organizations_vector.end(), p_organization_name);
-		if (it2 != organizations_vector.end())
+#ifdef _IMPORTANT_OUTPUT
+		std::cout << " - Replacing Playlist_Container" << std::endl;
+#endif // _IMPORTANT_OUTPUT
+		m_playlist_container.reset(new Container(*p_playlist_container.get_playlist_container()));
+		changed = true;
+	}
+	else
+	{
+		for (Container::iterator it = m_playlist_container->begin();
+			it != m_playlist_container->end(); ++it)
 		{
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " - Organization Found" << std::endl;
+			std::cout << " - Checking playlist: " << it->first->get_playlist_name() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-			Playlist_Ptr playlist_ptr = get_playlist_ptr(it->first->get_playlist_name(), p_organization_name);
-			if (playlist_ptr != 0)
-			{//Playlist_Item not found, therefore adding it
-	#ifdef _IMPORTANT_OUTPUT
-				std::cout << " + ADDING NEW playlist: '" << it->first->get_playlist_name()
-					<< "' to organization: '" << p_organization_name << "'" << std::endl;
-	#endif // _IMPORTANT_OUTPUT
-				add_playlist(it->first, it->second);
-			}
-			else
-			{//Updating playlist items
-	#ifdef _IMPORTANT_OUTPUT
-				std::cout << " $ UPDATING playlist: '" << it->first->get_playlist_name()
-					<< "' to organization: '" << p_organization_name << "'" << std::endl;
-	#endif // _IMPORTANT_OUTPUT
-				playlist_ptr->set_current_item_index(it->first->get_current_item_index());
-				playlist_ptr->set_end_time(it->first->get_end_time());
-				playlist_ptr->set_groups(*it->first->get_groups());
-				playlist_ptr->set_playlist_items(*it->first->get_playlist_items());
-				playlist_ptr->set_playlist_name(it->first->get_playlist_name());
-				playlist_ptr->set_start_time(it->first->get_start_time());
-			}
-		}
+			std::vector<std::string> organizations_vector = it->second;
+			std::vector<std::string>::iterator it2 =
+				std::find(organizations_vector.begin(), organizations_vector.end(), p_organization_name);
+			if (it2 != organizations_vector.end())
+			{
 #ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Organization NOT Found" << std::endl;
+				std::cout << " - Organization Found" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+				Playlist_Ptr playlist_ptr = get_playlist_ptr(it->first->get_playlist_name(), p_organization_name);
+				if (playlist_ptr != 0)
+				{//Playlist_Item not found, therefore adding it
+#ifdef _IMPORTANT_OUTPUT
+					std::cout << " + ADDING NEW playlist: '" << it->first->get_playlist_name()
+						<< "' to organization: '" << p_organization_name << "'" << std::endl;
+#endif // _IMPORTANT_OUTPUT
+					add_playlist(it->first, it->second);
+					changed = true;
+				}
+				else
+				{//Updating playlist items
+#ifdef _IMPORTANT_OUTPUT
+					std::cout << " $ UPDATING playlist: '" << it->first->get_playlist_name()
+						<< "' to organization: '" << p_organization_name << "'" << std::endl;
+#endif // _IMPORTANT_OUTPUT
+					if (playlist_ptr->get_playlist_items()->size()
+						== it->first->get_playlist_items()->size())
+					{
+						bool playlist_identical = true;
+						for (int i = 0; i < playlist_ptr->get_playlist_items()->size(); ++i)
+						{
+							if (playlist_ptr->get_playlist_items()->at(i).first
+								!= it->first->get_playlist_items()->at(i).first)
+							{
+								playlist_identical = false;
+							}
+						}
+						if(!playlist_identical)
+						{//Playlists are different, replace current with parameter
+							playlist_ptr->set_current_item_index(-1);
+							playlist_ptr->set_end_time(it->first->get_end_time());
+							playlist_ptr->set_groups(*it->first->get_groups());
+							playlist_ptr->set_playlist_items(*it->first->get_playlist_items());
+							playlist_ptr->set_playlist_name(it->first->get_playlist_name());
+							playlist_ptr->set_start_time(it->first->get_start_time());
+							changed = true;
+						}
+					}
+					else
+					{//Playlists are different, replace current with parameter
+						playlist_ptr->set_current_item_index(-1);
+						playlist_ptr->set_end_time(it->first->get_end_time());
+						playlist_ptr->set_groups(*it->first->get_groups());
+						playlist_ptr->set_playlist_items(*it->first->get_playlist_items());
+						playlist_ptr->set_playlist_name(it->first->get_playlist_name());
+						playlist_ptr->set_start_time(it->first->get_start_time());
+						changed = true;
+					}
+				}
+			}
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Organization NOT Found" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		}
 	}
+	return changed;
 }
 
 Playlist_Ptr Playlist_Container::get_playlist_ptr( std::string p_playlist_name, std::string p_organization_name)
@@ -374,14 +415,15 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
     for(Container::iterator it = get_playlist_container()->begin();
         it != get_playlist_container()->end(); ++it)
     {
+        //TODO check for null size playlists
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << "INDEX: " << it->first->get_current_item_index() << " of " << it->first->get_playlist_items()->size() << " <-> ";
+#endif // _SHOW_DEBUG_OUTPUT
         if((it->first->get_start_time() < current_time &&
             it ->first->get_end_time() > current_time) ||
 			(it->first->get_start_time() == ALL_DAY_TIME_DURATION &&
 			it->first->get_end_time() == ALL_DAY_TIME_DURATION))
         {
-#ifdef _SHOW_DEBUG_OUTPUT
-            std::cout << "INDEX: " << it->first->get_current_item_index() << " <-> ";
-#endif // _SHOW_DEBUG_OUTPUT
             if (it->first->get_current_item_index() == -1)
             {//First time the playlist is being played
                 it->first->currently_active = true;
@@ -399,7 +441,7 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
             {//Playing next item normally
                 it->first->currently_active = true;
                 it->first->set_current_item_index(it->first->get_current_item_index() + 1);
-                return it->first->get_playlist_items()->at(it->first->get_current_item_index());
+                return it->first->get_playlist_items()->at(it->first->get_current_item_index() - 1);
             }
         }
         else

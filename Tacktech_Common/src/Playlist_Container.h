@@ -57,7 +57,7 @@ public:
 
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
-	void update_playlist(Playlist_Container, std::string);
+	bool update_playlist(Playlist_Container, std::string);
 
 	std::string get_current_playing_item();
 
