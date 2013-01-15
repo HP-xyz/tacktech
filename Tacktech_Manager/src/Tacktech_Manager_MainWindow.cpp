@@ -246,47 +246,6 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 				}
 			}
 		}
-//		Typed_QTreeWidgetItem *group_item;
-//		Typed_QTreeWidgetItem *computer_item;
-//		for (unsigned int i = 0;
-//			i < display_client_container->get_display_client_container()->size();
-//			++i)
-//		{
-//#ifdef _SHOW_DEBUG_OUTPUT
-//			std::cout << "   - Adding name: "
-//				<< display_client_container->get_display_client_container()
-//				->at(i)->get_identification()
-//				<< std::endl;
-//#endif // _DEBUG
-//			computer_item = new Typed_QTreeWidgetItem();
-//			computer_item->set_computer_name(
-//				QString::fromStdString(display_client_container->
-//				get_display_client_container()
-//				->at(i)->get_identification()));
-//
-//			computer_item->set_group_name(QString::fromStdString(
-//				display_client_container->get_display_client_container()
-//				->at(i)->get_groups_string()));
-//			computer_item->set_type("COMPUTER");
-//			computer_item->setText(0,
-//				QString::fromStdString(display_client_container->
-//				get_display_client_container()
-//				->at(i)->get_identification()));
-//			computer_item->setText(1, QString::fromStdString(
-//				display_client_container->get_display_client_container()
-//				->at(i)->get_groups_string()));
-//
-//			/** Here we get the elapsed time between now, and the last ping the
-//			  * remote screen has answered */
-//			boost::posix_time::time_duration duration =
-//				boost::posix_time::second_clock::universal_time()
-//				- display_client_container->get_display_client_container()->at(i)->get_last_ping();
-//			std::string str_duration = boost::posix_time::to_simple_string(duration);
-//
-//			computer_item->setText(2, QString::fromStdString(str_duration));
-//
-//			ui.main_tree_widget->addTopLevelItem(computer_item);
-//		}
 	}
 }
 
@@ -566,12 +525,12 @@ void Tacktech_Manager_MainWindow::assign_group()
 	}
 }
 
-void Tacktech_Manager_MainWindow::display_container_changed()
+void Tacktech_Manager_MainWindow::display_container_changed(Display_Client_Container_Ptr p_display_client_container)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-    std::cout << "=Tacktech_Manager_MainWindow::display_container_changed()" << std::endl;
+    std::cout << "=Tacktech_Manager_MainWindow::display_container_changed(Display_Client_Container_Ptr)" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-    temp_display_client_container.reset(new Display_Client_Container(*display_client_container));
+    temp_display_client_container.reset(new Display_Client_Container(*p_display_client_container));
     upload_data.reset(new Upload_Data_Container(parameters));
     connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
         SLOT(start_upload(std::string)));
@@ -580,13 +539,27 @@ void Tacktech_Manager_MainWindow::display_container_changed()
     upload_data->get_xml_upload();
 }
 
+void Tacktech_Manager_MainWindow::display_container_changed()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tacktech_Manager_MainWindow::display_container_changed()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	temp_display_client_container.reset(new Display_Client_Container(*display_client_container));
+	upload_data.reset(new Upload_Data_Container(parameters));
+	connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+		SLOT(start_upload(std::string)));
+	upload_data->set_display_client_container(temp_display_client_container);
+	upload_data->set_command("SET_DISPLAY_CONTAINER");
+	upload_data->get_xml_upload();
+}
+
 void Tacktech_Manager_MainWindow::edit_playlist_slot()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
     std::cout << "=Tacktech_Manager_MainWindow::edit_playlist_slot()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	if (edit_playlist_dialog.get() != 0)
-		disconnect(edit_playlist_dialog.get(), SIGNAL(playlist_changed()), this, SLOT(display_container_changed()));
+		disconnect(edit_playlist_dialog.get(), SIGNAL(playlist_changed(Display_Client_Container_Ptr)), this, SLOT(display_container_changed(Display_Client_Container_Ptr)));
     edit_playlist_dialog.reset(new Edit_Playlist());
 	edit_playlist_dialog->set_group_name(ui.main_tree_widget->selectedItems().at(0)->text(1).toStdString());
 	edit_playlist_dialog->set_filelist(filelist);
@@ -594,7 +567,7 @@ void Tacktech_Manager_MainWindow::edit_playlist_slot()
 	edit_playlist_dialog->set_display_client_container(display_client_container);
 	
 
-	connect(edit_playlist_dialog.get(), SIGNAL(playlist_changed()), this, SLOT(display_container_changed()));
+	connect(edit_playlist_dialog.get(), SIGNAL(playlist_changed(Display_Client_Container_Ptr)), this, SLOT(display_container_changed(Display_Client_Container_Ptr)));
 
 	edit_playlist_dialog->show();
 }

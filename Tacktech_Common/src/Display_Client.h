@@ -64,6 +64,8 @@ public:
 	 ** The set will be returned as a comma separated list. */
 	std::string get_groups_string();
 
+	std::string get_organizations_string();
+
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
 
@@ -80,6 +82,10 @@ public:
 
 	/** Consolidates the current playlist, with that in the parameter */
 	void update_playlist_container(Playlist_Container_Ptr, std::string, std::string);
+
+	/** Returns a std::vector<Playlist_Ptr> of all the playlists that belong to
+	 ** a group identified by the parameter */
+	std::vector<Playlist_Ptr> get_playlists_of_group(std::string);
 private:
 	std::string m_identification;
 	boost::posix_time::ptime m_last_ping;

@@ -291,3 +291,22 @@ void Display_Client::update_playlist_container( Playlist_Container_Ptr p_playlis
 		}
 	}
 }
+
+std::vector<Playlist_Ptr> Display_Client::get_playlists_of_group( std::string group_name)
+{
+	std::vector<Playlist_Ptr> playlist_list;
+	for (Container::iterator it = get_playlist_container()->get_playlist_container()->begin();
+		it != get_playlist_container()->get_playlist_container()->end(); ++it)
+	{
+		if (it->first->contains_group(group_name))
+		{
+			playlist_list.push_back(it->first);
+		}
+	}
+	return playlist_list;
+}
+
+std::string Display_Client::get_organizations_string()
+{
+	return make_list(*get_organizations());
+}

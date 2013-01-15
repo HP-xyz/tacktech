@@ -33,11 +33,11 @@ public:
 	void set_display_client_container(Display_Client_Container_Ptr);
 private:
 	Ui::Edit_PlaylistClass ui;
-	Playlist_Container_Ptr playlist;
-	Playlist_Container *original_playlist;
 	Filelist_Ptr filelist;
 	Display_Client_Container_Ptr display_client_container;
 
+	std::vector<Display_Client_Ptr> display_client_list;
+	std::vector<Playlist_Ptr> playlist_list;
 
 	boost::shared_ptr<Add_File_Dialog> add_file_dialog;
 
@@ -54,18 +54,18 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 private slots:
 	/* Primary slots, called by this class */
-	//void add_file_slot();
+	void add_file_slot();
 	void remove_playlist_slot();
 	void remove_file_slot();
 	void ok_clicked();
 	void cancel_clicked();
 	void create_playlist_slot();
-	void update_display_client_container();
 
 	/* Seconday slots */
+	void playlist_added_slot(Playlist_Ptr);
 	void repopulate_widget();
 signals:
-	void playlist_changed();
+	void playlist_changed(Display_Client_Container_Ptr);
 };
 
 #endif // EDIT_PLAYLIST_H

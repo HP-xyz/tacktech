@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include <sstream>
+#include <fstream>
 #include <b64/decode.h>
 #include <b64/encode.h>
 #include <boost/shared_ptr.hpp>

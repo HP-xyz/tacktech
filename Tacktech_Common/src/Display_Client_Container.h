@@ -50,6 +50,9 @@ public:
 	 ** to the Dislpay_Client if found, else return iterator to
 	 ** m_display_client_container.end(). */
 	std::vector<Display_Client_Ptr>::iterator find_display_client_by_ident(std::string);
+
+	std::vector<Display_Client_Ptr> get_display_clients(std::string, std::string);
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
 #endif // _SHOW_DEBUG_OUTPUT
