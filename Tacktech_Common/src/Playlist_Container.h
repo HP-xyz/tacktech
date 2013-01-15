@@ -65,6 +65,15 @@ public:
 
 	std::vector<std::string> get_needed_items(std::vector<std::string>);
 
+	/** Removes a playlist identified by the std::string in the parameter,
+	 ** which should be a playlist_name */
+	void remove_playlist(std::string);
+
+	/** Removes a playlist_item identified by the first std::string parameter
+	 ** as a playlist_name, and the second std::string parameter as a
+	 ** item_name*/
+	void remove_playlist_item(std::string, std::string);
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
 #endif // _SHOW_DEBUG_OUTPUT

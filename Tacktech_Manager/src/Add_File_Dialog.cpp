@@ -1,13 +1,15 @@
 #include "Add_File_Dialog.h"
 
-Add_File_Dialog::Add_File_Dialog(Playlist_Container_Ptr p_playlist, Filelist_Ptr p_filelist, QString p_playlist_name, QString p_playlist_organizaiton, QString p_playlist_group, QWidget *parent, Qt::WFlags flags) :
+Add_File_Dialog::Add_File_Dialog(Filelist_Ptr p_filelist, QString p_playlist_name, QString p_playlist_organizaiton, QString p_playlist_group, QWidget *parent, Qt::WFlags flags) :
 		QMainWindow(parent, flags)
 {
-	set_playlist(p_playlist);
 	set_filelist(p_filelist);
 	set_playlist_name(p_playlist_name);
 	set_playlist_organization(p_playlist_organizaiton);
 	set_playlist_group(p_playlist_group);
+	playlist.reset(new Playlist());
+	playlist->add_group(playlist_group.toStdString());
+	playlist->set_playlist_name(playlist_name.toStdString());
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog()" << std::endl;
 	std::cout << " - Setting up ui" << std::endl;
@@ -79,16 +81,6 @@ Add_File_Dialog::~Add_File_Dialog()
 	delete add_pause_dialog;
 }
 
-/** Sets the class playlist variable to that of the calling class.
- ** */
-void Add_File_Dialog::set_playlist(Playlist_Container_Ptr p_playlist)
-{
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Add_File_Dialog::set_playlist()" << std::endl;
-#endif // _DEBUG
-	playlist = p_playlist;
-}
-
 /** Sets the class playlist_name variable to the one gained from checking
  ** the selected item in the calling class's widget.
  ** NB: HAS TO BE CALLED BEFORE set_playlist*/
@@ -103,25 +95,16 @@ void Add_File_Dialog::repopulate_widget()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Add_File_Dialog::repopulate_widget()" << std::endl;
-	playlist->print_contents();
 #endif // _DEBUG
 	ui.playlist_filenames->clear();
-	Container temp_container = playlist->get_playlist_container(playlist_organization.toStdString());
-	for (Container::iterator it = temp_container.begin();
-		it != temp_container.end(); ++it)
+	for (std::vector<std::pair<std::string,int> >::iterator it = playlist->get_playlist_items()->begin();
+		it != playlist->get_playlist_items()->end(); ++it)
 	{
-		if (it->first->get_playlist_name() == playlist_name.toStdString())
-		{
-			for (std::vector<std::pair<std::string, int> >::iterator it2 = it->first->get_playlist_items()->begin();
-				it2 != it->first->get_playlist_items()->end(); ++it2)
-			{
-				Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
-				item->set_filename(QString::fromStdString(it2->first));
-				item->setText(0, QString::fromStdString(it2->first));
-				item->setText(1, QString::fromStdString(boost::lexical_cast<std::string, int>(it2->second)));
-				ui.playlist_filenames->addTopLevelItem(item);
-			}
-		}
+		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
+		item->set_filename(QString::fromStdString(it->first));
+		item->setText(0, QString::fromStdString(it->first));
+		item->setText(1, QString::fromStdString(boost::lexical_cast<std::string, int>(it->second)));
+		ui.playlist_filenames->addTopLevelItem(item);
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
 	filelist->print_contents();
@@ -190,7 +173,7 @@ void Add_File_Dialog::ok_clicked()
 	std::cout << "= Add_File_Dialog::ok_clicked()" << std::endl;
 #endif // _DEBUG
 	add_new_playlist();
-	emit playlist_edited();
+	emit playlist_added(playlist);
 	this->close();
 }
 
@@ -277,24 +260,17 @@ void Add_File_Dialog::add_new_playlist()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Add_File_Dialog::add_new_playlist()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	Playlist_Ptr new_playlist(new Playlist());
-	new_playlist->set_playlist_name(playlist_name.toStdString());
-	new_playlist->add_group(playlist_group.toStdString());
-	new_playlist->set_current_item_index(0);
 	for (int i = 0; i < ui.playlist_filenames->topLevelItemCount(); ++i)
 	{
-		new_playlist->add_playlist_item(
+		playlist->add_playlist_item(
 			ui.playlist_filenames->topLevelItem(i)->text(0).toStdString(),
 			ui.playlist_filenames->topLevelItem(i)->text(1).toInt());
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Created playlist '" << playlist_name.toStdString() 
-		<< "' containing '" << new_playlist->get_playlist_items()->size() << "' items" << std::endl;
-	std::cout << " - Playlist belongs to group: " << make_list(*new_playlist->get_groups()) << std::endl;
+		<< "' containing '" << playlist->get_playlist_items()->size() << "' items" << std::endl;
+	std::cout << " - Playlist belongs to group: " << make_list(*playlist->get_groups()) << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	std::vector<std::string> organization_vector;
-	organization_vector.push_back(playlist_organization.toStdString());
-	playlist->add_playlist(new_playlist, organization_vector);
 }
 std::string Add_File_Dialog::make_list( std::set<std::string> p_vector)
 {

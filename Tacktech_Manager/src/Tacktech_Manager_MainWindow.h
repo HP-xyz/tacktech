@@ -79,6 +79,7 @@ private slots:
 	void edit_playlist_slot();
 	void check_uploads_pending();
 	void assign_group();
+	void display_container_changed(Display_Client_Container_Ptr);
 	void display_container_changed();
 };
 

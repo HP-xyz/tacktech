@@ -63,7 +63,7 @@ void Edit_Playlist::remove_file_slot()
 			Typed_QTreeWidgetItem *selected_item =
 					static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
 							i));
-			if (selected_item->get_type() == "FILENAME")
+			if (selected_item->get_type() == "PLAYLIST_ITEM")
 			{
 #ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << " - Removing filename: "
@@ -73,17 +73,21 @@ void Edit_Playlist::remove_file_slot()
 				Typed_QTreeWidgetItem *selected_item_parent =
 						static_cast<Typed_QTreeWidgetItem*>(selected_item->parent());
 
-				//playlist->remove_filename_from_playlist(
-					//selected_item->get_playlist_name().toStdString(),
-					//selected_item->get_filename().toStdString());
+				for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
+					it != display_client_list.end(); ++it)
+				{
+					it->get()->get_playlist_container()->remove_playlist_item(
+						selected_item_parent->get_playlist_name().toStdString(),
+						selected_item->get_filename().toStdString());
+				}
 			}
-			else if (selected_item->get_type() == "PLAYLIST")
-			{
-#ifdef _SHOW_DEBUG_OUTPUT
-				std::cout << " - Removing playlist" << std::endl;
-#endif // _DEBUG
-				remove_playlist_slot();
-			}
+//			else if (selected_item->get_type() == "PLAYLIST")
+//			{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//				std::cout << " - Removing playlist" << std::endl;
+//#endif // _DEBUG
+//				remove_playlist_slot();
+//			}
 		}
 		/* We now repopulate the widget to reflect the changes */
 		repopulate_widget();
@@ -104,7 +108,7 @@ void Edit_Playlist::remove_playlist_slot()
 	std::cout << "= Edit_Playlist::remove_playlist_slot()" << std::endl;
 #endif // _DEBUG
 	if (ui.playlist_tree_widget->selectedItems().count() > 0
-			&& ui.playlist_tree_widget->selectedItems().count() < 2)
+			&& ui.playlist_tree_widget->selectedItems().count() < 1)
 	{
 		Typed_QTreeWidgetItem *selected_item =
 				static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
@@ -114,8 +118,12 @@ void Edit_Playlist::remove_playlist_slot()
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - Removing Playlist" << std::endl;
 #endif // _DEBUG
-			//playlist->remove_playlist(
-				//	selected_item->get_playlist_name().toStdString());
+			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
+				it != display_client_list.end(); ++it)
+			{
+				it->get()->get_playlist_container()->remove_playlist(
+					selected_item->get_playlist_name().toStdString());
+			}
 			/* Repopulate widget to reflect changes */
 			repopulate_widget();
 		}
@@ -136,8 +144,8 @@ void Edit_Playlist::remove_playlist_slot()
 
 void Edit_Playlist::ok_clicked()
 {
-	update_display_client_container();
-	emit playlist_changed();
+	//update_display_client_container();
+	emit playlist_changed(display_client_container);
 	this->close();
 }
 
@@ -163,31 +171,28 @@ void Edit_Playlist::keyPressEvent(QKeyEvent *event)
 
 void Edit_Playlist::cancel_clicked()
 {
-	playlist.reset(original_playlist);
 	this->close();
 }
 
 void Edit_Playlist::repopulate_widget()
 {
 	ui.playlist_tree_widget->clear();
-
-#ifdef _SHOW_DEBUG_OUTPUT
-	playlist->print_contents();
-#endif // _DEBUG
-	Container temp_container = playlist->get_playlist_container(m_organization_name);
-	for (Container::iterator it = temp_container.begin();
-		it != temp_container.end(); ++it)
+	Container temp_container = *display_client_list[0]->get_playlist_container()->get_playlist_container();
+	for (std::vector<Playlist_Ptr>::iterator it = playlist_list.begin();
+		it != playlist_list.end(); ++it)
 	{
 		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
-		item->set_playlist_name(QString::fromStdString(it->first->get_playlist_name()));
-		item->setText(0, QString::fromStdString(it->first->get_playlist_name()));
-		item->setText(2, QString::fromStdString(boost::posix_time::to_iso_string(it->first->get_start_time())));
-		item->setText(3, QString::fromStdString(boost::posix_time::to_iso_string(it->first->get_end_time())));
+		item->set_type("PLAYLIST");
+		item->set_playlist_name(QString::fromStdString(it->get()->get_playlist_name()));
+		item->setText(0, QString::fromStdString(it->get()->get_playlist_name()));
+		item->setText(2, QString::fromStdString(boost::posix_time::to_iso_string(it->get()->get_start_time())));
+		item->setText(3, QString::fromStdString(boost::posix_time::to_iso_string(it->get()->get_end_time())));
 		ui.playlist_tree_widget->addTopLevelItem(item);
-		for (std::vector<std::pair<std::string, int> >::iterator it2 = it->first->get_playlist_items()->begin();
-			it2 != it->first->get_playlist_items()->end(); ++it2)
+		for (std::vector<std::pair<std::string, int> >::iterator it2 = it->get()->get_playlist_items()->begin();
+			it2 != it->get()->get_playlist_items()->end(); ++it2)
 		{
 			Typed_QTreeWidgetItem *file_item = new Typed_QTreeWidgetItem();
+			file_item->set_type("PLAYLIST_ITEM");
 			file_item->set_filename(QString::fromStdString(it2->first));
 			file_item->setText(0, QString::fromStdString(it2->first));
 			file_item->setText(1, QString::fromStdString(
@@ -207,9 +212,9 @@ void Edit_Playlist::create_playlist_slot()
 	if (ui.lineEdit->text() != "")
 	{
 		if (add_file_dialog.get() != 0)
-			disconnect(add_file_dialog.get(), SIGNAL(playlist_edited()), this, SLOT(repopulate_widget()));
-		add_file_dialog.reset(new Add_File_Dialog(playlist, filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
-		connect(add_file_dialog.get(), SIGNAL(playlist_edited()), this, SLOT(repopulate_widget()));
+			disconnect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+		add_file_dialog.reset(new Add_File_Dialog(filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
+		connect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
 		add_file_dialog->show();
 	}
 	else
@@ -235,42 +240,63 @@ void Edit_Playlist::set_display_client_container( Display_Client_Container_Ptr p
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "Edit_Playlist::set_display_client_container" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
-	display_client_container = p_display_client_container;
-
-	bool group_found = false;
-	std::vector<Display_Client_Ptr>::iterator it = display_client_container->get_display_client_container()->begin();
-	while (!group_found && it != display_client_container->get_display_client_container()->end())
-	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Checking if display_clien contains group: " << m_group_name << std::endl;
-#endif //_SHOW_DEBUG_OUTPUT
-		if (it->get()->contains_group(m_group_name))
-		{
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " -- TRUE " << std::endl;
-			std::cout << " - Creting new playlist" << std::endl;
-#endif //_SHOW_DEBUG_OUTPUT
-			playlist.reset(new Playlist_Container(
-				it->get()->get_playlist_container()->get_playlist_container(m_organization_name, m_group_name)));
-			group_found = true;
-		}
-		++it;
-	}
+	display_client_container.reset(new Display_Client_Container(*p_display_client_container));
+	display_client_list = display_client_container->get_display_clients(m_organization_name, m_group_name);
+	playlist_list = display_client_list[0]->get_playlists_of_group(m_group_name);
 }
 
-void Edit_Playlist::update_display_client_container()
+void Edit_Playlist::playlist_added_slot( Playlist_Ptr p_playlist_ptr)
 {
-	for (std::vector<Display_Client_Ptr>::iterator it = display_client_container->get_display_client_container()->begin();
-		it != display_client_container->get_display_client_container()->end(); ++it)
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Edit_Playlist::playlist_added_slot" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+	for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
+		it != display_client_list.end(); ++it)
 	{
-		std::set<std::string>::const_iterator group_found = 
-			std::find(
-			it->get()->get_groups()->begin(),
-			it->get()->get_groups()->begin(),
-			m_group_name);
-		if (group_found != it->get()->get_groups()->end())
-		{//Group is found
-			it->get()->update_playlist_container(playlist, m_organization_name, m_group_name);
+		std::vector<std::string> organization_vector;
+		organization_vector.push_back(m_organization_name);
+
+		/** First we remove the old playlist if it exists, then we add the new one*/
+		it->get()->get_playlist_container()->remove_playlist(p_playlist_ptr->get_playlist_name());
+		it->get()->get_playlist_container()->add_playlist(p_playlist_ptr, organization_vector);
+	}
+	playlist_list = display_client_list[0]->get_playlists_of_group(m_group_name);
+	repopulate_widget();
+}
+
+void Edit_Playlist::add_file_slot()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Edit_Playlist::add_file_slot" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+	if (ui.playlist_tree_widget->selectedItems().count() > 0
+		&& ui.playlist_tree_widget->selectedItems().count() < 1)
+	{
+		Typed_QTreeWidgetItem *selected_item =
+			static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
+			0));
+		if (selected_item->get_type() == "PLAYLIST")
+		{
+			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
+				it != display_client_list.end(); ++it)
+			{
+				it->get()->get_playlist_container()->remove_playlist(
+					selected_item->get_playlist_name().toStdString());
+			}
+			/* Repopulate widget to reflect changes */
+			repopulate_widget();
 		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Select a PLAYLIST to add file to");
+			msgBox.exec();
+		}
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select ONE playlist to add file to");
+		msgBox.exec();
 	}
 }

@@ -25,18 +25,17 @@ class Add_File_Dialog: public QMainWindow
 Q_OBJECT
 
 public:
-	Add_File_Dialog(Playlist_Container_Ptr, Filelist_Ptr, QString, QString, QString, QWidget *parent = 0, Qt::WFlags flags = 0);
+	Add_File_Dialog(Filelist_Ptr, QString, QString, QString, QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Add_File_Dialog();
-	void set_playlist(Playlist_Container_Ptr);
 	void set_filelist(Filelist_Ptr);
 	void set_playlist_name(QString);
 	void set_playlist_organization(QString);
 	void set_playlist_group(QString);
 private:
 	Ui::Add_File_DialogClass ui;
-	Playlist_Container_Ptr playlist;
 
 	Filelist_Ptr filelist;
+	Playlist_Ptr playlist;
 
 	Add_Pause_Dialog *add_pause_dialog;
 	QString playlist_name;
@@ -62,7 +61,7 @@ private slots:
 	void pause_changed_slot(int);
 	void pause_unchanged_slot();
 signals:
-	void playlist_edited();
+	void playlist_added(Playlist_Ptr);
 };
 
 #endif // ADD_FILE_DIALOG_H

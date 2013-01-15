@@ -73,6 +73,10 @@ public:
 	/** Returns a string representation of the Playlist. */
 	std::string get_playlist_xml();
 
+	/** Removes an item from the playlist, identified by the
+	 ** std::string in the parameter. Should be a item_name. */
+	void remove_item(std::string);
+
 	void set_groups(std::set<std::string>);
 	void add_group(std::string);
 	boost::shared_ptr<std::set<std::string> > get_groups();

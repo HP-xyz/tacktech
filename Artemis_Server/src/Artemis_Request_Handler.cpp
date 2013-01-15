@@ -165,8 +165,12 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "  - Adding filelist XML" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+			filelist.reset(new Filelist(parameters));
 			filelist->scan_playlist_directory();
 			upload_xml += filelist->get_filelist_xml(organization_name);
+#ifdef _SHOW_DEBUG_OUTPUT
+            std::cout << upload_xml << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
             return_xml->append(upload_xml);
             result_status = SINGLE_RESULT;
         }
@@ -204,7 +208,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		tacktech.child("CONTAINER").child("Display_Client_Item").print(writer);
 		Display_Client client(writer.result);
 
-		Display_Client_Ptr client_to_send = 
+		Display_Client_Ptr client_to_send =
 			display_client_container->get_display_client(organization_name, client.get_identification());
 
 		std::string upload_string = "<Tacktech>";
@@ -248,7 +252,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			std::vector<std::string> items_to_upload =
 				identified_display->get_playlist_container()->get_needed_items(remote_files);
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "   - Need to upload '" << items_to_upload.size() << "' items" << std::endl; 
+			std::cout << "   - Need to upload '" << items_to_upload.size() << "' items" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 			if (items_to_upload.size() > 0)
 			{//There are items to upload

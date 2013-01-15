@@ -278,7 +278,7 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 						== it->first->get_playlist_items()->size())
 					{
 						bool playlist_identical = true;
-						for (int i = 0; i < playlist_ptr->get_playlist_items()->size(); ++i)
+						for (unsigned int i = 0; i < playlist_ptr->get_playlist_items()->size(); ++i)
 						{
 							if (playlist_ptr->get_playlist_items()->at(i).first
 								!= it->first->get_playlist_items()->at(i).first)
@@ -485,6 +485,31 @@ std::vector<std::string> Playlist_Container::get_needed_items( std::vector<std::
 		}
 	}
 	return needed_items;
+}
+
+
+void Playlist_Container::remove_playlist( std::string p_playlist_name)
+{
+	for (Container::iterator it = get_playlist_container()->begin();
+		it != get_playlist_container()->end(); ++it)
+	{
+		if (it->first->get_playlist_name() == p_playlist_name)
+		{//We need to remove this playlist
+			get_playlist_container()->erase(it);
+		}
+	}
+}
+
+void Playlist_Container::remove_playlist_item( std::string playlist_name, std::string playlist_item_name)
+{
+	for (Container::iterator it = get_playlist_container()->begin();
+		it != get_playlist_container()->end(); ++it)
+	{
+		if (it->first->get_playlist_name() == playlist_name)
+		{//We need to remove an item in this playlist
+			it->first->remove_item(playlist_item_name);
+		}
+	}
 }
 
 #ifdef _SHOW_DEBUG_OUTPUT

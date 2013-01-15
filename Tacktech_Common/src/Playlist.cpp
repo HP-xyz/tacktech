@@ -218,3 +218,18 @@ bool Playlist::contains_group( std::string p_group)
 		return false;
 }
 
+void Playlist::remove_item( std::string item_name)
+{
+	for (std::vector< std::pair<std::string,int> >::iterator it = get_playlist_items()->begin();
+		it != get_playlist_items()->end(); ++it)
+	{
+		if (it->first == item_name)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " REMOVED ITEM: " << it->first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			get_playlist_items()->erase(it);
+		}
+	}
+}
+

@@ -132,6 +132,18 @@ void Display_Client_Container::print_contents()
 		std::cout << " -- Display_Name: "
 			<< get_display_client_container()->at(i)->get_identification()
 			<< std::endl;
+		std::cout << "   - Organizations: " << get_display_client_container()->at(i)->get_organizations_string() << std::endl;
+		std::cout << "   - Groups: " << get_display_client_container()->at(i)->get_groups_string() << std::endl;
+		for(Container::iterator it = get_display_client_container()->at(i)->get_playlist_container()->get_playlist_container()->begin();
+			it != get_display_client_container()->at(i)->get_playlist_container()->get_playlist_container()->end(); ++it)
+		{
+			std::cout << "  - Playlist: " << it->first->get_playlist_name() << std::endl;
+			for (std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
+				it2 != it->first->get_playlist_items()->end(); ++it2)
+			{
+				std::cout << "   - " << it2->first << std::endl;
+			}
+		}
 	}
 }
 #endif // _SHOW_DEBUG_OUTPUT
@@ -205,4 +217,18 @@ Display_Client_Ptr Display_Client_Container::get_display_client( std::string org
 		}
 	}
 	return Display_Client_Ptr();
+}
+
+std::vector<Display_Client_Ptr> Display_Client_Container::get_display_clients( std::string organization_name, std::string group_name)
+{
+	std::vector<Display_Client_Ptr> display_client_list;
+	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container()->begin();
+		it!= get_display_client_container()->end(); ++it)
+	{
+		if (it->get()->contains_group(group_name) && it->get()->contains_organization(organization_name))
+		{
+			display_client_list.push_back(*it);
+		}
+	}
+	return display_client_list;
 }
