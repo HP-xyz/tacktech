@@ -82,6 +82,11 @@ public:
 	boost::shared_ptr<std::set<std::string> > get_groups();
 	bool contains_group(std::string);
 	bool currently_active;
+
+#ifdef _SHOW_DEBUG_OUTPUT
+	void print_contents();
+#endif // _SHOW_DEBUG_OUTPUT
+
 private:
 	std::string m_playlist_name;
 	boost::shared_ptr<std::vector< std::pair<std::string,int> > > m_playlist_items;

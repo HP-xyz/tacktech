@@ -62,7 +62,9 @@ void Assign_Group::ok_clicked()
 #endif // _SHOW_DEBUG_OUTPUT
 		}
 	}
+	m_display_client_container->print_contents();
 	emit group_added();
+	emit group_added(m_display_client_container);
 	this->close();
 }
 

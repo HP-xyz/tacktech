@@ -316,36 +316,36 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 
 		/* Now substring the recieved data, and assign only the needed data
 		 * to the appropraite string */
-		if(playlist_str.find("<Playlist_Container>") != playlist_str.npos)
-		{
-			playlist_str = playlist_str.substr(
-				playlist_str.find("<Playlist_Container>"),
-				playlist_str.rfind("</Playlist_Container>") + 21);
-
-			pugi::xml_document playlist_container_doc;
-			playlist_container_doc.load(playlist_str.c_str());
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " - Playlist_Container RECIEVED Print: " << std::endl;
-			std::cout << "==================" << std::endl;
-			playlist_container_doc.print(std::cout);
-#endif
-
-			xml_string_writer playlist_container_writer;
-			playlist_container_doc.child("Playlist_Container")
-				.print(playlist_container_writer);
-			playlist_container.reset(
-				new Playlist_Container(playlist_container_writer.result));
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " - Playlist_Container Print: " << std::endl;
-			std::cout << "==================" << std::endl;
-			playlist_container->print_contents();
-#endif
-		}
-		else
-		{
-			playlist_container.reset(
-				new Playlist_Container());
-		}
+//		if(playlist_str.find("<Playlist_Container>") != playlist_str.npos)
+//		{
+//			playlist_str = playlist_str.substr(
+//				playlist_str.find("<Playlist_Container>"),
+//				playlist_str.rfind("</Playlist_Container>") + 21);
+//
+//			pugi::xml_document playlist_container_doc;
+//			playlist_container_doc.load(playlist_str.c_str());
+//#ifdef _SHOW_DEBUG_OUTPUT
+//			std::cout << " - Playlist_Container RECIEVED Print: " << std::endl;
+//			std::cout << "==================" << std::endl;
+//			playlist_container_doc.print(std::cout);
+//#endif
+//
+//			xml_string_writer playlist_container_writer;
+//			playlist_container_doc.child("Playlist_Container")
+//				.print(playlist_container_writer);
+//			playlist_container.reset(
+//				new Playlist_Container(playlist_container_writer.result));
+//#ifdef _SHOW_DEBUG_OUTPUT
+//			std::cout << " - Playlist_Container Print: " << std::endl;
+//			std::cout << "==================" << std::endl;
+//			playlist_container->print_contents();
+//#endif
+//		}
+//		else
+//		{
+//			playlist_container.reset(
+//				new Playlist_Container());
+//		}
 
 		if (display_client_str.find("<Display_Client_Container>") != display_client_str.npos)
 		{
@@ -513,11 +513,11 @@ void Tacktech_Manager_MainWindow::assign_group()
 		if (assign_group_dialog.get() != 0)
 		{
 			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
-			disconnect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(display_container_changed()));
+			disconnect(assign_group_dialog.get(), SIGNAL(group_added(Display_Client_Container_Ptr)), this, SLOT(display_container_changed(Display_Client_Container_Ptr)));
 		}
 		assign_group_dialog.reset(new Assign_Group(display_client_container, selected_names));
 		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(repopulate_ui()));
-		connect(assign_group_dialog.get(), SIGNAL(group_added()), this, SLOT(display_container_changed()));
+		connect(assign_group_dialog.get(), SIGNAL(group_added(Display_Client_Container_Ptr)), this, SLOT(display_container_changed(Display_Client_Container_Ptr)));
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " ---- Showing assign_group_dialog "  << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -529,6 +529,7 @@ void Tacktech_Manager_MainWindow::display_container_changed(Display_Client_Conta
 {
 #ifdef _SHOW_DEBUG_OUTPUT
     std::cout << "=Tacktech_Manager_MainWindow::display_container_changed(Display_Client_Container_Ptr)" << std::endl;
+	p_display_client_container->print_contents();
 #endif // _SHOW_DEBUG_OUTPUT
     temp_display_client_container.reset(new Display_Client_Container(*p_display_client_container));
     upload_data.reset(new Upload_Data_Container(parameters));
@@ -543,6 +544,7 @@ void Tacktech_Manager_MainWindow::display_container_changed()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Tacktech_Manager_MainWindow::display_container_changed()" << std::endl;
+
 #endif // _SHOW_DEBUG_OUTPUT
 	temp_display_client_container.reset(new Display_Client_Container(*display_client_container));
 	upload_data.reset(new Upload_Data_Container(parameters));

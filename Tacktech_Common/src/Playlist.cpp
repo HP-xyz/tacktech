@@ -12,6 +12,21 @@ struct xml_string_writer: pugi::xml_writer
 	}
 };
 
+template <class T>
+std::string make_list( T p_vector)
+{
+	std::string comma_separated_list;
+	for (typename T::iterator it = p_vector.begin();
+		it != p_vector.end(); ++it)
+	{
+		comma_separated_list += *it;
+		comma_separated_list += ", ";
+	}
+	comma_separated_list =
+		comma_separated_list.substr(0, comma_separated_list.length() - 2);
+	return comma_separated_list;
+}
+
 Playlist::Playlist(void)
 {
 	m_groups.reset(new std::set<std::string>);
@@ -212,7 +227,8 @@ boost::shared_ptr<std::set<std::string> > Playlist::get_groups()
 
 bool Playlist::contains_group( std::string p_group)
 {
-	if (get_groups()->find(p_group) != get_groups()->end())
+	std::set<std::string>::iterator iter = get_groups()->find(p_group);
+	if (iter != get_groups()->end())
 		return true;
 	else
 		return false;
@@ -232,4 +248,16 @@ void Playlist::remove_item( std::string item_name)
 		}
 	}
 }
-
+#ifdef _SHOW_DEBUG_OUTPUT
+void Playlist::print_contents()
+{
+	std::cout << "Playlist_Name: " << get_playlist_name() << std::endl;
+	std::cout << "Playlist_Groups: " << make_list(*get_groups()) << std::endl;
+	std::cout << "Playlist_Items: " << std::endl;
+	for (std::vector<std::pair<std::string, int> >::iterator it = get_playlist_items()->begin();
+		it != get_playlist_items()->end(); ++it)
+	{
+		std::cout << " - " << it->first << std::endl;
+	}
+}
+#endif // _SHOW_DEBUG_OUTPUT

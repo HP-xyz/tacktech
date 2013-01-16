@@ -36,7 +36,7 @@ private:
 	Filelist_Ptr filelist;
 	Display_Client_Container_Ptr display_client_container;
 
-	std::vector<Display_Client_Ptr> display_client_list;
+	boost::shared_ptr<std::vector<Display_Client_Ptr> > display_client_list;
 	std::vector<Playlist_Ptr> playlist_list;
 
 	boost::shared_ptr<Add_File_Dialog> add_file_dialog;

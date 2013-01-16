@@ -3,10 +3,18 @@
 Add_File_Dialog::Add_File_Dialog(Filelist_Ptr p_filelist, QString p_playlist_name, QString p_playlist_organizaiton, QString p_playlist_group, QWidget *parent, Qt::WFlags flags) :
 		QMainWindow(parent, flags)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Add_File_Dialog()" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 	set_filelist(p_filelist);
 	set_playlist_name(p_playlist_name);
 	set_playlist_organization(p_playlist_organizaiton);
 	set_playlist_group(p_playlist_group);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Playlist_Name: " << playlist_name.toStdString() << std::endl;
+	std::cout << "Playlist_Organization: " << playlist_organization.toStdString() << std::endl;
+	std::cout << "Playlist_Group: " << playlist_group.toStdString() << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 	playlist.reset(new Playlist());
 	playlist->add_group(playlist_group.toStdString());
 	playlist->set_playlist_name(playlist_name.toStdString());
@@ -267,9 +275,7 @@ void Add_File_Dialog::add_new_playlist()
 			ui.playlist_filenames->topLevelItem(i)->text(1).toInt());
 	}
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Created playlist '" << playlist_name.toStdString() 
-		<< "' containing '" << playlist->get_playlist_items()->size() << "' items" << std::endl;
-	std::cout << " - Playlist belongs to group: " << make_list(*playlist->get_groups()) << std::endl;
+	playlist->print_contents();
 #endif // _SHOW_DEBUG_OUTPUT
 }
 std::string Add_File_Dialog::make_list( std::set<std::string> p_vector)

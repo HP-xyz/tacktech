@@ -107,6 +107,8 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 	{
 #ifdef _SHOW_DEBUG_OUTPUT
         std::cout << "  - Checking name: " << get_display_client_container()->at(i)->get_identification() << std::endl;
+		std::cout << "  - Contains Organization: " << get_display_client_container()->at(i)->contains_organization(p_organization_name) << std::endl;
+		std::cout << "  - Organizations: " << get_display_client_container()->at(i)->get_organizations_string() << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 		if(get_display_client_container()->at(i)->contains_organization(p_organization_name))
 		{
@@ -127,23 +129,11 @@ std::string Display_Client_Container::get_display_client_container_xml( std::str
 void Display_Client_Container::print_contents()
 {
 	std::cout << "=Display_Client_Container::print_contents" << std::endl;
-	for (unsigned int i = 0; i < get_display_client_container()->size(); ++i)
+	std::cout << " - Container contains '" << get_display_client_container()->size() << "' items" << std::endl;
+	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container()->begin();
+		it != get_display_client_container()->end(); ++it)
 	{
-		std::cout << " -- Display_Name: "
-			<< get_display_client_container()->at(i)->get_identification()
-			<< std::endl;
-		std::cout << "   - Organizations: " << get_display_client_container()->at(i)->get_organizations_string() << std::endl;
-		std::cout << "   - Groups: " << get_display_client_container()->at(i)->get_groups_string() << std::endl;
-		for(Container::iterator it = get_display_client_container()->at(i)->get_playlist_container()->get_playlist_container()->begin();
-			it != get_display_client_container()->at(i)->get_playlist_container()->get_playlist_container()->end(); ++it)
-		{
-			std::cout << "  - Playlist: " << it->first->get_playlist_name() << std::endl;
-			for (std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
-				it2 != it->first->get_playlist_items()->end(); ++it2)
-			{
-				std::cout << "   - " << it2->first << std::endl;
-			}
-		}
+		it->get()->print_contents();
 	}
 }
 #endif // _SHOW_DEBUG_OUTPUT
@@ -219,16 +209,32 @@ Display_Client_Ptr Display_Client_Container::get_display_client( std::string org
 	return Display_Client_Ptr();
 }
 
-std::vector<Display_Client_Ptr> Display_Client_Container::get_display_clients( std::string organization_name, std::string group_name)
+boost::shared_ptr<std::vector<Display_Client_Ptr> > Display_Client_Container::get_display_clients( std::string organization_name, std::string group_name)
 {
-	std::vector<Display_Client_Ptr> display_client_list;
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client_Container::get_display_clients()" << std::endl;
+	std::cout << " - Looking for group: " << group_name << std::endl;
+	std::cout << " - Looking for organization: " << organization_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	boost::shared_ptr<std::vector<Display_Client_Ptr> > display_client_list(new std::vector<Display_Client_Ptr>);
 	for (std::vector<Display_Client_Ptr>::iterator it = get_display_client_container()->begin();
 		it!= get_display_client_container()->end(); ++it)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  - Display_Client: " << it->get()->get_identification() << std::endl;
+		std::cout << "   - Contains Group: " << it->get()->contains_group(group_name) << std::endl;
+		std::cout << "   - Contains Organization: " << it->get()->contains_organization(organization_name) << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		if (it->get()->contains_group(group_name) && it->get()->contains_organization(organization_name))
 		{
-			display_client_list.push_back(*it);
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  ++ " << it->get()->get_identification() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			display_client_list->push_back(*it);
 		}
 	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Returning '" << display_client_list->size() << "' display_clients" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return display_client_list;
 }

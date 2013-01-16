@@ -253,6 +253,7 @@ std::string Upload_Data_Container::get_update_display_container_xml()
 			<< std::endl;
 	std::cout << " -> ORGANIZATION = "
 		<< parameters["general.organization_name"].c_str() << std::endl;
+	display_client_container->print_contents();
 #endif // _DEBUG
 	std::string return_str;
 	return_str += "<Tacktech>";
