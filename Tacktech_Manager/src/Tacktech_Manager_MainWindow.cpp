@@ -144,39 +144,41 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 				/* If the NONE group already exists, create a pointer to it, else
 				 * create a pointer to a new Typed_QTreeWidgetItem */
 				Typed_QTreeWidgetItem *group_item;
-				if (group_none_found)
-					group_item = static_cast<Typed_QTreeWidgetItem*>(ui.main_tree_widget->topLevelItem(i));
-				else
-					group_item = new Typed_QTreeWidgetItem();
-				group_item->set_group_name("NONE");
-				group_item->setText(1, "NONE");
-				ui.main_tree_widget->addTopLevelItem(group_item);
+                if (group_none_found)
+                        group_item = static_cast<Typed_QTreeWidgetItem*>(ui.main_tree_widget->topLevelItem(i - 1));
+                else
+                        group_item = new Typed_QTreeWidgetItem();
+                group_item->set_group_name("NONE");
+                group_item->setText(1, "NONE");
+                ui.main_tree_widget->addTopLevelItem(group_item);
 
-				Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
-				computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
-				computer_item->set_group_name("NONE");
+                Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+                computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
+                computer_item->set_group_name("NONE");
 
-				/** Here we get the elapsed time between now, and the last ping the
-				* remote screen has answered */
-				boost::posix_time::time_duration duration =
-					boost::posix_time::second_clock::universal_time()
-					- it->get()->get_last_ping();
-				std::string str_duration = boost::posix_time::to_simple_string(duration);
+                /** Here we get the elapsed time between now, and the last ping the
+                * remote screen has answered */
+                boost::posix_time::time_duration duration =
+                        boost::posix_time::second_clock::universal_time()
+                        - it->get()->get_last_ping();
+                std::string str_duration = boost::posix_time::to_simple_string(duration);
 
-				/* Set actual data to display */
-				computer_item->setText(0, computer_item->get_computer_name());
-				computer_item->setText(2, QString::fromStdString(str_duration));
-				computer_item->setText(3, QString::fromStdString(
-					it->get()->get_playlist_container()->get_current_playing_item()));
+                /* Set actual data to display */
+                computer_item->setText(0, computer_item->get_computer_name());
+                computer_item->setText(2, QString::fromStdString(str_duration));
+                computer_item->setText(3, QString::fromStdString(
+                        it->get()->get_playlist_container()->get_current_playing_item()));
 
-				/* Last thing to do to the group item, we get the Playlist_Container
-					* name from the item we just added. */
-				group_item->set_playlist_name(
-					QString::fromStdString(
-					it->get()->get_playlist_container()->get_playlist_container_name()));
-				group_item->setText(3, group_item->get_playlist_name());
+                /* Last thing to do to the group item, we get the Playlist_Container
+                        * name from the item we just added. */
+                group_item->set_playlist_name(
+                        QString::fromStdString(
+                        it->get()->get_playlist_container()->get_playlist_container_name()));
+                group_item->setText(3, group_item->get_playlist_name());
 
-				group_item->addChild(computer_item);
+                group_item->addChild(computer_item);
+				group_item->setExpanded(true);
+				
 			}
 			else
 			{
@@ -242,6 +244,7 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 						group_item->setText(3, group_item->get_playlist_name());
 
 						group_item->addChild(computer_item);
+						group_item->setExpanded(true);
 					}
 				}
 			}
@@ -311,41 +314,7 @@ void Tacktech_Manager_MainWindow::data_recieved_slot( QString data_recieved )
 #endif // _DEBUG
 		/* We declare 2 strings that contain the variables */
 		std::string display_client_str = data_recieved.toStdString();
-		std::string playlist_str = data_recieved.toStdString();
 		std::string filelist_str = data_recieved.toStdString();
-
-		/* Now substring the recieved data, and assign only the needed data
-		 * to the appropraite string */
-//		if(playlist_str.find("<Playlist_Container>") != playlist_str.npos)
-//		{
-//			playlist_str = playlist_str.substr(
-//				playlist_str.find("<Playlist_Container>"),
-//				playlist_str.rfind("</Playlist_Container>") + 21);
-//
-//			pugi::xml_document playlist_container_doc;
-//			playlist_container_doc.load(playlist_str.c_str());
-//#ifdef _SHOW_DEBUG_OUTPUT
-//			std::cout << " - Playlist_Container RECIEVED Print: " << std::endl;
-//			std::cout << "==================" << std::endl;
-//			playlist_container_doc.print(std::cout);
-//#endif
-//
-//			xml_string_writer playlist_container_writer;
-//			playlist_container_doc.child("Playlist_Container")
-//				.print(playlist_container_writer);
-//			playlist_container.reset(
-//				new Playlist_Container(playlist_container_writer.result));
-//#ifdef _SHOW_DEBUG_OUTPUT
-//			std::cout << " - Playlist_Container Print: " << std::endl;
-//			std::cout << "==================" << std::endl;
-//			playlist_container->print_contents();
-//#endif
-//		}
-//		else
-//		{
-//			playlist_container.reset(
-//				new Playlist_Container());
-//		}
 
 		if (display_client_str.find("<Display_Client_Container>") != display_client_str.npos)
 		{
@@ -425,27 +394,34 @@ void Tacktech_Manager_MainWindow::upload_files_to_server( std::vector<std::strin
 #endif // _DEBUG
 	if(!items.empty())
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - There ARE items to upload" << std::endl;
-#endif // _DEBUG
-		if (time.hour() == 22 && time.second() == 22 && time.minute() == 22)
-		{//Time is equal to the specially defined time that means to upload instantly
-#ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " ## Upload time is: NOW" << std::endl;
-#endif // _DEBUG
-			upload_data.reset(new Upload_Data_Container(parameters));
-			connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
-				SLOT(start_upload(std::string)));
-			upload_data->set_upload_items(items);
-			upload_data->set_command("FILE_UPLOAD");
-			upload_data->get_xml_upload();
-		}
-		else
+		for (std::vector<std::string>::iterator it = items.begin();
+			it != items.end(); ++it)
 		{
+			/* We're hacking this now */
+			std::vector<std::string> item_vector;
+			item_vector.push_back(*it);
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " ## Upload time is: " << time.toString().toStdString() << std::endl;
+			std::cout << " - There ARE items to upload" << std::endl;
 #endif // _DEBUG
-			pending_uploads->push_back(std::pair<std::vector<std::string>, QTime>(items, time));
+			if (time.hour() == 22 && time.second() == 22 && time.minute() == 22)
+			{//Time is equal to the specially defined time that means to upload instantly
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << " ## Upload time is: NOW" << std::endl;
+#endif // _DEBUG
+				upload_data.reset(new Upload_Data_Container(parameters));
+				connect(upload_data.get(), SIGNAL(xml_creation_complete(std::string)), this,
+					SLOT(start_upload(std::string)));
+				upload_data->set_upload_items(item_vector);
+				upload_data->set_command("FILE_UPLOAD");
+				upload_data->get_xml_upload();
+			}
+			else
+			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << " ## Upload time is: " << time.toString().toStdString() << std::endl;
+#endif // _DEBUG
+				pending_uploads->push_back(std::pair<std::vector<std::string>, QTime>(item_vector, time));
+			}
 		}
 	}
 }

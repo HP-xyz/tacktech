@@ -263,7 +263,10 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 				pugi::xml_node type_node = tacktech_node.append_child("Type");
 				type_node.append_attribute("TYPE") = "UPLOAD";
 				pugi::xml_node items_node = tacktech_node.append_child("Items_Node");
-
+				
+				/* I propose a hack here, which only allows one file to upload
+				 * at a time. It should send a string postscript saying that
+				 * there are more files to upload.*/
 				for (std::vector<std::string>::iterator it = items_to_upload.begin();
 					it != items_to_upload.end(); ++it)
 				{
