@@ -169,6 +169,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 			filelist->scan_playlist_directory();
 			upload_xml += filelist->get_filelist_xml(organization_name);
 #ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  - Sending: Upload_XML" << std::endl;
             std::cout << upload_xml << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
             return_xml->append(upload_xml);
@@ -191,12 +192,13 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " - Received UPDATE_PLAYLIST_CONTAINER command" << std::endl;
 #endif // _DEBUG
-		xml_string_writer writer;
-		pugi::xml_node container_node = tacktech.child("CONTAINER").child("Playlist_Container");
-		container_node.print(writer);
-		Playlist_Container container(writer.result);
-		playlist_container->update_playlist(container,
-			tacktech.child("Organization").attribute("ORGANIZATION_NAME").as_string());
+		//TODO, CONSIDER REMOVING THIS
+		//xml_string_writer writer;
+		//pugi::xml_node container_node = tacktech.child("CONTAINER").child("Playlist_Container");
+		//container_node.print(writer);
+		//Playlist_Container container(writer.result);
+		//playlist_container->update_playlist(container,
+		//	tacktech.child("Organization").attribute("ORGANIZATION_NAME").as_string());
 	}
 	else if (type_string == "UPDATE_DISPLAY_CLIENT")
 	{

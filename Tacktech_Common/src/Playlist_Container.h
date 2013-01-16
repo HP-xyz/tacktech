@@ -28,7 +28,7 @@ public:
 	Playlist_Container();
 	/** Takes a string representation of a Playlist_Container
 	 ** object, and constructs the Playlist_Container object. */
-	Playlist_Container(std::string);
+	Playlist_Container(std::string, std::set<std::string>);
 	~Playlist_Container();
 	/** Returns a Container that will contain only the Playlist's that
 	 ** are allowed to be used by the std::string supplied in the parameter.
@@ -46,7 +46,12 @@ public:
 
 	/** Adds a Playlist to the Container, including a std::vector of strings
 	 ** to identify which ORGANIZAITONS have access to it. */
+	void add_playlist(Playlist_Ptr, std::vector<std::string>, std::set<std::string>);
+
+	/** Adds a Playlist to the Container, including a std::vector of strings
+	 ** to identify which ORGANIZAITONS have access to it. */
 	void add_playlist(Playlist_Ptr, std::vector<std::string>);
+
 	/** Returns a std::string representation of a playlist_container,
 	 ** containing only the playlists that can be used by the group,
 	 ** identified by the parameter string. */

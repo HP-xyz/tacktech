@@ -51,7 +51,7 @@ public:
 	 ** the current playlist container of the Display_Client. */
 	void set_playlist_container(Playlist_Container_Ptr);
 
-	void set_playlist_container(std::string);
+	void set_playlist_container(std::string, std::set<std::string>);
 
 	/** Receives a std::string that will be added to the groups
 	 ** the Display_Client is part of. */
@@ -86,6 +86,10 @@ public:
 	/** Returns a std::vector<Playlist_Ptr> of all the playlists that belong to
 	 ** a group identified by the parameter */
 	std::vector<Playlist_Ptr> get_playlists_of_group(std::string);
+
+#ifdef _SHOW_DEBUG_OUTPUT
+	void print_contents();
+#endif // _SHOW_DEBUG_OUTPUT
 private:
 	std::string m_identification;
 	boost::posix_time::ptime m_last_ping;

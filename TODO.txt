@@ -7,15 +7,5 @@ TODO:
 	  to be played. Timed playlists must also be possible.
 
 ISSUES:
-	- Pause not set in edit_playlist			= FIXED
-	- Select playlist displays playlist names 2 times	= FIXED
-	- Read from XML does not work 				= FIXED
-	- Crash if all playlist items are removed		= UNTESTED
-	- No data is actually sent by the Tacktech Manager	= FIXED
-	- Groups removed through the Edit_Group GUI are not	
-	  removed on the server side.
-	- After Manager refresh groups are not refreshed in
-	  the main window
-	- Identified computers do not show in the Edit_Group	= UNTESTED
-	  GUI
-	- Make Organization selectable in Manager
+	- Crash when none group edit playlist		-> Manager
+	- Crash if check for update before identify -> Server

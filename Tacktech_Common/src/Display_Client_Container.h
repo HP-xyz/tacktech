@@ -51,7 +51,7 @@ public:
 	 ** m_display_client_container.end(). */
 	std::vector<Display_Client_Ptr>::iterator find_display_client_by_ident(std::string);
 
-	std::vector<Display_Client_Ptr> get_display_clients(std::string, std::string);
+	boost::shared_ptr<std::vector<Display_Client_Ptr> > get_display_clients(std::string, std::string);
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();

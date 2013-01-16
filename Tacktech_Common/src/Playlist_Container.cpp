@@ -31,7 +31,7 @@ Playlist_Container::Playlist_Container()
 	m_playlist_container.reset(new Container());
 }
 
-Playlist_Container::Playlist_Container( std::string playlist_container_str)
+Playlist_Container::Playlist_Container( std::string playlist_container_str, std::set<std::string> organization_names)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "=Playlist_Container::Playlist_Container(STRING)" << std::endl;
@@ -54,8 +54,15 @@ Playlist_Container::Playlist_Container( std::string playlist_container_str)
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cout << " -- Adding Playlist" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-		add_playlist(playlist, make_vector(playlist_group.attribute("GROUPLIST").as_string()));
+		std::vector<std::string> group_list = make_vector(playlist_group.child("Groups").attribute("GROUPLIST").as_string());
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "   - Playlist_Groups: " << make_list(group_list) << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+		add_playlist(playlist, group_list, organization_names);
 	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	print_contents();
+#endif // _SHOW_DEBUG_OUTPUT
 }
 
 Playlist_Container::~Playlist_Container()
@@ -109,6 +116,13 @@ boost::shared_ptr<Container> Playlist_Container::get_playlist_container()
 	return m_playlist_container;
 }
 
+void Playlist_Container::add_playlist( Playlist_Ptr playlist, std::vector<std::string> groups, std::set<std::string> organization_names)
+{
+	Playlist_Item item(playlist, std::vector<std::string>(organization_names.begin(), organization_names.end()));
+	item.first->set_groups(std::set<std::string>(groups.begin(), groups.end()));
+	m_playlist_container->insert(item);
+}
+
 void Playlist_Container::add_playlist( Playlist_Ptr playlist, std::vector<std::string> organizations)
 {
 	m_playlist_container->insert(Playlist_Item(playlist, organizations));
@@ -131,18 +145,7 @@ std::string Playlist_Container::get_playlist_container_xml( std::string group_na
 		{
 			upload_xml += "<Playlist_Group>";
 			upload_xml += "<Groups GROUPLIST=\"";
-			for (unsigned int i = 0; i < it->second.size(); ++i)
-			{
-				if (i != (it->second.size() -1))
-				{
-					upload_xml += it->second[i];
-					upload_xml += ",";
-				}
-				else
-				{
-					upload_xml += it->second[i];
-				}
-			}
+			upload_xml += make_list(*it->first->get_groups());
 			upload_xml += "\"/>";
 			upload_xml += "<Playlist_Node>";
 			upload_xml += it->first->get_playlist_xml();
@@ -170,18 +173,7 @@ std::string Playlist_Container::get_playlist_container_xml()
 	{
 		upload_xml += "<Playlist_Group>";
 		upload_xml += "<Groups GROUPLIST=\"";
-		for (unsigned int i = 0; i < it->second.size(); ++i)
-		{
-			if (i != (it->second.size() -1))
-			{
-				upload_xml += it->second[i];
-				upload_xml += ",";
-			}
-			else
-			{
-				upload_xml += it->second[i];
-			}
-		}
+		upload_xml += make_list(*it->first->get_groups());
 		upload_xml += "\"/>";
 		upload_xml += "<Playlist_Node>";
 		upload_xml += it->first->get_playlist_xml();
@@ -519,9 +511,7 @@ void Playlist_Container::print_contents()
 	for (Container::iterator it = m_playlist_container->begin();
 		it != m_playlist_container->end(); ++it)
 	{
-		std::cout << " - Playlist Name: " << it->first->get_playlist_name()
-			<< ", Playlist Organizations: " << make_list(it->second)
-			<< ", Playlist Groups:" << make_list(*it->first->get_groups()) << std::endl;
+		it->first->print_contents();
 	}
 }
 #endif // _SHOW_DEBUG_OUTPUT

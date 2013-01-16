@@ -46,7 +46,7 @@ Display_Client::Display_Client( std::string display_client_str)
 	xml_string_writer writer;
 	root_node.child("Display_Playlist_Container").child("Playlist_Container").print(writer);
 
-	set_playlist_container(writer.result);
+	set_playlist_container(writer.result, *get_organizations());
 }
 
 
@@ -99,9 +99,9 @@ void Display_Client::set_playlist_container(Playlist_Container_Ptr p_playlist_co
 	m_playlist_container = p_playlist_container;
 }
 
-void Display_Client::set_playlist_container( std::string p_playlist_string)
+void Display_Client::set_playlist_container( std::string p_playlist_string, std::set<std::string> organizations_set)
 {
-	m_playlist_container.reset(new Playlist_Container(p_playlist_string));
+	m_playlist_container.reset(new Playlist_Container(p_playlist_string, organizations_set));
 }
 
 bool Display_Client::add_group(std::string p_group_name)
@@ -166,24 +166,16 @@ std::string Display_Client::get_display_client_xml()
 
 std::string Display_Client::make_list( std::set<std::string> p_set)
 {
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "=Display_Client::make_list" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
 	std::string comma_separated_list;
 	for (std::set<std::string>::iterator it = p_set.begin();
 		it != p_set.end(); ++it)
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Adding " << *it << ", " << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
 		comma_separated_list += *it;
 		comma_separated_list += ", ";
 	}
-	comma_separated_list =
-		comma_separated_list.substr(0, comma_separated_list.length() - 2);
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Final list: " << comma_separated_list << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
+	if (comma_separated_list.length() != 0)
+		comma_separated_list =
+			comma_separated_list.substr(0, comma_separated_list.length() - 2);
 	return comma_separated_list;
 }
 
@@ -231,14 +223,6 @@ std::string Display_Client::get_groups_string()
 
 bool Display_Client::contains_organization(std::string p_organization_name)
 {
-#ifdef _SHOW_DEBUG_OUTPUT
-    std::cout << "  = Display_Client organizations: " << std::endl;
-        for(std::set<std::string>::iterator iter = get_organizations()->begin();
-        iter != get_organizations()->end(); ++iter)
-    {
-        std::cout << "   - " << *iter << std::endl;
-    }
-#endif // _SHOW_DEBUG_OUTPUT
     std::set<std::string>::iterator iter = get_organizations()->find(p_organization_name);
     if(iter != get_organizations()->end())
         return true;
@@ -294,15 +278,29 @@ void Display_Client::update_playlist_container( Playlist_Container_Ptr p_playlis
 
 std::vector<Playlist_Ptr> Display_Client::get_playlists_of_group( std::string group_name)
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Display_Client::get_playlists_of_group()" << std::endl;
+	std::cout << " - For group: " << group_name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	std::vector<Playlist_Ptr> playlist_list;
 	for (Container::iterator it = get_playlist_container()->get_playlist_container()->begin();
 		it != get_playlist_container()->get_playlist_container()->end(); ++it)
 	{
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << " - Playlist: " << it->first->get_playlist_name() << std::endl;
+		std::cout << " - Contains Group: " << it->first->contains_group(group_name) << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		if (it->first->contains_group(group_name))
 		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "  ++ " << it->first->get_playlist_name() << " containing '" << it->first->get_playlist_items()->size() << "' items" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
 			playlist_list.push_back(it->first);
 		}
 	}
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Returning '" << playlist_list.size() << "' playlists" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	return playlist_list;
 }
 
@@ -310,3 +308,14 @@ std::string Display_Client::get_organizations_string()
 {
 	return make_list(*get_organizations());
 }
+
+#ifdef _SHOW_DEBUG_OUTPUT
+void Display_Client::print_contents()
+{
+	std::cout << "Display_Client" << std::endl;
+	std::cout << " - Identification: " << get_identification() << std::endl;
+	std::cout << " - Organizations: " << make_list(*get_organizations()) << std::endl;
+	std::cout << " - Groups: " << make_list(*get_groups()) << std::endl;
+	get_playlist_container()->print_contents();
+}
+#endif // _SHOW_DEBUG_OUTPUT

@@ -11,6 +11,8 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags) :
 	headers << "Filename" << "Pause" << "Start Time" << "End Time";
 	ui.playlist_tree_widget->setHeaderLabels(headers);
 
+	display_client_list.reset(new std::vector<Display_Client_Ptr>);
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Creating node_menu pointer" << std::endl;
 #endif // _DEBUG
@@ -73,8 +75,8 @@ void Edit_Playlist::remove_file_slot()
 				Typed_QTreeWidgetItem *selected_item_parent =
 						static_cast<Typed_QTreeWidgetItem*>(selected_item->parent());
 
-				for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
-					it != display_client_list.end(); ++it)
+				for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+					it != display_client_list->end(); ++it)
 				{
 					it->get()->get_playlist_container()->remove_playlist_item(
 						selected_item_parent->get_playlist_name().toStdString(),
@@ -118,8 +120,8 @@ void Edit_Playlist::remove_playlist_slot()
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " - Removing Playlist" << std::endl;
 #endif // _DEBUG
-			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
-				it != display_client_list.end(); ++it)
+			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+				it != display_client_list->end(); ++it)
 			{
 				it->get()->get_playlist_container()->remove_playlist(
 					selected_item->get_playlist_name().toStdString());
@@ -177,7 +179,11 @@ void Edit_Playlist::cancel_clicked()
 void Edit_Playlist::repopulate_widget()
 {
 	ui.playlist_tree_widget->clear();
-	Container temp_container = *display_client_list[0]->get_playlist_container()->get_playlist_container();
+	Container temp_container = *display_client_list->at(0)->get_playlist_container()->get_playlist_container();
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Received '" << display_client_list->size() << "' display_clients" << std::endl;
+	display_client_list->at(0)->print_contents();
+#endif // _DEBUG
 	for (std::vector<Playlist_Ptr>::iterator it = playlist_list.begin();
 		it != playlist_list.end(); ++it)
 	{
@@ -242,16 +248,18 @@ void Edit_Playlist::set_display_client_container( Display_Client_Container_Ptr p
 #endif //_SHOW_DEBUG_OUTPUT
 	display_client_container.reset(new Display_Client_Container(*p_display_client_container));
 	display_client_list = display_client_container->get_display_clients(m_organization_name, m_group_name);
-	playlist_list = display_client_list[0]->get_playlists_of_group(m_group_name);
+	playlist_list = display_client_list->at(0)->get_playlists_of_group(m_group_name);
+	repopulate_widget();
 }
 
 void Edit_Playlist::playlist_added_slot( Playlist_Ptr p_playlist_ptr)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "Edit_Playlist::playlist_added_slot" << std::endl;
+	p_playlist_ptr->print_contents();
 #endif //_SHOW_DEBUG_OUTPUT
-	for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
-		it != display_client_list.end(); ++it)
+	for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+		it != display_client_list->end(); ++it)
 	{
 		std::vector<std::string> organization_vector;
 		organization_vector.push_back(m_organization_name);
@@ -260,7 +268,7 @@ void Edit_Playlist::playlist_added_slot( Playlist_Ptr p_playlist_ptr)
 		it->get()->get_playlist_container()->remove_playlist(p_playlist_ptr->get_playlist_name());
 		it->get()->get_playlist_container()->add_playlist(p_playlist_ptr, organization_vector);
 	}
-	playlist_list = display_client_list[0]->get_playlists_of_group(m_group_name);
+	playlist_list = display_client_list->at(0)->get_playlists_of_group(m_group_name);
 	repopulate_widget();
 }
 
@@ -277,8 +285,8 @@ void Edit_Playlist::add_file_slot()
 			0));
 		if (selected_item->get_type() == "PLAYLIST")
 		{
-			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list.begin();
-				it != display_client_list.end(); ++it)
+			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+				it != display_client_list->end(); ++it)
 			{
 				it->get()->get_playlist_container()->remove_playlist(
 					selected_item->get_playlist_name().toStdString());
