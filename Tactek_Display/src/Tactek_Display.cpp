@@ -88,9 +88,16 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up VLC" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
-	m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
-	m_vlc_player->setVideoWidget(ui->vlc_video_widget);
+    try
+    {
+        m_vlc_instance = new VlcInstance(VlcCommon::args(), this);
+        m_vlc_player = new VlcMediaPlayer(m_vlc_instance);
+        m_vlc_player->setVideoWidget(ui->vlc_video_widget);
+    }
+    catch(std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 
 	ui->vlc_video_widget->setMediaPlayer(m_vlc_player);
 
@@ -177,6 +184,7 @@ void Tactek_Display::check_playlist_items_downloaded()
 	std::cout << "= Tacktech_Manager::check_for_updates()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     /* First, we check what files we have... */
+    check_file_directory();
     std::vector<std::string> files_needed;
     for(Container::iterator it = m_display_client->get_playlist_container()->get_playlist_container()->begin();
         it != m_display_client->get_playlist_container()->get_playlist_container()->end(); ++it)
@@ -188,9 +196,15 @@ void Tactek_Display::check_playlist_items_downloaded()
             it2 != it->first->get_playlist_items()->end(); ++it2)
         {
 #ifdef _SHOW_DEBUG_OUTPUT
+            for(std::vector<std::string>::iterator it = filelist.begin();
+                it != filelist.end(); ++it)
+                std::cout << "File: " << *it << std::endl;
             std::cout << "  - Playlist Item: " << it2->first << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-            std::vector<std::string>::iterator item_found = std::find(filelist.begin(), filelist.end(), it2->first);
+            std::string file_to_find = parameters["general.organization_name"];
+            file_to_find += "_";
+            file_to_find += it2->first;
+            std::vector<std::string>::iterator item_found = std::find(filelist.begin(), filelist.end(), file_to_find);
             if(item_found == filelist.end())
             {//We do not have the needed file
                 files_needed.push_back(it2->first);
@@ -227,6 +241,12 @@ void Tactek_Display::check_playlist_items_downloaded()
         boost::thread t(
             boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
         t.join();
+    }
+    else
+    {
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " - WE NEED NO NEW FILES!" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
     }
 //	pugi::xml_document document;
 //	pugi::xml_node tacktech_node = document.append_child("Tacktech");
@@ -299,8 +319,15 @@ void Tactek_Display::update_display_client()
  */
 void Tactek_Display::open_and_play(QString filepath)
 {
-	m_vlc_media = new VlcMedia(filepath, true, m_vlc_instance);
-	m_vlc_player->open(m_vlc_media);
+    try
+    {
+        m_vlc_media = new VlcMedia(filepath, true, m_vlc_instance);
+        m_vlc_player->open(m_vlc_media);
+    }
+    catch(std::exception &e)
+    {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
 }
 
 /**
@@ -392,7 +419,8 @@ void Tactek_Display::handle_recieved_data(QString data)
 			std::cout << "File_Data size: " << file_data.size() << std::endl;
 #endif
 
-			std::ofstream out_file(filename.c_str(), std::ios::binary);
+            std::string out_filename = parameters["general.playlist_directory"] + filename;
+			std::ofstream out_file(out_filename.c_str(), std::ios::binary);
 			out_file << file_data;
 			out_file.close();
 
@@ -403,6 +431,7 @@ void Tactek_Display::handle_recieved_data(QString data)
 //			emit new_file_added(QString::fromStdString(filename),
 //					boost::lexical_cast<int>(pause));
 		}
+		check_file_directory();
 	}
 	else if (type_string == "UPDATE")
     {
@@ -463,6 +492,7 @@ void Tactek_Display::check_file_directory()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tactek_Display::check_file_directory()" << std::endl;
+	std::cout << " - Checking directory: " << parameters["general.playlist_directory"] << std::endl;
 #endif
     filelist.clear();
     boost::filesystem::path current_dir(parameters["general.playlist_directory"]);
@@ -471,6 +501,9 @@ void Tactek_Display::check_file_directory()
 		++iter)
 	{
 		std::string name = iter->path().generic_string();
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " ++ " << name << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 		filelist.push_back(name);
 	}
 }

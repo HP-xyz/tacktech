@@ -9,3 +9,4 @@ TODO:
 ISSUES:
 	- Crash when none group edit playlist		-> Manager
 	- Crash if check for update before identify -> Server
+	- Filelist sent twice to Manager			-> Server/Manager
