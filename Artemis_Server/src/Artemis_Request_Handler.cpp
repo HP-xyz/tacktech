@@ -253,38 +253,47 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		{
 			std::vector<std::string> items_to_upload =
 				identified_display->get_playlist_container()->get_needed_items(remote_files);
+			if(items_to_upload.size() > 0)
+			{
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "   !!! Need to upload '" << items_to_upload[0] << "'" << std::endl;
+				std::cout << "   !!! Need to upload '" << items_to_upload[0] << "'" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-			if (items_to_upload.size() > 0)
-			{//There are items to upload
-				pugi::xml_document upload_document;
-				pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
-				pugi::xml_node type_node = tacktech_node.append_child("Type");
-				type_node.append_attribute("TYPE") = "UPLOAD";
-				pugi::xml_node items_node = tacktech_node.append_child("Items_Node");
+				if (items_to_upload.size() > 0)
+				{//There are items to upload
+					pugi::xml_document upload_document;
+					pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
+					pugi::xml_node type_node = tacktech_node.append_child("Type");
+					type_node.append_attribute("TYPE") = "UPLOAD";
+					pugi::xml_node items_node = tacktech_node.append_child("Items_Node");
 				
-				/* I propose a hack here, which only allows one file to upload
-				 * at a time. It should send a string postscript saying that
-				 * there are more files to upload.*/
-				//for (std::vector<std::string>::iterator it = items_to_upload.begin();
-				//	it != items_to_upload.end(); ++it)
-				//{
-				pugi::xml_node item_node = items_node.append_child("Item");
-				pugi::xml_node filename_node = item_node.append_child("Filename");
-				pugi::xml_node file_data_node = item_node.append_child("File_Data");
+					/* I propose a hack here, which only allows one file to upload
+					 * at a time. It should send a string postscript saying that
+					 * there are more files to upload.*/
+					//for (std::vector<std::string>::iterator it = items_to_upload.begin();
+					//	it != items_to_upload.end(); ++it)
+					//{
+					pugi::xml_node item_node = items_node.append_child("Item");
+					pugi::xml_node filename_node = item_node.append_child("Filename");
+					pugi::xml_node file_data_node = item_node.append_child("File_Data");
 
-				pugi::xml_node filename_pcdata = filename_node.append_child(
-					pugi::node_pcdata);
-				pugi::xml_node file_data_pcdata = file_data_node.append_child(
-					pugi::node_pcdata);
+					pugi::xml_node filename_pcdata = filename_node.append_child(
+						pugi::node_pcdata);
+					pugi::xml_node file_data_pcdata = file_data_node.append_child(
+						pugi::node_pcdata);
 
-				filename_pcdata.set_value(items_to_upload[0].c_str());
-				file_data_pcdata.set_value(
-					filelist->get_binary_file(organization_name, items_to_upload[0]).c_str());
-				//}
-				pugi::xml_node status_node = tacktech_node.append_child("Status");
-				status_node.append_attribute("STATUS") = "MORE_ITEMS";
+					filename_pcdata.set_value(items_to_upload[0].c_str());
+					file_data_pcdata.set_value(
+						filelist->get_binary_file(organization_name, items_to_upload[0]).c_str());
+					//}
+					pugi::xml_node status_node = tacktech_node.append_child("Status");
+					status_node.append_attribute("STATUS") = "MORE_ITEMS";
+				}
+				else
+				{
+#ifdef _IMPORTANT_OUTPUT
+					std::cout << "WARNING: Could not find items to upload (Display playlist probably out of sync)" << std::endl;
+#endif //_IMPORTANT_OUTPUT
+				}
 				xml_string_writer writer;
 				upload_document.print(writer);
 				return_xml->append(writer.result);
