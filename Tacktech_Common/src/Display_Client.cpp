@@ -309,6 +309,14 @@ std::string Display_Client::get_organizations_string()
 	return make_list(*get_organizations());
 }
 
+void Display_Client::remove_from_group( std::string group_name )
+{
+	std::set<std::string>::iterator group_iter = 
+		std::find(get_groups()->begin(), get_groups()->end(), group_name);
+	get_groups()->erase(group_iter);
+	get_playlist_container()->remove_playlist_of_group(group_name);
+}
+
 #ifdef _SHOW_DEBUG_OUTPUT
 void Display_Client::print_contents()
 {

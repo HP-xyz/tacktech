@@ -513,6 +513,21 @@ void Playlist_Container::remove_playlist_item( std::string playlist_name, std::s
 	}
 }
 
+void Playlist_Container::remove_playlist_of_group( std::string group_name)
+{
+	for (Container::iterator it = get_playlist_container()->begin(); it != get_playlist_container()->end(); ) 
+	{
+		if (it->first->contains_group(group_name)) 
+		{
+			get_playlist_container()->erase(it++);
+		}
+		else 
+		{
+			++it;
+		}
+	}
+}
+
 #ifdef _SHOW_DEBUG_OUTPUT
 void Playlist_Container::print_contents()
 {

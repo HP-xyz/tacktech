@@ -121,6 +121,7 @@ void Add_File_Dialog::repopulate_widget()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "Server contains '" << temp_vector.size() << "' files" << std::endl;
 #endif // _DEBUG
+	ui.server_filenames->clear();
 	for (std::vector<std::string>::iterator it = temp_vector.begin();
 		it != temp_vector.end(); ++it)
 	{

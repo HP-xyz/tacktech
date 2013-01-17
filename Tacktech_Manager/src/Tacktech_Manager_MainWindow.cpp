@@ -29,9 +29,11 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 	ui.main_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
 	add_to_group.reset(new QAction("Add to group...", node_menu.get()));
 	edit_playlist.reset(new QAction("Edit Playlist...", node_menu.get()));
+	remove_from_group.reset(new QAction("Remove from group...", node_menu.get()));
 
 	ui.main_tree_widget->addAction(add_to_group.get());
 	ui.main_tree_widget->addAction(edit_playlist.get());
+	ui.main_tree_widget->addAction(remove_from_group.get());
 
 	io_service.reset(new boost::asio::io_service);
 	network_manager.reset(
@@ -51,6 +53,7 @@ Tacktech_Manager_MainWindow::Tacktech_Manager_MainWindow( QWidget *parent /*= 0*
 		this, SLOT(upload_files_to_server( std::vector<std::string>, QTime)));
 	connect(add_to_group.get(), SIGNAL(triggered()), this, SLOT(assign_group()));
 	connect(edit_playlist.get(), SIGNAL(triggered()), this, SLOT(edit_playlist_slot()));
+	connect(remove_from_group.get(), SIGNAL(triggered()), this, SLOT(remove_from_group_slot()));
 	refresh_timer->start(30000);
 }
 
@@ -148,11 +151,13 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
                         group_item = static_cast<Typed_QTreeWidgetItem*>(ui.main_tree_widget->topLevelItem(i - 1));
                 else
                         group_item = new Typed_QTreeWidgetItem();
+				group_item->set_type("GROUP");
                 group_item->set_group_name("NONE");
                 group_item->setText(1, "NONE");
                 ui.main_tree_widget->addTopLevelItem(group_item);
 
                 Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+				computer_item->set_type("COMPUTER");
                 computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
                 computer_item->set_group_name("NONE");
 
@@ -193,6 +198,7 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 							== *it2)
 						{//There already exists a Group TopLevelItem, so add to its child
 							Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+							computer_item->set_type("COMPUTER");
 							computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
 							computer_item->set_group_name(QString::fromStdString(*it2));
 							/** Here we get the elapsed time between now, and the last ping the
@@ -216,11 +222,13 @@ void Tacktech_Manager_MainWindow::repopulate_ui()
 					if (tree_contains_group == false)
 					{//We need to create a new TopLevelItem for the Group now
 						Typed_QTreeWidgetItem *group_item = new Typed_QTreeWidgetItem();
+						group_item->set_type("GROUP");
 						group_item->set_group_name(QString::fromStdString(*it2));
 						group_item->setText(1, QString::fromStdString(*it2));
 						ui.main_tree_widget->addTopLevelItem(group_item);
 
 						Typed_QTreeWidgetItem *computer_item = new Typed_QTreeWidgetItem();
+						computer_item->set_type("COMPUTER");
 						computer_item->set_computer_name(QString::fromStdString(it->get()->get_identification()));
 						computer_item->set_group_name(QString::fromStdString(*it2));
 						computer_item->setText(3, QString::fromStdString(
@@ -548,4 +556,25 @@ void Tacktech_Manager_MainWindow::edit_playlist_slot()
 	connect(edit_playlist_dialog.get(), SIGNAL(playlist_changed(Display_Client_Container_Ptr)), this, SLOT(display_container_changed(Display_Client_Container_Ptr)));
 
 	edit_playlist_dialog->show();
+}
+
+void Tacktech_Manager_MainWindow::remove_from_group_slot()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Tacktech_Manager_MainWindow::remove_from_group_slot()" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	foreach(QTreeWidgetItem* item, ui.main_tree_widget->selectedItems())
+	{
+		Typed_QTreeWidgetItem *typed_item = static_cast<Typed_QTreeWidgetItem*>(item);
+		if (typed_item->get_type() == "COMPUTER")
+		{
+			Display_Client_Ptr display_client =
+				display_client_container->get_display_client(
+				parameters["general.organization_name"], typed_item->get_computer_name().toStdString());
+			std::string group_to_remove =
+				static_cast<Typed_QTreeWidgetItem*>(typed_item->parent())->get_group_name().toStdString();
+			display_client->remove_from_group(group_to_remove);
+		}
+	}
+	display_container_changed(display_client_container);
 }

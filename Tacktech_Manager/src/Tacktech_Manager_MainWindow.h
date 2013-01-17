@@ -42,6 +42,7 @@ private:
 	boost::shared_ptr<QMenu> node_menu;
 	boost::shared_ptr<QAction> add_to_group;
 	boost::shared_ptr<QAction> edit_playlist;
+	boost::shared_ptr<QAction> remove_from_group;
 
     boost::shared_ptr<Edit_Playlist> edit_playlist_dialog;
 
@@ -79,6 +80,7 @@ private slots:
 	void edit_playlist_slot();
 	void check_uploads_pending();
 	void assign_group();
+	void remove_from_group_slot();
 	void display_container_changed(Display_Client_Container_Ptr);
 	void display_container_changed();
 };
