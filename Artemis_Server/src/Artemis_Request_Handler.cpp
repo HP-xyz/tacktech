@@ -258,12 +258,12 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #ifdef _SHOW_DEBUG_OUTPUT
 				std::cout << "   !!! Need to upload '" << items_to_upload[0] << "'" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+				pugi::xml_document upload_document;
+				pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
+				pugi::xml_node type_node = tacktech_node.append_child("Type");
+				type_node.append_attribute("TYPE") = "UPLOAD";
 				if (items_to_upload.size() > 0)
-				{//There are items to upload
-					pugi::xml_document upload_document;
-					pugi::xml_node tacktech_node = upload_document.append_child("Tacktech");
-					pugi::xml_node type_node = tacktech_node.append_child("Type");
-					type_node.append_attribute("TYPE") = "UPLOAD";
+				{//There are items to upload			
 					pugi::xml_node items_node = tacktech_node.append_child("Items_Node");
 				
 					/* I propose a hack here, which only allows one file to upload
