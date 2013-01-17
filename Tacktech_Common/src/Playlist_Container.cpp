@@ -248,13 +248,13 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 			if (it2 != organizations_vector.end())
 			{
 #ifdef _SHOW_DEBUG_OUTPUT
-				std::cout << " - Organization Found" << std::endl;
+				std::cout << "  - Organization Found" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 				Playlist_Ptr playlist_ptr = get_playlist_ptr(it->first->get_playlist_name(), p_organization_name);
 				if (playlist_ptr != 0)
 				{//Playlist_Item not found, therefore adding it
 #ifdef _IMPORTANT_OUTPUT
-					std::cout << " + ADDING NEW playlist: '" << it->first->get_playlist_name()
+					std::cout << "  + ADDING NEW playlist: '" << it->first->get_playlist_name()
 						<< "' to organization: '" << p_organization_name << "'" << std::endl;
 #endif // _IMPORTANT_OUTPUT
 					add_playlist(it->first, it->second);
@@ -263,7 +263,7 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 				else
 				{//Updating playlist items
 #ifdef _IMPORTANT_OUTPUT
-					std::cout << " $ UPDATING playlist: '" << it->first->get_playlist_name()
+					std::cout << "  $ UPDATING playlist: '" << it->first->get_playlist_name()
 						<< "' to organization: '" << p_organization_name << "'" << std::endl;
 #endif // _IMPORTANT_OUTPUT
 					if (playlist_ptr->get_playlist_items()->size()
@@ -280,6 +280,14 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 						}
 						if(!playlist_identical)
 						{//Playlists are different, replace current with parameter
+						 //Playlists are the same size, but we still replace our current
+						 //playlist with the one we recieved as a parameter.
+#ifdef _IMPORTANT_OUTPUT
+							std::cout << "  $ REPLACING playlist: '" << playlist_ptr->get_playlist_name() 
+								<< "' containing '" << playlist_ptr->get_playlist_items()->size() 
+								<< "' items with playlist '" << it->first->get_playlist_name()
+								<< "' containing '" << it->first->get_playlist_items()->size() << "' items" << std::endl;
+#endif // _IMPORTANT_OUTPUT
 							playlist_ptr->set_current_item_index(-1);
 							playlist_ptr->set_end_time(it->first->get_end_time());
 							playlist_ptr->set_groups(*it->first->get_groups());
@@ -291,6 +299,13 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 					}
 					else
 					{//Playlists are different, replace current with parameter
+					 //Playlists are different sizes
+#ifdef _IMPORTANT_OUTPUT
+						std::cout << "  $ REPLACING playlist: '" << playlist_ptr->get_playlist_name() 
+							<< "' containing '" << playlist_ptr->get_playlist_items()->size() 
+							<< "' items with playlist '" << it->first->get_playlist_name()
+							<< "' containing '" << it->first->get_playlist_items()->size() << "' items" << std::endl;
+#endif // _IMPORTANT_OUTPUT
 						playlist_ptr->set_current_item_index(-1);
 						playlist_ptr->set_end_time(it->first->get_end_time());
 						playlist_ptr->set_groups(*it->first->get_groups());
@@ -301,9 +316,12 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 					}
 				}
 			}
+			else
+			{
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << " - Organization NOT Found" << std::endl;
+				std::cout << "  - Organization NOT Found" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+			}
 		}
 	}
 	return changed;
