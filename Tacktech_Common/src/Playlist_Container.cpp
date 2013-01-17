@@ -419,7 +419,10 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
             if (it->first->get_current_item_index() == -1)
             {//First time the playlist is being played
                 it->first->currently_active = true;
-                it->first->set_current_item_index(0);
+                it->first->set_current_item_index(1);
+#ifdef _SHOW_DEBUG_OUTPUT
+                std::cout << " '" << it->first->get_playlist_items()->at(0).first << "' ";
+#endif // _SHOW_DEBUG_OUTPUT
                 return it->first->get_playlist_items()->at(0);
             }
             else if(it->first->get_current_item_index() == (it->first->get_playlist_items()->size() - 1) )
@@ -427,12 +430,18 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
                 it->first->currently_active = true;
                 int index = it->first->get_current_item_index();
                 it->first->set_current_item_index(0);
+#ifdef _SHOW_DEBUG_OUTPUT
+                std::cout << " '" << it->first->get_playlist_items()->at(index).first << "' ";
+#endif // _SHOW_DEBUG_OUTPUT
                 return it->first->get_playlist_items()->at(index);
             }
             else
             {//Playing next item normally
                 it->first->currently_active = true;
                 it->first->set_current_item_index(it->first->get_current_item_index() + 1);
+#ifdef _SHOW_DEBUG_OUTPUT
+                std::cout << " '" << it->first->get_playlist_items()->at(it->first->get_current_item_index() - 1).first << "' ";
+#endif // _SHOW_DEBUG_OUTPUT
                 return it->first->get_playlist_items()->at(it->first->get_current_item_index() - 1);
             }
         }
