@@ -338,6 +338,7 @@ std::string Upload_Data_Container::upload_file()
 					temp_filename.find_last_of("/") + 1);
 
 		/* Giving pcdata a value */
+		std::replace(temp_filename.begin(), temp_filename.end(), '_', '-');
 		filename_pcdata.set_value(temp_filename.c_str());
 		file_data_pcdata.set_value(
 				get_binary_file(QString::fromStdString(*it)).c_str());

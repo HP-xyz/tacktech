@@ -37,6 +37,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/bind.hpp>
 #include <b64/decode.h>
 #include <pugixml.hpp>
 #include <Tacktech_Network_Manager.h>
@@ -82,8 +83,10 @@ private:
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
 
-	Tacktech_Network_Manager_Ptr network_manager;
-	boost::shared_ptr<boost::asio::io_service> io_service;
+	Tacktech_Network_Manager_Ptr network_manager_file_transfer;
+	Tacktech_Network_Manager_Ptr network_manager_identification;
+	boost::shared_ptr<boost::asio::io_service> io_service_identification;
+	boost::shared_ptr<boost::asio::io_service> io_service_file_transfer;
 
 	QString playlist_name;
 	std::vector<std::string> filelist;
@@ -94,6 +97,8 @@ private:
 
 	/** Reads a config file*/
 	void read_config();
+
+	void write_file(std::string, std::string);
 
 	std::set<std::string> make_set(std::string);
 };

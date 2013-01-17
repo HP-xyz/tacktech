@@ -5,36 +5,37 @@ Tacktech_Network_Manager::Tacktech_Network_Manager(
 	std::map<std::string, std::string>& parameters): strand(io_service)
 {
 	parms = parameters;
+	busy = false;
 	m_socket.reset(new boost::asio::ip::tcp::socket(io_service));
 }
 
 Tacktech_Network_Manager::~Tacktech_Network_Manager()
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Network_Manager::"
 			<< "~Tacktech_Network_Manager()" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 }
 
 void Tacktech_Network_Manager::start_write(
 	boost::shared_ptr<std::string> _xml_string )
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << " =Tacktech_Network_Manager::start_write()"
 		<< std::endl;
-#endif //_DEBUG
+#endif //_SHOW_VERBOSE_DEBUG_OUTPUT
 	xml_string.reset(new std::string(*_xml_string));
 }
 
 void Tacktech_Network_Manager::do_write()
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
 	std::cout << " =Tacktech_Network_Manager::do_write()"
 		<< std::endl;
 	std::cout << " ->>> Socket is currently open: "
 		<< m_socket->is_open() << std::endl;
 	std::cout << " - Writing size: " << xml_string->size() << std::endl;
-#endif //_DEBUG
+#endif //_IMPORTANT_OUTPUT
 	xml_string->append(";");
 	boost::asio::async_write(*m_socket,
 			boost::asio::buffer(xml_string->c_str(), xml_string->size()),
@@ -70,26 +71,26 @@ void Tacktech_Network_Manager::connect(std::string dest_ip,
 {
 	try
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 		std::cout << "= Tacktech_Network_Manager::connect()"
 			<< std::endl;
 		std::cout << " ->> Dest IP:   " << dest_ip << std::endl;
 		std::cout << " ->> Dest PORT: " << dest_port << std::endl;
 		std::cout << " - Creating resolver" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 		boost::asio::ip::tcp::resolver resolver(m_socket->get_io_service());
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 		std::cout << " - Creating query" << std::endl;
-#endif //_DEBUG
+#endif //_SHOW_VERBOSE_DEBUG_OUTPUT
 		boost::asio::ip::tcp::resolver::query query(dest_ip, dest_port);
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 		std::cout << " - Creating endpoint_iterator" << std::endl;
-#endif //_DEBUG
+#endif //_SHOW_VERBOSE_DEBUG_OUTPUT
 		boost::asio::ip::tcp::resolver::iterator endpoint_iterator =
 			resolver.resolve(query);
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 		std::cout << " - Calling async_connect" << std::endl;
-#endif //_DEBUG
+#endif //_SHOW_VERBOSE_DEBUG_OUTPUT
 		m_socket->get_io_service().post(
 			boost::bind(&Tacktech_Network_Manager::do_connect,
 					this,
@@ -103,30 +104,30 @@ void Tacktech_Network_Manager::connect(std::string dest_ip,
 void Tacktech_Network_Manager::do_connect(
 		boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Network_Manager::do_connect()"
 			<< std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 	boost::asio::async_connect(*m_socket, endpoint_iterator,
 			boost::bind(&Tacktech_Network_Manager::handle_connect,
 					this, boost::asio::placeholders::error));
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << " - Socket is open: " << m_socket->is_open() << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 }
 void Tacktech_Network_Manager::handle_connect(
 		const boost::system::error_code &error)
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Network_Manager::handle_connect()"
 			<< std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 	if (!error)
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 		std::cout << " - Connected without error" << std::endl;
 		std::cout << " - Starting write" << std::endl;
-#endif //_DEBUG
+#endif //_SHOW_VERBOSE_DEBUG_OUTPUT
 		do_write();
 	}
 	else
@@ -138,18 +139,18 @@ void Tacktech_Network_Manager::handle_connect(
 }
 void Tacktech_Network_Manager::do_close()
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Network_Manager::do_close()"
 		<< std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 	m_socket->close();
 }
 
 void Tacktech_Network_Manager::read()
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Network_Manager::read()" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 	boost::asio::async_read_until(*m_socket, buffer, ';',
 		boost::bind(&Tacktech_Network_Manager::handle_read,
 		shared_from_this(), boost::asio::placeholders::error,
@@ -159,14 +160,14 @@ void Tacktech_Network_Manager::read()
 void Tacktech_Network_Manager::handle_read(
 	const boost::system::error_code& error, std::size_t bytes_transferred )
 {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << " == Tacktech_Network_Manager::Handle Read" << std::endl << " =============="
 		<< std::endl << " - Bytes transferred before error check: "
 		<< bytes_transferred << std::endl;
 	std::cout << " --> Recieved from IP: "
 		<< m_socket->remote_endpoint().address().to_string()
 		<< std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 	/** Constructing the recieved message to std::string*/
 	std::vector<char> xml;
 	xml.reserve(bytes_transferred + 1);
@@ -181,9 +182,9 @@ void Tacktech_Network_Manager::handle_read(
 	{
 		received_xml += xml[i];
 	}
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _SHOW_VERBOSE_DEBUG_OUTPUT
 	std::cout << " - Closing" << std::endl;
-#endif // _DEBUG
+#endif // _SHOW_VERBOSE_DEBUG_OUTPUT
 	//Initiate graceful connection closure.
 	boost::system::error_code ignored_ec;
 	Tacktech_Network_Manager::m_socket->shutdown(

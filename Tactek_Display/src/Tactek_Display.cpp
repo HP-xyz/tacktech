@@ -43,6 +43,23 @@ std::string make_list( T p_vector)
 	return comma_separated_list;
 }
 
+class Write_File
+{
+public:
+    static void write_file(std::string filename, std::string file_data)
+    {
+        std::stringstream encoded_stream;
+        std::stringstream decoded_stream;
+        encoded_stream << file_data;
+        base64::decoder D;
+        D.decode(encoded_stream, decoded_stream);
+        file_data = decoded_stream.str();
+        std::ofstream out_file(filename.c_str(), std::ios::binary);
+        out_file << file_data;
+        out_file.close();
+    }
+};
+
 /**
  * Initiates and sets up the class for usage. Connects the check_media_state and
  * play_next_media_in_queue signals to their respective slots.
@@ -79,11 +96,14 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	Tactek_Display::update_display_client_timer = new QTimer(this);
 
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Setting up Network_Manager" << std::endl;
+	std::cout << " - Setting up Network_Managers" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	io_service.reset(new boost::asio::io_service);
-	network_manager.reset(
-		new Tacktech_Network_Manager(*io_service, parameters));
+    io_service_file_transfer.reset(new boost::asio::io_service);
+	io_service_identification.reset(new boost::asio::io_service);
+	network_manager_file_transfer.reset(
+		new Tacktech_Network_Manager(*io_service_file_transfer, parameters));
+    network_manager_identification.reset(
+		new Tacktech_Network_Manager(*io_service_identification, parameters));
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up VLC" << std::endl;
@@ -195,22 +215,27 @@ void Tactek_Display::check_playlist_items_downloaded()
         for(std::vector< std::pair<std::string,int> >::iterator it2 = it->first->get_playlist_items()->begin();
             it2 != it->first->get_playlist_items()->end(); ++it2)
         {
+            std::string file_to_find = parameters["general.playlist_directory"];
+            file_to_find += it2->first;
 #ifdef _SHOW_DEBUG_OUTPUT
             for(std::vector<std::string>::iterator it = filelist.begin();
                 it != filelist.end(); ++it)
                 std::cout << "File: " << *it << std::endl;
-            std::cout << "  - Playlist Item: " << it2->first << std::endl;
+            std::cout << "  - Playlist Item: " << file_to_find << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-            std::string file_to_find = parameters["general.organization_name"];
-            file_to_find += "_";
-            file_to_find += it2->first;
             std::vector<std::string>::iterator item_found = std::find(filelist.begin(), filelist.end(), file_to_find);
             if(item_found == filelist.end())
             {//We do not have the needed file
+#ifdef _SHOW_DEBUG_OUTPUT
+                std::cout << "  ++ " << it2->first << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
                 files_needed.push_back(it2->first);
             }
         }
     }
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " - Need to get '" << files_needed.size() << "' items" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
     if(files_needed.size() > 0)
     {
         pugi::xml_document document;
@@ -227,20 +252,24 @@ void Tactek_Display::check_playlist_items_downloaded()
         document.save(writer);
         document.print(std::cout);
 
-        boost::shared_ptr<std::string> string_to_send;
-        string_to_send.reset(new std::string(writer.result));
+        if(!network_manager_file_transfer->busy)
+        {
+            boost::shared_ptr<std::string> string_to_send;
+            string_to_send.reset(new std::string(writer.result));
 
-        io_service->reset();
-        network_manager.reset(
-                new Tacktech_Network_Manager(*io_service, parameters));
-        network_manager->connect(parameters["general.server_ip"],
-                parameters["general.server_port"]);
-        connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-                    SLOT(handle_recieved_data(QString)));
-        network_manager->start_write(string_to_send);
-        boost::thread t(
-            boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
-        t.join();
+            io_service_file_transfer->reset();
+            network_manager_file_transfer.reset(
+                    new Tacktech_Network_Manager(*io_service_file_transfer, parameters));
+            network_manager_file_transfer->connect(parameters["general.server_ip"],
+                    parameters["general.server_port"]);
+            network_manager_file_transfer->busy = true;
+            connect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+                        SLOT(handle_recieved_data(QString)));
+            network_manager_file_transfer->start_write(string_to_send);
+            boost::thread t(
+                boost::bind(&boost::asio::io_service::run, boost::ref(io_service_file_transfer)));
+            t.join();
+        }
     }
     else
     {
@@ -297,20 +326,24 @@ void Tactek_Display::update_display_client()
 	document.save(writer);
 	document.print(std::cout);
 
-	boost::shared_ptr<std::string> string_to_send;
-	string_to_send.reset(new std::string(writer.result));
+    if(!network_manager_identification->busy)
+    {
+        boost::shared_ptr<std::string> string_to_send;
+        string_to_send.reset(new std::string(writer.result));
 
-	io_service->reset();
-	network_manager.reset(
-				new Tacktech_Network_Manager(*io_service, parameters));
-	network_manager->connect(parameters["general.server_ip"],
-			parameters["general.server_port"]);
-	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-				SLOT(handle_recieved_data(QString)));
-	network_manager->start_write(string_to_send);
-	boost::thread t(
-		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
-	t.join();
+        io_service_identification->reset();
+        network_manager_identification.reset(
+                    new Tacktech_Network_Manager(*io_service_identification, parameters));
+        network_manager_identification->connect(parameters["general.server_ip"],
+                parameters["general.server_port"]);
+        network_manager_identification->busy = true;
+        connect(network_manager_identification.get(), SIGNAL(data_recieved(QString)), this,
+                    SLOT(handle_recieved_data(QString)));
+        network_manager_identification->start_write(string_to_send);
+        boost::thread t(
+            boost::bind(&boost::asio::io_service::run, boost::ref(io_service_identification)));
+        t.join();
+    }
 }
 
 /**
@@ -350,19 +383,21 @@ void Tactek_Display::check_media_state()
 void Tactek_Display::play_next_media_in_queue()
 {
     std::pair<std::string, int> next_item = m_display_client->get_playlist_container()->get_next_item();
-    std::ifstream file(next_item.first.c_str());
+    std::string filename = parameters["general.playlist_directory"];
+    filename += next_item.first;
+    std::ifstream file(filename.c_str());
 	if (next_item.first != "NO ITEMS" && file.good())
 	{
 		if (next_item.second == 0)
 		{
-			open_and_play(QString::fromStdString(next_item.first));
+			open_and_play(QString::fromStdString(filename));
 		}
 		else
 		{
 			std::cout << "Pausing for: " << next_item.second * 1000
 					<< std::endl;
 			QTimer::singleShot((next_item.second * 1000), this, NULL);
-			open_and_play(QString::fromStdString(next_item.first));
+			open_and_play(QString::fromStdString(filename));
 		}
 	}
 	else
@@ -381,16 +416,16 @@ void Tactek_Display::handle_recieved_data(QString data)
 	std::cout << "= Tactek_Display::handle_recieved_data()" << std::endl;
 	std::cout << " - Received data size: " << data.size() << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
-	/** Disconnect allows the network_manager smart pointer to be deleted
-	 *  as no further reference to it exists */
-	disconnect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-					SLOT(handle_recieved_data(QString)));
 	pugi::xml_document tacktech;
 	tacktech.load(data.toStdString().c_str());
 	pugi::xml_node tacktech_node = tacktech.child("Tacktech");
 	std::string type_string = tacktech_node.child("Type").attribute("TYPE").as_string();
 	if (type_string == "UPLOAD")
 	{
+    /** Disconnect allows the network_manager smart pointer to be deleted
+	 *  as no further reference to it exists */
+	disconnect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+					SLOT(handle_recieved_data(QString)));
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved UPLOAD command" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
@@ -406,24 +441,16 @@ void Tactek_Display::handle_recieved_data(QString data)
 					<< std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
 			std::string filename = file_data_node.child_value("Filename");
+			filename = parameters["general.playlist_directory"] + filename;
 			std::string file_data = file_data_node.child_value("File_Data");
-			std::stringstream encoded_stream;
-			std::stringstream decoded_stream;
-
-			encoded_stream << file_data;
-			base64::decoder D;
-			D.decode(encoded_stream, decoded_stream);
-			file_data = decoded_stream.str();
-
 #ifdef _SHOW_DEBUG_OUTPUT
-			std::cout << "File_Data size: " << file_data.size() << std::endl;
-#endif
-
-            std::string out_filename = parameters["general.playlist_directory"] + filename;
-			std::ofstream out_file(out_filename.c_str(), std::ios::binary);
-			out_file << file_data;
-			out_file.close();
-
+                std::cout << "File_Data size: " << file_data.size() << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+			if(file_data.size() > 0)
+            {
+                class Write_File wf;
+                boost::thread write_file_thread(Write_File::write_file, filename, file_data);
+            }
 //			std::string pause = file_data_node.child_value("Pause");
 //			if (pause == "")
 //				pause = "0";
@@ -432,9 +459,21 @@ void Tactek_Display::handle_recieved_data(QString data)
 //					boost::lexical_cast<int>(pause));
 		}
 		check_file_directory();
+#ifdef _SHOW_DEBUG_OUTPUT
+		std::cout << "  **** Server status: " << tacktech_node.child("Status").attribute("STATUS").as_string();
+#endif // _SHOW_DEBUG_OUTPUT
+		if(tacktech_node.child("Status").attribute("STATUS").as_string() == "MORE_ITEMS")
+        {//If there is still items to download, start new request
+            check_playlist_items_downloaded();
+        }
+        network_manager_file_transfer->busy = false;
 	}
 	else if (type_string == "UPDATE")
     {
+    /** Disconnect allows the network_manager smart pointer to be deleted
+	 *  as no further reference to it exists */
+        disconnect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+					SLOT(handle_recieved_data(QString)));
 #ifdef _SHOW_DEBUG_OUTPUT
         std::cout << " - Recieved UPDATE command" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
@@ -449,7 +488,9 @@ void Tactek_Display::handle_recieved_data(QString data)
         container_node.print(std::cout);
 
         Display_Client client(writer.result);
-        bool playlist_container_changed = m_display_client->get_playlist_container()->update_playlist(*client.get_playlist_container(), parameters["general.organization_name"]);
+        bool playlist_container_changed =
+            m_display_client->get_playlist_container()->update_playlist(*client.get_playlist_container(), parameters["general.organization_name"]);
+        network_manager_file_transfer->busy = false;
 //        if(playlist_container_changed)
 //            check_playlist_items_downloaded();
 //#ifdef _SHOW_DEBUG_OUTPUT
@@ -467,6 +508,10 @@ void Tactek_Display::handle_recieved_data(QString data)
     }
 	else if(type_string == "IDENTIFY")
 	{
+        /** Disconnect allows the network_manager smart pointer to be deleted
+         *  as no further reference to it exists */
+        disconnect(network_manager_identification.get(), SIGNAL(data_recieved(QString)), this,
+					SLOT(handle_recieved_data(QString)));
 		/** This return is just to notify the display that its
 		 *  identity has been sent to the server. It does nothing
 		 *  more at this moment.
@@ -474,6 +519,7 @@ void Tactek_Display::handle_recieved_data(QString data)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved IDENTIFY command" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
+        network_manager_identification->busy = false;
 	}
 	//tacktech.print(std::cout);
 }
@@ -547,18 +593,21 @@ void Tactek_Display::check_display_container()
     upload_string += "</CONTAINER>";
     upload_string += "</Tacktech>";
 
-    boost::shared_ptr<std::string> string_to_send;
-	string_to_send.reset(new std::string(upload_string));
-
-	io_service->reset();
-	network_manager.reset(
-				new Tacktech_Network_Manager(*io_service, parameters));
-	network_manager->connect(parameters["general.server_ip"],
-			parameters["general.server_port"]);
-	connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
-				SLOT(handle_recieved_data(QString)));
-	network_manager->start_write(string_to_send);
-	boost::thread t(
-		boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
-	t.join();
+    if(!network_manager_file_transfer->busy)
+    {
+        boost::shared_ptr<std::string> string_to_send;
+        string_to_send.reset(new std::string(upload_string));
+        io_service_file_transfer->reset();
+        network_manager_file_transfer.reset(
+                    new Tacktech_Network_Manager(*io_service_file_transfer, parameters));
+        network_manager_file_transfer->connect(parameters["general.server_ip"],
+                parameters["general.server_port"]);
+        network_manager_file_transfer->busy = true;
+        connect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+                    SLOT(handle_recieved_data(QString)));
+        network_manager_file_transfer->start_write(string_to_send);
+        boost::thread t(
+            boost::bind(&boost::asio::io_service::run, boost::ref(io_service_file_transfer)));
+        t.join();
+    }
 }

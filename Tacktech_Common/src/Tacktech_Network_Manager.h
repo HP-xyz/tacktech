@@ -1,5 +1,8 @@
 #ifndef TACKTECH_NETWORK_MANAGER_H
 #define TACKTECH_NETWORK_MANAGER_H
+#ifdef _SHOW_DEBUG_OUTPUT
+#define _IMPORTANT_OUTPUT _SHOW_DEBUG_OUTPUT
+#endif // _SHOW_DEBUG_OUTPUT
 #include <QObject>
 #include <QString>
 #include <boost/asio.hpp>
@@ -34,6 +37,7 @@ public:
 	void connect(std::string dest_ip, std::string dest_port);
 	void start_write(boost::shared_ptr<std::string> _xml_string);
 	void do_close();
+	bool busy;
 private:
 	void read();
 	/** Handle completion of a write operation */
