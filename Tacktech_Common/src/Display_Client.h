@@ -87,6 +87,10 @@ public:
 	 ** a group identified by the parameter */
 	std::vector<Playlist_Ptr> get_playlists_of_group(std::string);
 
+	/** Removes the Display_Client from the group identified by the std::string
+	 ** in the parameter. */
+	void remove_from_group(std::string);
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
 #endif // _SHOW_DEBUG_OUTPUT

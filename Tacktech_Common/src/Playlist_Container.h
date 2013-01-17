@@ -79,6 +79,8 @@ public:
 	 ** item_name*/
 	void remove_playlist_item(std::string, std::string);
 
+	void remove_playlist_of_group(std::string);
+
 #ifdef _SHOW_DEBUG_OUTPUT
 	void print_contents();
 #endif // _SHOW_DEBUG_OUTPUT
