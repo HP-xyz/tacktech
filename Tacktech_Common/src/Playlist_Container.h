@@ -63,6 +63,7 @@ public:
 	void set_playlist_container_name(std::string);
 	std::string get_playlist_container_name();
 	bool update_playlist(Playlist_Container, std::string);
+	void update_playlist_on_server(Playlist_Container, std::string);
 
 	std::string get_current_playing_item();
 
@@ -87,7 +88,8 @@ public:
 private:
 	boost::shared_ptr<Container> m_playlist_container;
 	std::string m_playlist_container_name;
-
+	std::string m_current_playlist_name;
+	int m_current_playlist_index;
 	/** Takes a comma_separated_list and creates a
 	 ** std::vector of strings. */
 	std::vector<std::string> make_vector(std::string);

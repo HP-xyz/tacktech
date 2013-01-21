@@ -219,6 +219,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 
 		if(client_to_send.get() != 0)
 		{
+			/* We need to set the item that is currently playing on the display */
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << "CLIENT" << std::endl;
 			client.print_contents();
@@ -235,7 +236,6 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		}
 		else
 		{
-			std::cout << "Upload_String:" << std::endl << upload_string << std::endl;
 #ifdef _IMPORTANT_OUTPUT
 			std::cout << "CRITICAL: Server could not find the client that asked for an update." << std::endl
 				<< "	This normally happens if the client asks for an update before it has" << std::endl
@@ -335,12 +335,27 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #endif // _SHOW_DEBUG_OUTPUT
 		pugi::xml_node indentification_node = tacktech.child("Identity");
 
+		xml_string_writer writer;
+		tacktech.child("CONTAINER").child("Playlist_Container").print(writer);
+		std::set<std::string> organization_name_set;
+		organization_name_set.insert(indentification_node.attribute("Organization_Name").as_string());
+
+		Playlist_Container_Ptr temp_container(new Playlist_Container(writer.result, organization_name_set));
+		std::cout << "Temp_Container current playing item:" << temp_container->get_current_playing_item() << std::endl;
 		Display_Client_Ptr display_client(new Display_Client());
 
 		display_client->add_organization(indentification_node.attribute("Organization_Name").as_string());
 		display_client->set_identification(indentification_node.attribute("Computer_Name").as_string());
 		display_client->set_last_ping(boost::posix_time::second_clock::universal_time());
 		display_client_container->add_display_client(display_client);
+		display_client_container->find_display_client_by_ident(indentification_node.attribute("Computer_Name").as_string())
+			->get()->get_playlist_container()->update_playlist_on_server(*temp_container, indentification_node.attribute("Organization_Name").as_string());
+
+#ifdef _IMPORTANT_OUTPUT
+		std::cout << " # Display_Client: '" << indentification_node.attribute("Organization_Name").as_string() 
+			<< "' is playing '" << display_client_container->find_display_client_by_ident(indentification_node.attribute("Computer_Name").as_string())
+			->get()->get_playlist_container()->get_current_playing_item() << "'" << std::endl;
+#endif // _IMPORTANT_OUTPUT
 
 		std::string upload_xml;
 		upload_xml += "<Tacktech>";

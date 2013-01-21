@@ -47,6 +47,7 @@ Filelist::~Filelist(void)
 
 void Filelist::scan_playlist_directory()
 {
+	filelist->clear();
 	boost::filesystem::path current_dir(parameters["general.playlist_directory"]);
 	for (boost::filesystem::recursive_directory_iterator iter(current_dir), end;
 		iter != end;

@@ -46,8 +46,6 @@ Playlist::Playlist( std::string playlist_str)
 	m_playlist_items.reset(new std::vector<std::pair<std::string, int> >);
 	m_start_time = ALL_DAY_TIME;
 	m_end_time = ALL_DAY_TIME;
-	set_current_item_index(-1);
-	currently_active = false;
 
 	pugi::xml_document playlist_document;
 	playlist_document.load(playlist_str.c_str());
@@ -71,6 +69,11 @@ Playlist::Playlist( std::string playlist_str)
 
 	set_start_time(start_time);
 	set_end_time(end_time);
+	if (playlist_node.child("Playlist").attribute("Currently_Active").as_int() == 1)
+		currently_active = true;
+	else
+		currently_active = false;
+
 	for (pugi::xml_node playlist_item_node = playlist_node.child("Playlist").child("Playlist_Item");
 		playlist_item_node; playlist_item_node = playlist_item_node.next_sibling("Playlist_Item"))
 	{
@@ -196,6 +199,10 @@ std::string Playlist::get_playlist_xml()
 	root_node.append_attribute("Current_Item_Index") = get_current_item_index();
 	root_node.append_attribute("Start_Time") = boost::posix_time::to_iso_string(get_start_time()).c_str();
 	root_node.append_attribute("End_Time") = boost::posix_time::to_iso_string(get_end_time()).c_str();
+	if (currently_active)
+		root_node.append_attribute("Currently_Active") = 1;
+	else
+		root_node.append_attribute("Currently_Active") = 0;
 	for(std::vector< std::pair<std::string,int> >::iterator it =
 		m_playlist_items->begin(); it != m_playlist_items->end(); ++it)
 	{

@@ -308,22 +308,24 @@ void Tactek_Display::update_display_client()
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tacktech_Manager::send_identity_to_server()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-   	pugi::xml_document document;
- 	pugi::xml_node tacktech_node = document.append_child("Tacktech");
-	pugi::xml_node type_node = tacktech_node.append_child("Type");
- 	type_node.append_attribute("TYPE") = "IDENTIFY";
- 	pugi::xml_node identity_node = tacktech_node.append_child("Identity");
- 	identity_node.append_attribute("Organization_Name") = parameters["general.organization_name"].c_str();
- 	identity_node.append_attribute("Computer_Name") = parameters["general.computer_name"].c_str();
+    std::string upload_string = "<Tacktech>";
+    upload_string += "<Type TYPE=\"";
+    upload_string += "IDENTIFY";
+    upload_string += "\"/>";
+    upload_string += "<Identity Organization_Name=\"" + parameters["general.organization_name"] + "\" Computer_Name=\"" + parameters["general.computer_name"] + "\"/>";
+    upload_string += "<CONTAINER>";
+    upload_string += m_display_client->get_playlist_container()->get_playlist_container_xml();
+    upload_string += "</CONTAINER>";
+    upload_string += "</Tacktech>";
 
-	xml_string_writer writer;
-	document.save(writer);
-	document.print(std::cout);
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << upload_string << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 
     if(!network_manager_identification->busy)
     {
         boost::shared_ptr<std::string> string_to_send;
-        string_to_send.reset(new std::string(writer.result));
+        string_to_send.reset(new std::string(upload_string));
 
         io_service_identification->reset();
         network_manager_identification.reset(
@@ -481,9 +483,12 @@ void Tactek_Display::handle_recieved_data(QString data)
         container_node.print(writer);
         container_node.print(std::cout);
 
-        Display_Client client(writer.result);
-        bool playlist_container_changed =
-            m_display_client->get_playlist_container()->update_playlist(*client.get_playlist_container(), parameters["general.organization_name"]);
+        if (writer.result.size() > 0)
+        {
+            Display_Client client(writer.result);
+            bool playlist_container_changed =
+                m_display_client->get_playlist_container()->update_playlist(*client.get_playlist_container(), parameters["general.organization_name"]);
+        }
         network_manager_file_transfer->busy = false;
 //        if(playlist_container_changed)
 //            check_playlist_items_downloaded();
