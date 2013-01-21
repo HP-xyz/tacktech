@@ -46,6 +46,7 @@
      <string>Dislay</string>
     </property>
     <addaction name="actionRefresh_All"/>
+    <addaction name="actionSend_Data_to_Server"/>
    </widget>
    <widget class="QMenu" name="menuPlaylist">
     <property name="title">
@@ -92,6 +93,11 @@
   <action name="actionEdit_Preferences">
    <property name="text">
     <string>Edit Preferences</string>
+   </property>
+  </action>
+  <action name="actionSend_Data_to_Server">
+   <property name="text">
+    <string>Send Data to Server</string>
    </property>
   </action>
  </widget>

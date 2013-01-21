@@ -3,8 +3,10 @@
 #include <iostream>
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    Tactek_Display w;
-    w.showFullScreen();
-    return a.exec();
+    QCoreApplication::setApplicationName("Tackteck Advertising");
+    QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
+	QApplication a(argc, argv);
+	Tactek_Display w;
+	w.showFullScreen();
+	return a.exec();
 }

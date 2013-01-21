@@ -9,14 +9,14 @@
 Playlist::Playlist()
 {
 #ifdef _DEBUG
-    std::cout << "= Playlist()" << std::endl;
+	std::cout << "= Playlist()" << std::endl;
 #endif //_DEBUG
-    Playlist::current_index_of_queue = 0;
+	Playlist::current_index_of_queue = 0;
 }
 
 Playlist::Playlist(const Playlist& orig)
 {
-    current_index_of_queue = 0;
+	current_index_of_queue = 0;
 }
 
 Playlist::~Playlist()
@@ -28,17 +28,17 @@ Playlist::~Playlist()
  * values, where filepath is an QString and pause is an int.
  * @return Playlist as QList<QPair<filepath, pause>>
  */
-QList< QPair<QString, int> > Playlist::get_playlist()
+QList<QPair<QString, int> > Playlist::get_playlist()
 {
-    QList< QPair<QString, int> > playlist;
-    QPair<QString, int> playlist_item;
-    for(int i = 0; i < Playlist::m_filepath.size(); i++)
-    {
-        playlist_item.first = Playlist::m_filepath[i];
-        playlist_item.second = Playlist::m_pause[i];
-        playlist.append(playlist_item);
-    }
-    return (playlist);
+	QList<QPair<QString, int> > playlist;
+	QPair<QString, int> playlist_item;
+	for (int i = 0; i < Playlist::m_filepath.size(); i++)
+	{
+		playlist_item.first = Playlist::m_filepath[i];
+		playlist_item.second = Playlist::m_pause[i];
+		playlist.append(playlist_item);
+	}
+	return (playlist);
 }
 
 /**
@@ -49,7 +49,12 @@ QList< QPair<QString, int> > Playlist::get_playlist()
  */
 bool Playlist::add_to_playlist(QPair<QString, int> playlist_item)
 {
-    Playlist::m_filepath.append(playlist_item.first);
-    Playlist::m_pause.append(playlist_item.second);
-    return (true);
+	Playlist::m_filepath.append(playlist_item.first);
+	Playlist::m_pause.append(playlist_item.second);
+	return (true);
+}
+
+void Playlist::set_display_time(QDate p_display_time)
+{
+	display_time = p_display_time;
 }

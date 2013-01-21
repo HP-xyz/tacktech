@@ -15,3 +15,7 @@ if(BUILD_SHARED_LIBS)
 else()
     add_library(libb64 STATIC ${SOURCES})
 endif()
+
+install(TARGETS libb64
+		ARCHIVE
+		DESTINATION lib)

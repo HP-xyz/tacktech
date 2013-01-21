@@ -1,88 +1,51 @@
 #include "Edit_Playlist.h"
 
-Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags)
-    : QWidget(parent, flags)
+Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags) :
+		QWidget(parent, flags)
 {
-#ifdef _DEBUG
-    std::cout << "= Setting up Edit_Playlist GUI" << std::endl;
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Setting up Edit_Playlist GUI" << std::endl;
 #endif // _DEBUG
-    ui.setupUi(this);
-    QStringList headers;
-    headers << "Playlist";
-    ui.playlist_tree_widget->setHeaderLabels(headers);
+	ui.setupUi(this);
+	QStringList headers;
+	headers << "Filename" << "Pause" << "Start Time" << "End Time";
+	ui.playlist_tree_widget->setHeaderLabels(headers);
 
-#ifdef _DEBUG
-    std::cout << " - Creating add_playlist_dialog pointer" << std::endl;
+	display_client_list.reset(new std::vector<Display_Client_Ptr>);
+
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Creating node_menu pointer" << std::endl;
 #endif // _DEBUG
-    add_playlist_dialog = new Add_Playlist_Dialog();
-#ifdef _DEBUG
-    std::cout << " - Creating add_file_dialog pointer" << std::endl;
-#endif // _DEBUG
-    add_file_dialog = new Add_File_Dialog();
+	node_menu = new QMenu();
+	ui.playlist_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-#ifdef _DEBUG
-    std::cout << " - Creating node_menu pointer" << std::endl;
-#endif // _DEBUG
-    node_menu = new QMenu();
-    ui.playlist_tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
+	/* Creating context menu actions */
+	add_file = new QAction(tr("Add file to playlist"), node_menu);
+	remove_playlist = new QAction(tr("Remove Playlist"), node_menu);
+	remove_file = new QAction(tr("Remove file from playlist"), node_menu);
 
-    /* Creating context menu actions */
-    add_playlist = new QAction(tr("Add Playlist"), node_menu);
-    add_file = new QAction(tr("Add file to playlist"), node_menu);
-    remove_playlist = new QAction(tr("Remove Playlist"), node_menu);
-    remove_file = new QAction(tr("Remove file from playlist"), node_menu);
+	/* Adding actions to context_menu */
+	ui.playlist_tree_widget->addAction(add_file);
+	ui.playlist_tree_widget->addAction(remove_playlist);
+	ui.playlist_tree_widget->addAction(remove_file);
 
-    /* Adding actions to context_menu */
-    ui.playlist_tree_widget->addAction(add_playlist);
-    ui.playlist_tree_widget->addAction(add_file);
-    ui.playlist_tree_widget->addAction(remove_playlist);
-    ui.playlist_tree_widget->addAction(remove_file);
-
-    /* Connecting the main GUI signals for this class */
-    connect(add_playlist, SIGNAL(triggered()),
-            this, SLOT(add_playlist_slot()));
-    connect(add_file, SIGNAL(triggered()),
-            this, SLOT(add_file_slot()));
-    connect(ui.buttonBox, SIGNAL(accepted()),
-            this, SLOT(ok_clicked()));
-    connect(ui.buttonBox, SIGNAL(rejected()),
-            this, SLOT(cancel_clicked()));
-    connect(remove_file, SIGNAL(triggered()),
-            this, SLOT(remove_file_slot()));
-    connect(remove_playlist, SIGNAL(triggered()),
-            this, SLOT(remove_playlist_slot()));
-
-    /* Connecting secondary signals */
-    connect(add_playlist_dialog, SIGNAL(playlist_name_added()),
-            this, SLOT(repopulate_widget()));
-    connect(add_file_dialog, SIGNAL(filelist_changed()),
-            this, SLOT(repopulate_widget()));
+	/* Connecting the main GUI signals for this class */
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ok_clicked()));
+	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(cancel_clicked()));
+	connect(remove_file, SIGNAL(triggered()), this, SLOT(remove_file_slot()));
+	connect(remove_playlist, SIGNAL(triggered()), this,
+			SLOT(remove_playlist_slot()));
+	connect(add_file, SIGNAL(triggered()), this, SLOT(add_file_slot()));
+	connect(ui.add_playlist_pushbutton, SIGNAL(clicked()),
+		this, SLOT(create_playlist_slot()));
 }
 
 Edit_Playlist::~Edit_Playlist()
 {
-    delete add_playlist;
     delete add_file;
-    delete remove_playlist;
-    delete remove_file;
-    delete node_menu;
-    delete add_playlist_dialog;
-    delete add_file_dialog;
-}
-/** Function to set the playlist variable to that the calling class
- ** provides */
-void Edit_Playlist::set_playlist( Playlist_Container *p_playlist)
-{
-    playlist = p_playlist;
-    original_playlist = new Playlist_Container(*p_playlist);
-    repopulate_widget();
-}
-
-/** Slot to start the Add_Playlist GUI and show the GUI */
-void Edit_Playlist::add_playlist_slot()
-{
-    add_playlist_dialog->set_playlist(playlist);
-    add_playlist_dialog->show();
+	delete remove_playlist;
+	delete remove_file;
+	delete node_menu;
 }
 
 /** Slot gets fired when the context menu item connected to it is
@@ -92,174 +55,256 @@ void Edit_Playlist::add_playlist_slot()
  ** Note: This function will take n^2 time to complete. */
 void Edit_Playlist::remove_file_slot()
 {
-#ifdef _DEBUG
-    std::cout << "= Edit_Playlist::remove_file_slot()" << std::endl;
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Edit_Playlist::remove_file_slot()" << std::endl;
 #endif // _DEBUG
-    if(!ui.playlist_tree_widget->selectedItems().count() == 0)
-    {
-        for(int i = 0;
-                i < ui.playlist_tree_widget->selectedItems().size(); i++)
-        {
-            Typed_QTreeWidgetItem *selected_item =
-                static_cast<Typed_QTreeWidgetItem*>
-                (ui.playlist_tree_widget->selectedItems().at(i));
-            if (selected_item->get_type() == "FILENAME")
-            {
-#ifdef _DEBUG
-                std::cout << " - Removing filename" << std::endl;
+	if (!ui.playlist_tree_widget->selectedItems().count() == 0)
+	{
+		for (int i = 0; i < ui.playlist_tree_widget->selectedItems().size();
+				i++)
+		{
+			Typed_QTreeWidgetItem *selected_item =
+					static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
+							i));
+			if (selected_item->get_type() == "PLAYLIST_ITEM")
+			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << " - Removing filename: "
+					<< selected_item->get_filename().toStdString()
+					<< std::endl;
 #endif // _DEBUG
-                Typed_QTreeWidgetItem *selected_item_parent =
-                    static_cast<Typed_QTreeWidgetItem*>
-                    (selected_item->parent());
-                for (int j = 0; j < playlist->get_playlist().values(
-                            selected_item_parent->get_playlist_name()).size();
-                        j++)
-                {
-                    playlist->get_playlist().remove(
-                        selected_item_parent->get_playlist_name(),
-                        playlist->get_playlist().values(
-                            selected_item_parent->get_playlist_name()).
-                        at(j));
-                }
-            }
-            else if (selected_item->get_type() == "PLAYLIST")
-            {
-#ifdef _DEBUG
-                std::cout << " - Removing playlist" << std::endl;
-#endif // _DEBUG
-                remove_playlist_slot();
-            }
-        }
-        /* We now repopulate the widget to reflect the changes */
-        repopulate_widget();
-    }
-    else
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Select a file to remove from playlist");
-        msgBox.exec();
-    }
+				Typed_QTreeWidgetItem *selected_item_parent =
+						static_cast<Typed_QTreeWidgetItem*>(selected_item->parent());
+
+				for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+					it != display_client_list->end(); ++it)
+				{
+					it->get()->get_playlist_container()->remove_playlist_item(
+						selected_item_parent->get_playlist_name().toStdString(),
+						selected_item->get_filename().toStdString());
+				}
+			}
+//			else if (selected_item->get_type() == "PLAYLIST")
+//			{
+//#ifdef _SHOW_DEBUG_OUTPUT
+//				std::cout << " - Removing playlist" << std::endl;
+//#endif // _DEBUG
+//				remove_playlist_slot();
+//			}
+		}
+		/* We now repopulate the widget to reflect the changes */
+		repopulate_widget();
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select a file to remove from playlist");
+		msgBox.exec();
+	}
 }
 
 /** Slot removes a playlist and all its items from the widget and the
  ** playlist global variable */
 void Edit_Playlist::remove_playlist_slot()
 {
-#ifdef _DEBUG
-    std::cout << "= Edit_Playlist::remove_playlist_slot()" << std::endl;
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "= Edit_Playlist::remove_playlist_slot()" << std::endl;
 #endif // _DEBUG
-    if(ui.playlist_tree_widget->selectedItems().count() > 0 &&
-            ui.playlist_tree_widget->selectedItems().count() < 2)
-    {
-        Typed_QTreeWidgetItem *selected_item =
-            static_cast<Typed_QTreeWidgetItem*>
-            (ui.playlist_tree_widget->selectedItems().at(0));
-        if (selected_item->get_type() == "PLAYLIST")
-        {
-#ifdef _DEBUG
-            std::cout << " - Removing Playlist" << std::endl;
+	if (ui.playlist_tree_widget->selectedItems().count() > 0
+			&& ui.playlist_tree_widget->selectedItems().count() < 1)
+	{
+		Typed_QTreeWidgetItem *selected_item =
+				static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
+						0));
+		if (selected_item->get_type() == "PLAYLIST")
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Removing Playlist" << std::endl;
 #endif // _DEBUG
-            playlist->remove_playlist(selected_item->get_playlist_name());
-            /* Repopulate widget to reflect changes */
-            repopulate_widget();
-        }
-        else
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Select a PLAYLIST to remove from playlist");
-            msgBox.exec();
-        }
-    }
-    else
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Select ONE playlist to remove from playlist");
-        msgBox.exec();
-    }
-}
-
-void Edit_Playlist::add_file_slot()
-{
-    if (ui.playlist_tree_widget->selectedItems().count() == 1)
-    {
-        add_file_dialog->set_playlist_name(
-            ui.playlist_tree_widget->selectedItems().at(0)->text(0));
-        add_file_dialog->set_playlist(playlist);
-        add_file_dialog->show();
-    }
-    else
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Select only ONE playlist to add files to");
-        msgBox.exec();
-    }
+			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+				it != display_client_list->end(); ++it)
+			{
+				it->get()->get_playlist_container()->remove_playlist(
+					selected_item->get_playlist_name().toStdString());
+			}
+			/* Repopulate widget to reflect changes */
+			repopulate_widget();
+		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Select a PLAYLIST to remove from playlist");
+			msgBox.exec();
+		}
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select ONE playlist to remove from playlist");
+		msgBox.exec();
+	}
 }
 
 void Edit_Playlist::ok_clicked()
 {
-    emit playlist_changed();
-    this->close();
+	//update_display_client_container();
+	emit playlist_changed(display_client_container);
+	this->close();
 }
 
 void Edit_Playlist::keyPressEvent(QKeyEvent *event)
 {
-	switch (event->key()) {
+	switch (event->key())
+	{
 	case Qt::Key_Enter:
-		{  
-			ok_clicked();
-			break;
-		}
+	{
+		ok_clicked();
+		break;
+	}
 	case Qt::Key_Return:
-		{  
-			ok_clicked();
-			break;
-		}
+	{
+		ok_clicked();
+		break;
+	}
 	default:
 		QWidget::keyPressEvent(event);
-	}
+    break;
+    }
 }
 
 void Edit_Playlist::cancel_clicked()
 {
-    delete playlist;
-    playlist = original_playlist;
-    this->close();
+	this->close();
 }
 
 void Edit_Playlist::repopulate_widget()
 {
-    ui.playlist_tree_widget->clear();
-#ifdef _DEBUG
-    playlist->print_contents();
+	ui.playlist_tree_widget->clear();
+	Container temp_container = *display_client_list->at(0)->get_playlist_container()->get_playlist_container();
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Received '" << display_client_list->size() << "' display_clients" << std::endl;
+	display_client_list->at(0)->print_contents();
 #endif // _DEBUG
-    foreach(QString playlist_name, playlist->get_playlist().uniqueKeys())
-    {
-        Typed_QTreeWidgetItem *playlist_item = new Typed_QTreeWidgetItem();
-        playlist_item->setText(0, playlist_name);
-        playlist_item->set_type("PLAYLIST");
-        playlist_item->set_playlist_name(playlist_name);
-        ui.playlist_tree_widget->addTopLevelItem(playlist_item);
-        for (int i = 0;
-                i < playlist->get_playlist().values(playlist_name).count();
-                i++)
-        {
-            Typed_QTreeWidgetItem *filename_item =
-                new Typed_QTreeWidgetItem();
-            filename_item->setText(0,
-                                   playlist->get_playlist().values(playlist_name)
-                                   .at(i).first);
-            filename_item->setText(1, QString::number(
-                                       playlist->get_playlist().values(playlist_name)
-                                       .at(i).second));
-            filename_item->set_filename(
-                playlist->get_playlist().values(playlist_name)
-                .at(i).first);
-            filename_item->set_pause(
-                playlist->get_playlist().values(playlist_name)
-                .at(i).second);
-            filename_item->set_type("FILENAME");
-            filename_item->set_playlist_name(playlist_name);
-            playlist_item->addChild(filename_item);
-        }
-    }
+	for (std::vector<Playlist_Ptr>::iterator it = playlist_list.begin();
+		it != playlist_list.end(); ++it)
+	{
+		Typed_QTreeWidgetItem *item = new Typed_QTreeWidgetItem();
+		item->set_type("PLAYLIST");
+		item->set_playlist_name(QString::fromStdString(it->get()->get_playlist_name()));
+		item->setText(0, QString::fromStdString(it->get()->get_playlist_name()));
+		item->setText(2, QString::fromStdString(boost::posix_time::to_iso_string(it->get()->get_start_time())));
+		item->setText(3, QString::fromStdString(boost::posix_time::to_iso_string(it->get()->get_end_time())));
+		ui.playlist_tree_widget->addTopLevelItem(item);
+		for (std::vector<std::pair<std::string, int> >::iterator it2 = it->get()->get_playlist_items()->begin();
+			it2 != it->get()->get_playlist_items()->end(); ++it2)
+		{
+			Typed_QTreeWidgetItem *file_item = new Typed_QTreeWidgetItem();
+			file_item->set_type("PLAYLIST_ITEM");
+			file_item->set_filename(QString::fromStdString(it2->first));
+			file_item->setText(0, QString::fromStdString(it2->first));
+			file_item->setText(1, QString::fromStdString(
+				boost::lexical_cast<std::string, int>(it2->second)));
+			item->addChild(file_item);
+		}
+	}
+}
+
+void Edit_Playlist::set_organization_name( std::string p_oranization_name)
+{
+	m_organization_name = p_oranization_name;
+}
+
+void Edit_Playlist::create_playlist_slot()
+{
+	if (ui.lineEdit->text() != "")
+	{
+		if (add_file_dialog.get() != 0)
+			disconnect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+		add_file_dialog.reset(new Add_File_Dialog(filelist, ui.lineEdit->text(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
+		connect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+		add_file_dialog->show();
+	}
+	else
+	{
+		QMessageBox box;
+		box.setText("Please enter a playlist name");
+		box.show();
+	}
+}
+
+void Edit_Playlist::set_filelist( Filelist_Ptr p_filelist)
+{
+	filelist = p_filelist;
+}
+
+void Edit_Playlist::set_group_name( std::string p_group_name)
+{
+	m_group_name = p_group_name;
+}
+
+void Edit_Playlist::set_display_client_container( Display_Client_Container_Ptr p_display_client_container)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Edit_Playlist::set_display_client_container" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+	display_client_container.reset(new Display_Client_Container(*p_display_client_container));
+	display_client_list = display_client_container->get_display_clients(m_organization_name, m_group_name);
+	playlist_list = display_client_list->at(0)->get_playlists_of_group(m_group_name);
+	repopulate_widget();
+}
+
+void Edit_Playlist::playlist_added_slot( Playlist_Ptr p_playlist_ptr)
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Edit_Playlist::playlist_added_slot" << std::endl;
+	p_playlist_ptr->print_contents();
+#endif //_SHOW_DEBUG_OUTPUT
+	for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
+		it != display_client_list->end(); ++it)
+	{
+		std::vector<std::string> organization_vector;
+		organization_vector.push_back(m_organization_name);
+
+		/** First we remove the old playlist if it exists, then we add the new one*/
+		it->get()->get_playlist_container()->remove_playlist(p_playlist_ptr->get_playlist_name());
+		it->get()->get_playlist_container()->add_playlist(p_playlist_ptr, organization_vector);
+	}
+	playlist_list = display_client_list->at(0)->get_playlists_of_group(m_group_name);
+	repopulate_widget();
+}
+
+void Edit_Playlist::add_file_slot()
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "Edit_Playlist::add_file_slot()" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+	if (ui.playlist_tree_widget->selectedItems().count() > 0
+		&& ui.playlist_tree_widget->selectedItems().count() < 2)
+	{
+		Typed_QTreeWidgetItem *selected_item =
+			static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
+			0));
+		if (selected_item->get_type() == "PLAYLIST")
+		{
+			if (add_file_dialog.get() != 0)
+				disconnect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+			add_file_dialog.reset(new Add_File_Dialog(filelist, selected_item->get_playlist_name(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
+			connect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+			add_file_dialog->show();
+			/* Repopulate widget to reflect changes */
+			repopulate_widget();
+		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Select a PLAYLIST to add file to");
+			msgBox.exec();
+		}
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select ONE playlist to add file to");
+		msgBox.exec();
+	}
 }

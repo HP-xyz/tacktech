@@ -7,53 +7,53 @@
 
 #include "TCPServer.h"
 /*
-TCPServer::TCPServer(QObject* parent): QObject(parent)
+ TCPServer::TCPServer(QObject* parent): QObject(parent)
+ {
+ connect (&server, SIGNAL(newConneciton()), this, SLOT(acceptConnection()));
+ }
+
+ TCPServer::~TCPServer()
+ {
+ server.close();
+ }
+
+ TCPServer::acceptConnection()
+ {
+ client = server.nextPendingConnection();
+ connect (client, SIGNAL(readyRead()), this, SLOT(startRead()));
+ }
+
+ TCPServer::startRead()
+ {
+ char buffer[1024] = {0};
+ client->read(buffer, client->bytesAvailable());
+ client->close();
+ }
+ */
+TCPServer::TCPServer(QObject* parent) :
+		QObject(parent)
 {
-    connect (&server, SIGNAL(newConneciton()), this, SLOT(acceptConnection()));
+	connect(&server, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
+
+	server.listen(QHostAddress::Any, 8888);
 }
 
 TCPServer::~TCPServer()
 {
-    server.close();
-}
-
-TCPServer::acceptConnection()
-{
-    client = server.nextPendingConnection();
-    connect (client, SIGNAL(readyRead()), this, SLOT(startRead()));
-}
-
-TCPServer::startRead()
-{
-    char buffer[1024] = {0};
-    client->read(buffer, client->bytesAvailable());
-    client->close();
-}
-*/
-TCPServer::TCPServer(QObject* parent): QObject(parent)
-{
-  connect(&server, SIGNAL(newConnection()),
-    this, SLOT(acceptConnection()));
-
-  server.listen(QHostAddress::Any, 8888);
-}
-
-TCPServer::~TCPServer()
-{
-  server.close();
+	server.close();
 }
 
 void TCPServer::acceptConnection()
 {
-  client = server.nextPendingConnection();
+	client = server.nextPendingConnection();
 
-  connect(client, SIGNAL(readyRead()),
-    this, SLOT(startRead()));
+	connect(client, SIGNAL(readyRead()), this, SLOT(startRead()));
 }
 
 void TCPServer::startRead()
 {
-  char buffer[1024] = {0};
-  client->read(buffer, client->bytesAvailable());
-  client->close();
+	char buffer[1024] =
+	{ 0 };
+	client->read(buffer, client->bytesAvailable());
+	client->close();
 }

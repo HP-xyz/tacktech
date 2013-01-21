@@ -3,12 +3,16 @@
 
 #include <QThread>
 #include "Send_Data.h"
+#ifdef _SHOW_DEBUG_OUTPUT
+#include <iostream>
+#endif // _DEBUG
 
-class Start_Send_Data_Thread : public QThread
+class Start_Send_Data_Thread: public QThread
 {
 Q_OBJECT
 public:
-	Start_Send_Data_Thread (int socket_descriptor, std::string xml, QObject *parent);
+	Start_Send_Data_Thread(int socket_descriptor, std::string xml,
+			QObject *parent);
 	~Start_Send_Data_Thread();
 
 	void run();
@@ -21,4 +25,4 @@ private slots:
 	void bytes_written(qint64);
 };
 
-#endif
+#endif //START_SEND_DATA_THREAD_H
