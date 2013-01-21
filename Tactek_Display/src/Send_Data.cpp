@@ -1,25 +1,44 @@
 #include "Send_Data.h"
 
-Send_Data::Send_Data (int socket_descriptor, std::string t_data)
+/** @brief ~Send_Data
+ *
+ * Constructor
+ */
+Send_Data::Send_Data(const QString &p_host_name, quint16 p_port,
+		std::string &p_xml_string)
 {
-    socket = new QTcpSocket();
-    if (!socket->setSocketDescriptor(socket_descriptor))
-    {
-        emit error(socket->error());
-        return;
-    }
-    data = t_data;
-    connect(socket, SIGNAL(connected()), this, SLOT(send_data()));
+	xml_string = p_xml_string;
+	socket = new QTcpSocket();
+	connect(socket, SIGNAL(connected()), this, SLOT(send_data_to_server()));
+	socket->connectToHost(p_host_name, p_port);
 }
 
-Send_Data::~Send_Data ()
+/** @brief Send_Data
+ *
+ * Default Destructor
+ */
+Send_Data::~Send_Data()
 {
-    delete socket;
+#ifdef _DEBUG
+	std::cout << "destructor of send data" << std::endl;
+#endif // _DEBUG
+	socket->close();
 }
 
-void Send_Data::send_data()
+/** @brief send_data_to_server
+ *
+ * Sets up the connection settings and
+ * calls the run function if the class
+ * is not already running.
+ */
+void Send_Data::send_data_to_server()
 {
-    socket->write(data.c_str());
-    socket->disconnectFromHost();
-    socket->waitForDisconnected();
+#ifdef _DEBUG
+	std::cout << "= Send_Data::send_data_to_server()" << std::endl;
+	std::cout << " - Sending file of size: " << xml_string.size() << std::endl;
+#endif // _DEBUG
+	Start_Send_Data_Thread *ssdt = new Start_Send_Data_Thread(
+			socket->socketDescriptor(), xml_string, this);
+	ssdt->start();
+	connect(ssdt, SIGNAL(finished()), ssdt, SLOT(deleteLater()));
 }

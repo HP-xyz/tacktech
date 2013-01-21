@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>813</width>
-    <height>596</height>
+    <width>870</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,15 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
+     <widget class="QTreeWidget" name="all_computers_tree_widget">
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item row="1" column="0">
      <widget class="QTreeWidget" name="main_tree_widget">
       <property name="contextMenuPolicy">
        <enum>Qt::DefaultContextMenu</enum>
@@ -27,7 +36,7 @@
       </column>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QDialogButtonBox" name="buttonBox">
       <property name="standardButtons">
        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>

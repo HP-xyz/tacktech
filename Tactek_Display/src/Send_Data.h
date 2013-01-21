@@ -1,31 +1,24 @@
-/*
- * File:   TCPClient.h
- * Author: G-spot
- *
- * Created on July 11, 2012, 7:23 PM
- */
-
 #ifndef SEND_DATA_H
-#define	SEND_DATA_H
+#define SEND_DATA_H
 
 #include <QTcpSocket>
-#include <iostream>
 #include <string>
-#include <QObject>
+#include "Start_Send_Data_Thread.h"
 
-class Send_Data : public QTcpSocket
+#include <iostream>
+class Send_Data: public QTcpSocket
 {
 Q_OBJECT
 public:
-    Send_Data (int, std::string);
-    ~Send_Data();
-signals:
-void error(QTcpSocket::SocketError error);
+	Send_Data(const QString&, quint16, std::string&);
+	~Send_Data();
+
 private:
-    int socket_descriptor;
-    QTcpSocket *socket;
-    std::string data;
+	QTcpSocket *socket;
+	std::string xml_string;
 private slots:
-    void send_data ();
+	void
+	send_data_to_server();
 };
-#endif //SEND_DATA_H
+
+#endif // SEND_DATA_H

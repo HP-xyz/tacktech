@@ -1,9 +1,10 @@
 #ifndef ADD_FILE_DIALOG_H
 #define ADD_FILE_DIALOG_H
 
-#ifdef _DEBUG
+#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
 #endif // _DEBUG
+#include <vector>
 #include <QtGui/QMainWindow>
 #include <QMenu>
 #include <QAction>
@@ -11,47 +12,56 @@
 #include <QFileDialog>
 #include <QSpinBox>
 #include <QKeyEvent>
+#include <boost/lexical_cast.hpp>
+#include <Playlist_Container.h>
+#include <Filelist.h>
 #include "ui_Add_File_Dialog.h"
-#include "Playlist_Container.h"
 #include "Typed_QTreeWidgetItem.h"
 #include "Add_Pause_Dialog.h"
-#include "Add_Playlist_Dialog.h"
+#include "Edit_Times.h"
 
-class Add_File_Dialog : public QMainWindow
+class Add_File_Dialog: public QMainWindow
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    Add_File_Dialog(QWidget *parent = 0, Qt::WFlags flags = 0);
-    ~Add_File_Dialog();
-    void set_playlist(Playlist_Container*);
-    void set_playlist_name(QString);
+	Add_File_Dialog(Filelist_Ptr, QString, QString, QString, QWidget *parent = 0, Qt::WFlags flags = 0);
+	~Add_File_Dialog();
+	void set_filelist(Filelist_Ptr);
+	void set_playlist_name(QString);
+	void set_playlist_organization(QString);
+	void set_playlist_group(QString);
 private:
-    Ui::Add_File_DialogClass ui;
-    Playlist_Container *original_playlist;
-    Playlist_Container *playlist;
+	Ui::Add_File_DialogClass ui;
 
-    Add_Pause_Dialog *add_pause_dialog;
-    QString playlist_name;
+	Filelist_Ptr filelist;
+	Playlist_Ptr playlist;
 
-    QMenu *node_menu;
-    QAction *remove_filename;
+	Add_Pause_Dialog *add_pause_dialog;
+	QString playlist_name;
+	QString playlist_organization;
+	QString playlist_group;
 
-    void repopulate_widget();
+	QMenu *node_menu;
+	QAction *add_pause;
+
+	void repopulate_widget();
+	void add_new_playlist();
 	void keyPressEvent(QKeyEvent *event);
+	std::string make_list(std::set<std::string>);
 private slots:
-    void ok_clicked();
-    void cancel_clicked();
-    void remove_filename_slot();
-    void add_filename_slot();
-    void add_pause_slot(QTreeWidgetItem*, int);
+	void ok_clicked();
+	void cancel_clicked();
+	void add_file_slot();
+	void remove_file_slot();
+	void add_pause_slot();
+	void add_pause_slot(QTreeWidgetItem*, int);
 
-    /* Secondary slots, called by other class */
-    void pause_changed_slot(int);
-    void pause_unchanged_slot();
-
+	/* Secondary slots, called by other class */
+	void pause_changed_slot(int);
+	void pause_unchanged_slot();
 signals:
-    void filelist_changed();
+	void playlist_added(Playlist_Ptr);
 };
 
 #endif // ADD_FILE_DIALOG_H
