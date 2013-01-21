@@ -332,6 +332,51 @@ bool Playlist_Container::update_playlist( Playlist_Container p_playlist_containe
 	return changed;
 }
 
+void Playlist_Container::update_playlist_on_server( Playlist_Container p_playlist_container, std::string p_organization_name )
+{
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << "=Playlist_Container::update_playlist_on_server" << std::endl;
+	std::cout << " - Playlist_Container size: " << m_playlist_container->size() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	if (m_playlist_container->size() > 0)
+	{
+		for (Container::iterator it = p_playlist_container.get_playlist_container()->begin();
+			it != p_playlist_container.get_playlist_container()->end(); ++it)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << " - Checking playlist: " << it->first->get_playlist_name() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			std::vector<std::string> organizations_vector = it->second;
+			std::vector<std::string>::iterator it2 =
+				std::find(organizations_vector.begin(), organizations_vector.end(), p_organization_name);
+			if (it2 != organizations_vector.end())
+			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << "  - Organization Found" << std::endl;
+				std::cout << "  - Looking for playlist '" << it->first->get_playlist_name() 
+					<< "' in organization '" << p_organization_name << "'" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+				Playlist_Ptr playlist_ptr = get_playlist_ptr(it->first->get_playlist_name(), p_organization_name);
+				if (playlist_ptr.get() != 0)
+				{//Updating playlist items
+#ifdef _SHOW_DEBUG_OUTPUT
+					std::cout << "  - Setting current_item index to: " << it->first->get_current_item_index() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+					playlist_ptr->set_current_item_index(it->first->get_current_item_index());
+					playlist_ptr->currently_active = it->first->currently_active;
+				}
+			}
+			else
+			{
+#ifdef _SHOW_DEBUG_OUTPUT
+				std::cout << "  - Organization NOT Found" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+			}
+		}
+	}
+}
+
+
 Playlist_Ptr Playlist_Container::get_playlist_ptr( std::string p_playlist_name, std::string p_organization_name)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -404,7 +449,7 @@ std::string Playlist_Container::get_current_playing_item()
 					return "NONE PLAYING";
 				else
 					return it->first->get_playlist_items()->at(
-					it->first->get_current_item_index()).first;
+					it->first->get_current_item_index() - 1).first;
 			}
 		}
 		return "NOTHING CURRENTLY PLAYING";
