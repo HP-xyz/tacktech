@@ -245,10 +245,11 @@ void Playlist::remove_item( std::string item_name)
 #ifdef _SHOW_DEBUG_OUTPUT
 			std::cout << " REMOVED ITEM: " << it->first << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-			get_playlist_items()->erase(it);
+			get_playlist_items()->erase(it++);
 			item_removed = true;
 		}
-		++it;
+		if (!item_removed)
+			++it;
 	}
 }
 #ifdef _SHOW_DEBUG_OUTPUT
