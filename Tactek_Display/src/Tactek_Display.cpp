@@ -138,7 +138,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 #endif // _SHOW_DEBUG_OUTPUT
 	update_timer->start(1000);
 	check_update_timer->start(80000);
-	update_display_client_timer->start(60000);
+	update_display_client_timer->start(40000);
 	identify_timer->start(30000);
 	update_display_client();
 }
@@ -217,12 +217,6 @@ void Tactek_Display::check_playlist_items_downloaded()
         {
             std::string file_to_find = parameters["general.playlist_directory"];
             file_to_find += it2->first;
-#ifdef _SHOW_DEBUG_OUTPUT
-            for(std::vector<std::string>::iterator it = filelist.begin();
-                it != filelist.end(); ++it)
-                std::cout << "File: " << *it << std::endl;
-            std::cout << "  - Playlist Item: " << file_to_find << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
             std::vector<std::string>::iterator item_found = std::find(filelist.begin(), filelist.end(), file_to_find);
             if(item_found == filelist.end())
             {//We do not have the needed file
@@ -422,10 +416,11 @@ void Tactek_Display::handle_recieved_data(QString data)
 	std::string type_string = tacktech_node.child("Type").attribute("TYPE").as_string();
 	if (type_string == "UPLOAD")
 	{
-    /** Disconnect allows the network_manager smart pointer to be deleted
-	 *  as no further reference to it exists */
-	disconnect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
-					SLOT(handle_recieved_data(QString)));
+        /** Disconnect allows the network_manager smart pointer to be deleted
+         *  as no further reference to it exists */
+        disconnect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+                        SLOT(handle_recieved_data(QString)));
+        network_manager_file_transfer->busy = false;
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved UPLOAD command" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
@@ -466,7 +461,6 @@ void Tactek_Display::handle_recieved_data(QString data)
         {//If there is still items to download, start new request
             check_playlist_items_downloaded();
         }
-        network_manager_file_transfer->busy = false;
 	}
 	else if (type_string == "UPDATE")
     {
@@ -579,7 +573,7 @@ std::set<std::string> Tactek_Display::make_set( std::string comma_separated_list
 void Tactek_Display::check_display_container()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "=Tactek_Display::make_vector" << std::endl;
+	std::cout << "=Tactek_Display::check_display_container" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     std::string upload_string = "<Tacktech>";
     upload_string += "<Type TYPE=\"UPDATE_DISPLAY_CLIENT\" />";
@@ -595,6 +589,9 @@ void Tactek_Display::check_display_container()
 
     if(!network_manager_file_transfer->busy)
     {
+#ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " - Sending update request" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
         boost::shared_ptr<std::string> string_to_send;
         string_to_send.reset(new std::string(upload_string));
         io_service_file_transfer->reset();
@@ -609,5 +606,11 @@ void Tactek_Display::check_display_container()
         boost::thread t(
             boost::bind(&boost::asio::io_service::run, boost::ref(io_service_file_transfer)));
         t.join();
+    }
+    else
+    {
+ #ifdef _SHOW_DEBUG_OUTPUT
+        std::cout << " - Network Manager busy, not sending request" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
     }
 }

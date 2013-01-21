@@ -206,6 +206,10 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		std::cout << " - Received UPDATE_DISPLAY_CLIENT command" << std::endl;
 #endif // _DEBUG
 		std::string organization_name = tacktech.child("Identification").attribute("ORGANIZATION").as_string();
+
+		std::string upload_string = "<Tacktech>";
+		upload_string += "<Type TYPE=\"UPDATE\" />";
+
 		xml_string_writer writer;
 		tacktech.child("CONTAINER").child("Display_Client_Item").print(writer);
 		Display_Client client(writer.result);
@@ -213,15 +217,31 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 		Display_Client_Ptr client_to_send =
 			display_client_container->get_display_client(organization_name, client.get_identification());
 
-		std::string upload_string = "<Tacktech>";
-		upload_string += "<Type TYPE=\"UPDATE\" />";
-		upload_string += "<Identification GROUPS=\"" + client_to_send->get_groups_string() + "\" />";
-		upload_string += "<CONTAINER>";
-		upload_string += "<Display_Client_Item>";
-		upload_string += client_to_send->get_display_client_xml();
-		upload_string += "<Display_Client_Item>";
-		upload_string += "</CONTAINER>";
-		upload_string += "</Tacktech>";
+		if(client_to_send.get() != 0)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "CLIENT" << std::endl;
+			client.print_contents();
+			std::cout << "CLIENT_TO_SEND" << std::endl;
+			client_to_send->print_contents();
+#endif // _SHOW_DEBUG_OUTPUT	
+			upload_string += "<Identification GROUPS=\"" + client_to_send->get_groups_string() + "\" />";
+			upload_string += "<CONTAINER>";
+			upload_string += "<Display_Client_Item>";
+			upload_string += client_to_send->get_display_client_xml();
+			upload_string += "<Display_Client_Item>";
+			upload_string += "</CONTAINER>";
+			upload_string += "</Tacktech>";
+		}
+		else
+		{
+			std::cout << "Upload_String:" << std::endl << upload_string << std::endl;
+#ifdef _IMPORTANT_OUTPUT
+			std::cout << "CRITICAL: Server could not find the client that asked for an update." << std::endl
+				<< "	This normally happens if the client asks for an update before it has" << std::endl
+				<< "	identified itself to the server" << std::endl;
+#endif // _IMPORTANT_OUTPUT
+		}
 		return_xml->append(upload_string);
 		result_status = SINGLE_RESULT;
 	}

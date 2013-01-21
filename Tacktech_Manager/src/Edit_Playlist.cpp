@@ -35,6 +35,7 @@ Edit_Playlist::Edit_Playlist(QWidget *parent, Qt::WFlags flags) :
 	connect(remove_file, SIGNAL(triggered()), this, SLOT(remove_file_slot()));
 	connect(remove_playlist, SIGNAL(triggered()), this,
 			SLOT(remove_playlist_slot()));
+	connect(add_file, SIGNAL(triggered()), this, SLOT(add_file_slot()));
 	connect(ui.add_playlist_pushbutton, SIGNAL(clicked()),
 		this, SLOT(create_playlist_slot()));
 }
@@ -275,22 +276,21 @@ void Edit_Playlist::playlist_added_slot( Playlist_Ptr p_playlist_ptr)
 void Edit_Playlist::add_file_slot()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "Edit_Playlist::add_file_slot" << std::endl;
+	std::cout << "Edit_Playlist::add_file_slot()" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
 	if (ui.playlist_tree_widget->selectedItems().count() > 0
-		&& ui.playlist_tree_widget->selectedItems().count() < 1)
+		&& ui.playlist_tree_widget->selectedItems().count() < 2)
 	{
 		Typed_QTreeWidgetItem *selected_item =
 			static_cast<Typed_QTreeWidgetItem*>(ui.playlist_tree_widget->selectedItems().at(
 			0));
 		if (selected_item->get_type() == "PLAYLIST")
 		{
-			for (std::vector<Display_Client_Ptr>::iterator it = display_client_list->begin();
-				it != display_client_list->end(); ++it)
-			{
-				it->get()->get_playlist_container()->remove_playlist(
-					selected_item->get_playlist_name().toStdString());
-			}
+			if (add_file_dialog.get() != 0)
+				disconnect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+			add_file_dialog.reset(new Add_File_Dialog(filelist, selected_item->get_playlist_name(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
+			connect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+			add_file_dialog->show();
 			/* Repopulate widget to reflect changes */
 			repopulate_widget();
 		}

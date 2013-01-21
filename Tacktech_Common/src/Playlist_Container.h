@@ -19,7 +19,7 @@
 /** Container is the type that will hold the playlists. It consists of a
  ** set, containing a pair where the first member of the pair is the
  ** Playlist object, and the second member is a vector of strings, that will
- ** contain the organizations that are able to use the aforementioned vector. */
+ ** contain the organizations that are able to use the aforementioned Playlist object. */
 typedef std::pair<Playlist_Ptr, std::vector<std::string> > Playlist_Item;
 typedef std::set<Playlist_Item> Container;
 class Playlist_Container
