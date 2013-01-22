@@ -51,7 +51,7 @@ target_link_libraries ( Tacktech_Display
 						pugixml
 						Tacktech_Common
 						${SYSTEM_LIBRARIES}
-						)
+						)  
 if (WIN32)
 	INCLUDE(InstallRequiredSystemLibraries)
 						
@@ -73,11 +73,11 @@ if (WIN32)
 	set(CPACK_RESOURCE_FILE_LICENSE "${Tacktech_Display_SOURCE_DIR}/License.txt")
 	include (CPack)
 else (WIN32)
-	install (TARGETS Tacktech_Display
-			RUNTIME
-			DESTINATION Tacktech_Display/bin)
-	install (FILES ${Tacktech_Display_SOURCE_DIR}/config.ini "${LIBVLCQT_LIBRARY}"
-			DESTINATION Tacktech_Display/bin)
+	 install (TARGETS Tacktech_Display
+			 RUNTIME
+			 DESTINATION Tacktech_Display/bin)
+	 install (FILES ${Tacktech_Display_SOURCE_DIR}/config.ini
+			 DESTINATION Tacktech_Display/bin)
 			
 	set(CPACK_PACKAGE_NAME "Tacktech_Display")
 	set(CPACK_PACKAGE_VENDOR "Tacktech")
@@ -96,6 +96,6 @@ else (WIN32)
 	set(CPACK_RPM_PACKAGE_GROUP "Applications/Multimedia")
 	set(CPACK_RPM_PACKAGE_VENDOR "Tacktech")
 	set(CPACK_RPM_PACKAGE_DESCRIPTION "Displays media that is defined through other Tacktech products")
-	set(CPACK_RPM_PACKAGE_REQUIRES "Qt4, Boost>=1.48")
+	set(CPACK_GENERATOR                 "DEB;RPM")
 	include (CPack)
 endif (WIN32)
