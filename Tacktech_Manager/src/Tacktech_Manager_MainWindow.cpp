@@ -112,6 +112,7 @@ Tacktech_Manager_MainWindow::~Tacktech_Manager_MainWindow(void)
 	std::cout << "=~Tacktech_Manager_MainWindow" << std::endl;
 #endif // _DEBUG
 	delete refresh_timer;
+	network_manager.reset();
 }
 
 void Tacktech_Manager_MainWindow::repopulate_ui()
