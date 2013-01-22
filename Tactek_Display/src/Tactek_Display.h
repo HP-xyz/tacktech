@@ -23,6 +23,12 @@
 #include <QtGui/QFileDialog>
 #include <QTimer>
 #include <QPair>
+#include <QUrl>
+#include <QBuffer>
+#include <QXmlStreamReader>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 #include <vlc-qt/Common.h>
 #include <vlc-qt/Instance.h>
 #include <vlc-qt/Media.h>
@@ -58,7 +64,8 @@ class Tactek_Display: public QMainWindow
 Q_OBJECT
 public:
 	explicit Tactek_Display(QWidget *parent = 0);
-	~Tactek_Display();signals:
+	~Tactek_Display();
+signals:
 	void start_next_media();
 	void new_file_added(QString, int);
 	void set_playlist_name(QString);
@@ -72,6 +79,8 @@ private slots:
 	void handle_new_file_added(QString, int);
 	void check_file_directory();
 	void check_display_container();
+	void read_news_from_network();
+	void display_news();
 private:
 	Ui::Tactek_Display *ui;
 	Display_Client_Ptr m_display_client;
@@ -79,6 +88,7 @@ private:
 	QTimer *check_update_timer;
 	QTimer *identify_timer;
 	QTimer *update_display_client_timer;
+	QTimer *news_ticker_display_timer;
 	VlcInstance *m_vlc_instance;
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
@@ -101,6 +111,19 @@ private:
 	void write_file(std::string, std::string);
 
 	std::set<std::string> make_set(std::string);
+
+	boost::shared_ptr<std::string> m_news;
+	boost::shared_ptr<std::string> m_news_descriptions;
+	QUrl m_rss_url;
+	QXmlStreamReader m_news_xml;
+	QNetworkAccessManager m_news_networkmanager;
+	QNetworkReply *m_news_current_reply;
+
+    int screen_length;
+    int current_news_segment;
+	void get_news_from_network();
+	void parse_xml_for_news();
+	std::string get_news_segment();
 };
 
 #endif // TACTEK_DISPLAY_H

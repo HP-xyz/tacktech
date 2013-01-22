@@ -7,6 +7,9 @@ TODO:
 	  to be played. Timed playlists must also be possible.
 
 ISSUES:
-	- Crash when none group edit playlist		-> Manager
-	- Crash if check for update before identify -> Server
-	- Filelist sent twice to Manager			-> Server/Manager
+	- Crash when none group edit playlist		-> Manager	[FIXED]
+	- Crash if check for update before identify -> Server	[FIXED]
+	- Filelist sent twice to Manager			-> Server/Manager	[FIXED]
+	- Incorrect reporting of what is being 
+	  played if the Display_Client is still
+	  downloading data
