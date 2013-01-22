@@ -1,0 +1,12 @@
+TODO:
+  HIGH PRIORITY:
+	- Implement newsticker in Tacktech_Display.
+
+  NORMAL PRIORITY:
+	- Multiple playlists in Tacktech_Display should be able
+	  to be played. Timed playlists must also be possible.
+
+ISSUES:
+	- Crash when none group edit playlist		-> Manager
+	- Crash if check for update before identify -> Server
+	- Filelist sent twice to Manager			-> Server/Manager

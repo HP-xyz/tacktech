@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTreeWidget" name="management_tree_widget">
+      <attribute name="headerHighlightSections">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDislay">
+    <property name="title">
+     <string>Dislay</string>
+    </property>
+    <addaction name="actionRefresh_All"/>
+    <addaction name="actionSend_Data_to_Server"/>
+   </widget>
+   <widget class="QMenu" name="menuPlaylist">
+    <property name="title">
+     <string>Playlist</string>
+    </property>
+    <addaction name="actionEdit_Playlist"/>
+   </widget>
+   <widget class="QMenu" name="menuGroups">
+    <property name="title">
+     <string>Groups</string>
+    </property>
+    <addaction name="actionEdit_Group"/>
+   </widget>
+   <addaction name="menuDislay"/>
+   <addaction name="menuPlaylist"/>
+   <addaction name="menuGroups"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionRefresh_All">
+   <property name="text">
+    <string>Refresh All</string>
+   </property>
+  </action>
+  <action name="actionCreate_Playlist">
+   <property name="text">
+    <string>Create Playlist</string>
+   </property>
+  </action>
+  <action name="actionEdit_Playlist">
+   <property name="text">
+    <string>Edit Playlist</string>
+   </property>
+  </action>
+  <action name="actionAdd_Group">
+   <property name="text">
+    <string>Add Group</string>
+   </property>
+  </action>
+  <action name="actionEdit_Group">
+   <property name="text">
+    <string>Edit Group</string>
+   </property>
+  </action>
+  <action name="actionEdit_Preferences">
+   <property name="text">
+    <string>Edit Preferences</string>
+   </property>
+  </action>
+  <action name="actionSend_Data_to_Server">
+   <property name="text">
+    <string>Send Data to Server</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
