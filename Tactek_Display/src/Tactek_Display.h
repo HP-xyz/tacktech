@@ -37,7 +37,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-//#include <boost/lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
