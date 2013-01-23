@@ -7,9 +7,6 @@
 
 #ifndef ARTEMIS_REQUEST_HANDLER_H
 #define	ARTEMIS_REQUEST_HANDLER_H
-#ifdef _SHOW_DEBUG_OUTPUT
-#define _IMPORTANT_OUTPUT _SHOW_DEBUG_OUTPUT
-#endif // _SHOW_DEBUG_OUTPUT
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>

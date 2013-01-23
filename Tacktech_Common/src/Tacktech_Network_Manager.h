@@ -1,8 +1,5 @@
 #ifndef TACKTECH_NETWORK_MANAGER_H
 #define TACKTECH_NETWORK_MANAGER_H
-#ifdef _SHOW_DEBUG_OUTPUT
-#define _IMPORTANT_OUTPUT _SHOW_DEBUG_OUTPUT
-#endif // _SHOW_DEBUG_OUTPUT
 #include <QObject>
 #include <QString>
 #include <boost/asio.hpp>

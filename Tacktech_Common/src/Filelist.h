@@ -1,8 +1,6 @@
 #ifndef FILELIST_H
 #define FILELIST_H
-#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
-#endif // _SHOW_DEBUG_OUTPUT
 #include <utility>
 #include <vector>
 #include <sstream>
