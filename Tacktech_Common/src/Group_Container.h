@@ -7,9 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <pugixml.hpp>
-#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
-#endif // _DEBUG
 typedef std::pair<std::string, boost::posix_time::ptime> Computer_Item;
 typedef std::pair<std::string, Computer_Item> Group_Item;
 typedef boost::shared_ptr<std::multimap<std::string, Computer_Item> > Groups_And_Computers_Ptr;
@@ -53,7 +51,7 @@ public:
 	bool contains_group_name(std::string);
 
 	/** Returns a std::map<std::string, std::string> containing only
-	 ** unique group names 
+	 ** unique group names
 	 ** NOTE
 	 ** FUNCTION TAKES N^2 TIME TO COMPLETE
 	 ** TODO OPTIMIZE FUNCTION */
@@ -63,8 +61,8 @@ public:
 	 ** group_name set to NONE */
 	Group_Multimap get_computers_not_in_groups();
 
-	/** Checks to see if a item with group_name and computer_name already 
-	 ** exists in the Group_Container. Returns an iterator to 
+	/** Checks to see if a item with group_name and computer_name already
+	 ** exists in the Group_Container. Returns an iterator to
 	 ** groups_and_computers.end() if the Group_Container DOES NOT contain
 	 ** the provided value item, else returns an iterator to the item found */
 	Group_Multimap::iterator contains_computer_in_group(std::string group_name,

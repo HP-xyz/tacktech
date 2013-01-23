@@ -31,9 +31,7 @@
 #include <Display_Client_Container.h>
 #include <Filelist.h>
 #include "Artemis_Request_Handler.h"
-#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
-#endif // _SHOW_DEBUG_OUTPUT
 namespace Artemis
 {
 
