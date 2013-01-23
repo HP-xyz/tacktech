@@ -1,7 +1,76 @@
 #include "Artemis_Server.h"
 namespace Artemis
 {
-
+	class Alerts
+	{
+	public:
+		static void check_alerts(Display_Client_Container_Ptr p_display_client_container, std::map<std::string, std::string> parameters)
+		{
+#ifdef _SHOW_DEBUG_OUTPUT
+			std::cout << "=Alerts::check_alerts" << std::endl;
+#endif // _SHOW_DEUG_OUTPUT
+			while (true)
+			{//This loop should run forever
+				for (std::vector<Display_Client_Ptr>::iterator it = p_display_client_container->get_display_client_container()->begin();
+					it != p_display_client_container->get_display_client_container()->end(); ++it)
+				{//We iterate over all the Display_Clients in the container
+					std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
+					current_time_str = current_time_str.substr(current_time_str.find("T") + 1);
+					boost::posix_time::time_duration current_time(
+						boost::lexical_cast<int,std::string>(current_time_str.substr(0, 2)),
+						boost::lexical_cast<int,std::string>(current_time_str.substr(2, 2)),
+						boost::lexical_cast<int,std::string>(current_time_str.substr(4)),
+						0);
+					current_time = current_time + boost::posix_time::minutes(5);
+#ifdef _SHOW_DEBUG_OUTPUT
+					std::cout << " # " << it->get()->get_identification() << " last ping: " 
+						<< (it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign() << std::endl;
+#endif // _SHOW_DEUG_OUTPUT
+					if (((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign() <
+						boost::posix_time::time_duration(0,boost::lexical_cast<int, std::string>(parameters["alerts.critical_minutes"]),0,0)))
+					{
+						if (((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign() >
+							boost::posix_time::time_duration(0,boost::lexical_cast<int, std::string>(parameters["alerts.warning_minutes"]),0,0)))
+						{//We need to send a WARNING alert
+#ifdef _SHOW_DEBUG_OUTPUT
+							std::cout << "  # Ping has been longer than " << parameters["alerts.warning_minutes"] << " minutes, sending WARNING" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+							std::string sendmail_command = "sendmail -t ";
+							sendmail_command += "From: <DvorakUser@gmail.com>";
+							sendmail_command += "To: ";
+							sendmail_command += parameters["Tacktech.admin"];
+							sendmail_command += "Subject: Warning for " + it->get()->get_identification();
+							sendmail_command += "MIME-Version: 1.0";
+							sendmail_command += "Content-Type: text/plain";
+							sendmail_command += "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
+							sendmail_command += "The last ping we recieved was " + boost::posix_time::to_iso_string((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign()) + " ago.";
+							sendmail_command += "\n.";
+							system(sendmail_command.c_str());
+						}
+					}
+					else
+					{//We need to send a CRITICAL alert
+#ifdef _SHOW_DEBUG_OUTPUT
+						std::cout << "  # Ping has been longer than " << parameters["alerts.critical_minutes"] << " minutes, sending CRITICAL" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+						std::string sendmail_command = "sendmail -t ";
+						sendmail_command += "From: <DvorakUser@gmail.com>";
+						sendmail_command += "To: ";
+						sendmail_command += parameters["Tacktech.admin"];
+						sendmail_command += "Subject: CRITICAL warning for " + it->get()->get_identification();
+						sendmail_command += "MIME-Version: 1.0";
+						sendmail_command += "Content-Type: text/plain";
+						sendmail_command += "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.critical_minutes"] + " minutes. ";
+						sendmail_command += "The last ping we recieved was " + boost::posix_time::to_iso_string((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign()) + " ago.";
+						sendmail_command += "\n.";
+						system(sendmail_command.c_str());
+					}
+					
+				}
+				boost::this_thread::sleep_for(boost::chrono::milliseconds(boost::lexical_cast<int, std::string>(parameters["alerts.check_frequency"])));
+			}
+		}
+	};
 //************************************
 // Method:    read_config
 // FullName:  Artemis::Artemis_Server::read_config
@@ -120,6 +189,7 @@ Artemis_Server::Artemis_Server(std::size_t p_thread_pool_size) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " -- Calling start_accept()" << std::endl;
 #endif // _DEBUG
+	boost::thread check_alerts(Alerts::check_alerts, display_client_container, parameters);
 	start_accept();
 }
 

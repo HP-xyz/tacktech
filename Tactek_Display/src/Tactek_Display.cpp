@@ -521,7 +521,9 @@ void Tactek_Display::handle_recieved_data(QString data)
 //                    parameters["general.organization"],
 //                    *it);
 //        }
+#ifdef _SHOW_DEBUG_OUTPUT
         m_display_client->get_playlist_container()->print_contents();
+#endif //_SHOW_DEBUG_OUTPUT
     }
 	else if(type_string == "IDENTIFY")
 	{
