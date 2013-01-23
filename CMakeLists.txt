@@ -13,12 +13,19 @@ IF( NOT CMAKE_BUILD_TYPE )
 	if (NOT WIN32)
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 	endif (NOT WIN32)
+	add_definitions(-D_SHOW_DEBUG_OUTPUT)
+else(NOT CMAKE_BUILD_TYPE)
+	if (CMAKE_BUILD_TYPE MATCHES "Release")
+		add_definitions(-D_IMPORTANT_OUTPUT)
+	endif (CMAKE_BUILD_TYPE MATCHES "Release")
 ENDIF( NOT CMAKE_BUILD_TYPE )
 
 if(SHOW_DEBUG_OUTPUT)
 	add_definitions(-D_SHOW_DEBUG_OUTPUT)
 endif(SHOW_DEBUG_OUTPUT)
-
+if(SHOW_IMPORTANT_OUTPUT)
+	add_definitions(-D_IMPORTANT_OUTPUT)
+endif(SHOW_IMPORTANT_OUTPUT)
 if(BUILD_32 AND UNIX)
     # only build 32-bit binaries
     add_definitions(-m32)
@@ -27,11 +34,6 @@ if(BUILD_32 AND UNIX)
     set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CXX_FLAGS} -m32")
 	message (STATUS "ATTENTION: Building 32bit - Should be done only when cross compiling")
 endif(BUILD_32 AND UNIX)
-
-IF( NOT CMAKE_BUILD_TYPE )
-  message (STATUS "###### WE ARE BUILD IN 'Debug' MODE")
-  SET( CMAKE_BUILD_TYPE Debug ) 
-ENDIF( NOT CMAKE_BUILD_TYPE )
 
 # THIS IS FOR LIBB64
 # select a buffersize
