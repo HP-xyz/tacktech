@@ -6,9 +6,7 @@
 #include <boost/shared_ptr.hpp>
 #include "Display_Client.h"
 #include "Playlist_Container.h"
-#ifdef _SHOW_DEBUG_OUTPUT
 #include <iostream>
-#endif // _SHOW_DEBUG_OUTPUT
 class Display_Client_Container
 {
 public:
