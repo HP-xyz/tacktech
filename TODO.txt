@@ -13,3 +13,4 @@ ISSUES:
 	- Incorrect reporting of what is being 
 	  played if the Display_Client is still
 	  downloading data
+	- Make newsticker text configurable via config file

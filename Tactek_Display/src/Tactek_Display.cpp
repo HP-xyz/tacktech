@@ -59,7 +59,6 @@ public:
         out_file.close();
     }
 };
-
 /**
  * Initiates and sets up the class for usage. Connects the check_media_state and
  * play_next_media_in_queue signals to their respective slots.
@@ -80,6 +79,9 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
     m_news.reset(new std::string());
     m_news_current_reply = 0;
     current_news_segment = 0;
+
+    QFont font("Arial", boost::lexical_cast<int, std::string>(parameters["news.font_size"]));
+    ui->news_label->setFont(font);
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Chekcing file directory" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -143,7 +145,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting Screen_lenght" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-    screen_length = boost::lexical_cast<int, std::string>(parameters["general.news_length"]);
+    screen_length = boost::lexical_cast<int, std::string>(parameters["news.news_length"]);
 #ifdef _SHOW_DEBUG_OUTPUT
     std::cout << " - Screen length: " << screen_length << std::endl;
 	std::cout << " - Starting Timers" << std::endl;
@@ -155,7 +157,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	update_display_client();
 
 	get_news_from_network();
-	news_ticker_display_timer->start(200);
+	news_ticker_display_timer->start(boost::lexical_cast<int, std::string>(parameters["news.scroll_speed"]));
 }
 
 Tactek_Display::~Tactek_Display()
@@ -723,13 +725,19 @@ std::string Tactek_Display::get_news_segment()
                 std::string text_left = m_news_descriptions->substr(0, (m_news_descriptions->size() - (current_news_segment + screen_length)));
                 std::string text_right = m_news_descriptions->substr(current_news_segment);
                 current_news_segment += 1;
+#ifdef _SHOW_DEBUG_OUTPUT
+                std::cout << "News (Looping): " << text_left + text_right << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
                 return text_left + text_right;
             }
             else
             {
                 int segment_to_return = current_news_segment;
                 current_news_segment = current_news_segment + 1;
-                return m_news_descriptions->substr(segment_to_return, screen_length);
+#ifdef _SHOW_DEBUG_OUTPUT
+                std::cout << "News (Normal): " << m_news_descriptions->substr(segment_to_return + 1, screen_length) << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+                return m_news_descriptions->substr(segment_to_return + 1, screen_length);
             }
         }
         else
