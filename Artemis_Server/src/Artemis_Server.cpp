@@ -35,15 +35,14 @@ namespace Artemis
 #ifdef _SHOW_DEBUG_OUTPUT
 							std::cout << "  # Ping has been longer than " << parameters["alerts.warning_minutes"] << " minutes, sending WARNING" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-							std::string sendmail_command = "sendmail -t \"";
-							sendmail_command += "To: ";
-							sendmail_command += parameters["Tacktech.admin"] + "\n";
-							sendmail_command += "Subject: Warning for " + it->get()->get_identification() + "\n\n"; 
-							sendmail_command += "MIME-Version: 1.0\n";
-							sendmail_command += "Content-Type: text/plain\n";
-							sendmail_command += "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
-							sendmail_command += "The last ping we received was " + boost::posix_time::to_iso_string((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign()) + " ago.";
-							sendmail_command += "\n\"\n";
+							std::ofstream mail_file;
+							mail_file.open("mail.txt");
+							mail_file << "To: ";
+							mail_file << parameters["Tacktech.admin"] + "\n";
+							mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
+							mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
+							mail_file.close();
+							std::string sendmail_command = "sendmail -t < mail.txt";
 #ifdef _SHOW_DEBUG_OUTPUT
 							std::cout << "  !! Sending: " << sendmail_command << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -55,15 +54,14 @@ namespace Artemis
 #ifdef _SHOW_DEBUG_OUTPUT
 						std::cout << "  # Ping has been longer than " << parameters["alerts.critical_minutes"] << " minutes, sending CRITICAL" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-						std::string sendmail_command = "sendmail -t \"";
-						sendmail_command += "To: ";
-						sendmail_command += parameters["Tacktech.admin"] + "\n";
-						sendmail_command += "Subject: CRITICAL warning for " + it->get()->get_identification() + "\n\n";
-						sendmail_command += "MIME-Version: 1.0\n";
-						sendmail_command += "Content-Type: text/plain\n";
-						sendmail_command += "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.critical_minutes"] + " minutes. ";
-						sendmail_command += "The last ping we received was " + boost::posix_time::to_iso_string((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign()) + " ago.";
-						sendmail_command += "\n\"\n";
+						std::ofstream mail_file;
+						mail_file.open("mail.txt");
+						mail_file << "To: ";
+						mail_file << parameters["Tacktech.admin"] + "\n";
+						mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
+						mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
+						mail_file.close();
+						std::string sendmail_command = "sendmail -t < mail.txt";
 #ifdef _SHOW_DEBUG_OUTPUT
 						std::cout << "  !! Sending: " << sendmail_command << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
