@@ -722,22 +722,23 @@ std::string Tactek_Display::get_news_segment()
     {
         if ((current_news_segment + screen_length) < m_news_descriptions->size())
         {
-            if((current_news_segment + screen_length) >= m_news_descriptions->size())
+            if((current_news_segment + screen_length + 1) >= m_news_descriptions->size())
             {
-                std::string text_left = m_news_descriptions->substr(0, (m_news_descriptions->size() - (current_news_segment + screen_length)));
-                std::string text_right = m_news_descriptions->substr(current_news_segment);
-                current_news_segment += 1;
+                current_news_segment = 0;
+//                std::string text_left = m_news_descriptions->substr(0, (m_news_descriptions->size() - (current_news_segment + screen_length)));
+//                std::string text_right = m_news_descriptions->substr(current_news_segment);
+//                current_news_segment += 1;
 #ifdef _SHOW_DEBUG_OUTPUT
-                std::cout << "News (Looping): " << text_left + text_right << std::endl;
+                std::cout << "News (Looping): " << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-                return text_left + text_right;
+//                return text_left + text_right;
             }
             else
             {
                 int segment_to_return = current_news_segment;
                 current_news_segment = current_news_segment + 1;
 #ifdef _SHOW_DEBUG_OUTPUT
-                std::cout << "News (Normal): " << m_news_descriptions->substr(segment_to_return + 1, screen_length) << std::endl;
+                //std::cout << "News (Normal): " << m_news_descriptions->substr(segment_to_return + 1, screen_length) << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
                 return m_news_descriptions->substr(segment_to_return + 1, screen_length);
             }
