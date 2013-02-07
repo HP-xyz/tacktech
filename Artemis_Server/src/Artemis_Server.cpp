@@ -36,7 +36,6 @@ namespace Artemis
 							std::cout << "  # Ping has been longer than " << parameters["alerts.warning_minutes"] << " minutes, sending WARNING" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 							std::string sendmail_command = "sendmail -t \"";
-							sendmail_command += "From: <DvorakUser@gmail.com>\n";
 							sendmail_command += "To: ";
 							sendmail_command += parameters["Tacktech.admin"] + "\n";
 							sendmail_command += "Subject: Warning for " + it->get()->get_identification() + "\n\n"; 
@@ -45,6 +44,9 @@ namespace Artemis
 							sendmail_command += "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
 							sendmail_command += "The last ping we received was " + boost::posix_time::to_iso_string((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign()) + " ago.";
 							sendmail_command += "\n\"\n";
+#ifdef _SHOW_DEBUG_OUTPUT
+							std::cout << "  !! Sending: " << sendmail_command << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 							system(sendmail_command.c_str());
 						}
 					}
@@ -54,7 +56,6 @@ namespace Artemis
 						std::cout << "  # Ping has been longer than " << parameters["alerts.critical_minutes"] << " minutes, sending CRITICAL" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 						std::string sendmail_command = "sendmail -t \"";
-						sendmail_command += "From: <DvorakUser@gmail.com>\n";
 						sendmail_command += "To: ";
 						sendmail_command += parameters["Tacktech.admin"] + "\n";
 						sendmail_command += "Subject: CRITICAL warning for " + it->get()->get_identification() + "\n\n";
@@ -63,6 +64,9 @@ namespace Artemis
 						sendmail_command += "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.critical_minutes"] + " minutes. ";
 						sendmail_command += "The last ping we received was " + boost::posix_time::to_iso_string((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign()) + " ago.";
 						sendmail_command += "\n\"\n";
+#ifdef _SHOW_DEBUG_OUTPUT
+						std::cout << "  !! Sending: " << sendmail_command << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 						system(sendmail_command.c_str());
 					}
 					
