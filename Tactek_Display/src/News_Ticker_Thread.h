@@ -2,6 +2,7 @@
 #define _NEWS_TICKER_THREAD_H
 #include <QThread>
 #include <map>
+#include <iostream>
 #include "News_Ticker.h"
 class News_Ticker_Thread : public QThread
 {
