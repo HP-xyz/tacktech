@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iostream>
 #include <fstream>
 #include <map>
 class News_Ticker : public QObject
