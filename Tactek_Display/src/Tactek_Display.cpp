@@ -68,17 +68,12 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 		QMainWindow(parent), ui(new Ui::Tactek_Display), m_vlc_media(0)
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Tacktech_Manager()" << std::endl;
+	std::cout << "= Tactek_Display()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+    read_config();
 	ui->setupUi(this);
 	m_display_client.reset(new Display_Client());
-	//ui->news_label->setMaximumWidth(ui->vlc_video_widget->width());
-	screen_length = ui->centralwidget->width();
-	read_config();
-	m_rss_url = "http://24.com.feedsportal.com/c/33816/f/607927/index.rss";
-    m_news.reset(new std::string());
-    m_news_current_reply = 0;
-    current_news_segment = 0;
+	news_ticker_thread = new News_Ticker_Thread(parameters);
 
     QFont font("Arial", boost::lexical_cast<int, std::string>(parameters["news.font_size"]));
     ui->news_label->setFont(font);
@@ -101,7 +96,6 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	Tactek_Display::check_update_timer = new QTimer(this);
 	Tactek_Display::identify_timer = new QTimer(this);
 	Tactek_Display::update_display_client_timer = new QTimer(this);
-	Tactek_Display::news_ticker_display_timer = new QTimer(this);
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up Network_Managers" << std::endl;
@@ -140,14 +134,9 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 			SLOT(play_next_media_in_queue()));
 	connect(this, SIGNAL(new_file_added(QString, int)), this,
 			SLOT(handle_new_file_added(QString, int)));
-    connect(news_ticker_display_timer, SIGNAL(timeout()), this, SLOT(display_news()));
+    connect(news_ticker_thread, SIGNAL(news_ready(QString)), this, SLOT(display_news(QString)));
 
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Setting Screen_lenght" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-    screen_length = boost::lexical_cast<int, std::string>(parameters["news.news_length"]);
-#ifdef _SHOW_DEBUG_OUTPUT
-    std::cout << " - Screen length: " << screen_length << std::endl;
 	std::cout << " - Starting Timers" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 	update_timer->start(1000);
@@ -155,9 +144,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	update_display_client_timer->start(40000);
 	identify_timer->start(30000);
 	update_display_client();
-
-	get_news_from_network();
-	news_ticker_display_timer->start(boost::lexical_cast<int, std::string>(parameters["news.scroll_speed"]));
+	news_ticker_thread->start();
 }
 
 Tactek_Display::~Tactek_Display()
@@ -170,7 +157,7 @@ Tactek_Display::~Tactek_Display()
 	delete check_update_timer;
 	delete identify_timer;
 	delete update_display_client_timer;
-	delete news_ticker_display_timer;
+	delete news_ticker_thread;
 }
 
 void Tactek_Display::read_config()
@@ -554,7 +541,7 @@ void Tactek_Display::handle_new_file_added(QString new_filename, int pause)
 }
 
 void Tactek_Display::check_file_directory()
-{m_news.reset(new std::string());
+{
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << "= Tactek_Display::check_file_directory()" << std::endl;
 	std::cout << " - Checking directory: " << parameters["general.playlist_directory"] << std::endl;
@@ -639,113 +626,7 @@ void Tactek_Display::check_display_container()
 #endif // _SHOW_DEBUG_OUTPUT
     }
 }
-
-void Tactek_Display::get_news_from_network()
+void Tactek_Display::display_news(QString news)
 {
-    QNetworkRequest request(m_rss_url);
-    if(m_news_current_reply != 0)
-    {
-        try
-        {
-            m_news_current_reply->disconnect();
-            m_news_current_reply->deleteLater();
-        }
-        catch(std::exception &e)
-        {
-            std::cerr << "Critical error getting news: " << e.what() << std::endl;
-        }
-    }
-    m_news_current_reply = m_news_networkmanager.get(request);
-    m_news_descriptions.reset(new std::string());
-    connect(m_news_current_reply, SIGNAL(readyRead()), this, SLOT(read_news_from_network()));
-}
-
-void Tactek_Display::read_news_from_network()
-{
-    QByteArray data = m_news_current_reply->readAll();
-    m_news_xml.addData(data);
-    parse_xml_for_news();
-}
-void Tactek_Display::parse_xml_for_news()
-{
-    QString description_str;
-    QString current_tag;
-    QString title_str;
-    while (!m_news_xml.atEnd())
-	{
-		m_news_xml.readNext();
-		if (m_news_xml.isStartElement()) {
-			if (m_news_xml.name() == "description")
-				description_str = m_news_xml.attributes().value("rss:about").toString();
-			current_tag = m_news_xml.name().toString();
-		}
-		else if (m_news_xml.isEndElement())
-		{
-			if (m_news_xml.name() == "item")
-			{
-				int i = 0;
-				i = description_str.indexOf("<", i);
-				description_str = description_str.remove(i, description_str.length());
-
-				QString temp;
-				temp = title_str;
-				temp.append(" : ");
-				temp.append(description_str);
-				temp.append(" | ");
-				*m_news_descriptions += temp.toStdString();
-
-				description_str.clear();
-				title_str.clear();
-			}
-
-		}
-		else if (m_news_xml.isCharacters() && !m_news_xml.isWhitespace())
-		{
-			if (current_tag == "title")
-				title_str += m_news_xml.text().toString();
-			else if (current_tag == "description")
-				description_str += m_news_xml.text().toString();
-		}
-	}
-	display_news();
-}
-
-void Tactek_Display::display_news()
-{
-    QString display_string = QString::fromStdString(get_news_segment());
-    ui->news_label->setText(display_string);
-}
-
-std::string Tactek_Display::get_news_segment()
-{
-    if (m_news_descriptions->size() > 0)
-    {
-        if ((current_news_segment + screen_length) < m_news_descriptions->size())
-        {
-            if((current_news_segment + screen_length + 1) >= m_news_descriptions->size())
-            {
-                current_news_segment = 0;
-//                std::string text_left = m_news_descriptions->substr(0, (m_news_descriptions->size() - (current_news_segment + screen_length)));
-//                std::string text_right = m_news_descriptions->substr(current_news_segment);
-//                current_news_segment += 1;
-#ifdef _SHOW_DEBUG_OUTPUT
-                std::cout << "News (Looping): " << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-//                return text_left + text_right;
-            }
-            else
-            {
-                int segment_to_return = current_news_segment;
-                current_news_segment = current_news_segment + 1;
-#ifdef _SHOW_DEBUG_OUTPUT
-                //std::cout << "News (Normal): " << m_news_descriptions->substr(segment_to_return + 1, screen_length) << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-                return m_news_descriptions->substr(segment_to_return + 1, screen_length);
-            }
-        }
-        else
-            return *m_news_descriptions;
-    }
-    else
-        return "";
+    ui->news_label->setText(news);
 }
