@@ -3,6 +3,37 @@ namespace Artemis
 {
 	class Alerts
 	{
+	private:
+		static bool warning_sent(std::string computer_name, boost::gregorian::date current_date)
+		{
+			std::string filename = computer_name;
+			filename += "_WARNING_";
+			filename += boost::gregorian::to_simple_string(current_date);
+			std::ifstream file(filename.c_str());
+			if (file.good())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		static bool critical_sent(std::string computer_name, boost::gregorian::date current_date)
+		{
+			std::string filename = computer_name;
+			filename += "_CRITICAL_";
+			filename += boost::gregorian::to_simple_string(current_date);
+			std::ifstream file(filename.c_str());
+			if (file.good())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	public:
 		static void check_alerts(Display_Client_Container_Ptr p_display_client_container, std::map<std::string, std::string> parameters)
 		{
@@ -14,6 +45,8 @@ namespace Artemis
 				for (std::vector<Display_Client_Ptr>::iterator it = p_display_client_container->get_display_client_container()->begin();
 					it != p_display_client_container->get_display_client_container()->end(); ++it)
 				{//We iterate over all the Display_Clients in the container
+
+					/* First we get the current time and current date */
 					std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
 					current_time_str = current_time_str.substr(current_time_str.find("T") + 1);
 					boost::posix_time::time_duration current_time(
@@ -22,6 +55,11 @@ namespace Artemis
 						boost::lexical_cast<int,std::string>(current_time_str.substr(4)),
 						0);
 					current_time = current_time + boost::posix_time::minutes(5);
+					std::string current_date_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
+					current_date_str = current_date_str.substr(0, current_date_str.find("T"));
+					boost::gregorian::date current_date(boost::gregorian::from_undelimited_string(current_date_str));
+
+					/* Now the checks start */
 #ifdef _SHOW_DEBUG_OUTPUT
 					std::cout << " # " << it->get()->get_identification() << " last ping: " 
 						<< (it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign() << std::endl;
@@ -32,42 +70,53 @@ namespace Artemis
 						if (((it->get()->get_last_ping() - boost::posix_time::second_clock::universal_time()).invert_sign() >
 							boost::posix_time::time_duration(0,boost::lexical_cast<int, std::string>(parameters["alerts.warning_minutes"]),0,0)))
 						{//We need to send a WARNING alert
+							if (!warning_sent(it->get()->get_identification(), current_date))
+							{
 #ifdef _SHOW_DEBUG_OUTPUT
-							std::cout << "  # Ping has been longer than " << parameters["alerts.warning_minutes"] << " minutes, sending WARNING" << std::endl;
+								std::cout << "  # Ping has been longer than " << parameters["alerts.warning_minutes"] << " minutes, sending WARNING" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
+								std::string filename = it->get()->get_identification();
+								filename += "_WARNING_";
+								filename += boost::gregorian::to_simple_string(current_date);
+								std::ofstream mail_file;
+								mail_file.open(filename.c_str());
+								mail_file << "To: ";
+								mail_file << parameters["Tacktech.admin"] + "\n";
+								mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
+								mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
+								mail_file.close();
+								std::string sendmail_command = "sendmail -t < " + filename;
+#ifdef _SHOW_DEBUG_OUTPUT
+								std::cout << "  !! Sending: " << sendmail_command << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+								system(sendmail_command.c_str());
+							}
+						}
+					}
+					else
+					{//We need to send a CRITICAL alert
+						if (!critical_sent(it->get()->get_identification(), current_date))
+						{
+#ifdef _SHOW_DEBUG_OUTPUT
+							std::cout << "  # Ping has been longer than " << parameters["alerts.critical_minutes"] << " minutes, sending CRITICAL" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+							std::string filename = it->get()->get_identification();
+							filename += "_CRITICAL_";
+							filename += boost::gregorian::to_simple_string(current_date);
 							std::ofstream mail_file;
-							mail_file.open("mail.txt");
+							mail_file.open(filename.c_str());
 							mail_file << "To: ";
 							mail_file << parameters["Tacktech.admin"] + "\n";
 							mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
 							mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
 							mail_file.close();
-							std::string sendmail_command = "sendmail -t < mail.txt";
+							std::string sendmail_command = "sendmail -t < " + filename;
 #ifdef _SHOW_DEBUG_OUTPUT
 							std::cout << "  !! Sending: " << sendmail_command << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 							system(sendmail_command.c_str());
 						}
-					}
-					else
-					{//We need to send a CRITICAL alert
-#ifdef _SHOW_DEBUG_OUTPUT
-						std::cout << "  # Ping has been longer than " << parameters["alerts.critical_minutes"] << " minutes, sending CRITICAL" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-						std::ofstream mail_file;
-						mail_file.open("mail.txt");
-						mail_file << "To: ";
-						mail_file << parameters["Tacktech.admin"] + "\n";
-						mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
-						mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
-						mail_file.close();
-						std::string sendmail_command = "sendmail -t < mail.txt";
-#ifdef _SHOW_DEBUG_OUTPUT
-						std::cout << "  !! Sending: " << sendmail_command << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-						system(sendmail_command.c_str());
-					}
-					
+					}			
 				}
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(boost::lexical_cast<int, std::string>(parameters["alerts.check_frequency"])));
 			}

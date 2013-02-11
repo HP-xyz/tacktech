@@ -10,6 +10,7 @@
 #include <boost/config.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
+#include "boost/date_time/gregorian/gregorian.hpp"
 #include <string>
 #include <vector>
 #include <iostream>
