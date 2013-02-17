@@ -48,7 +48,6 @@
 #include <pugixml.hpp>
 #include <Tacktech_Network_Manager.h>
 #include <Display_Client.h>
-#include "News_Ticker_Thread.h"
 #include "ui_Tactek_Display.h"
 
 namespace Ui
@@ -80,7 +79,7 @@ private slots:
 	void handle_new_file_added(QString, int);
 	void check_file_directory();
 	void check_display_container();
-	void display_news(QString);
+	void display_news();
 private:
 	Ui::Tactek_Display *ui;
 	Display_Client_Ptr m_display_client;
@@ -91,7 +90,6 @@ private:
 	VlcInstance *m_vlc_instance;
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
-	News_Ticker_Thread *news_ticker_thread;
 
 	Tacktech_Network_Manager_Ptr network_manager_file_transfer;
 	Tacktech_Network_Manager_Ptr network_manager_identification;
