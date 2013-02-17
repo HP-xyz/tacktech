@@ -1,4 +1,5 @@
 #include "src/Tactek_Display.h"
+#include "src/NewsTicker.h"
 #include <QtGui/QApplication>
 #include <iostream>
 int main(int argc, char *argv[])

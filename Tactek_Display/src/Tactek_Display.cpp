@@ -71,12 +71,25 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	std::cout << "= Tactek_Display()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     read_config();
+
+#ifdef _SHOW_DEBUG_OUTPUT
+	std::cout << " - Setting up timers" << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
+	Tactek_Display::update_timer = new QTimer(this);
+	Tactek_Display::check_update_timer = new QTimer(this);
+	Tactek_Display::identify_timer = new QTimer(this);
+	Tactek_Display::update_display_client_timer = new QTimer(this);
+
 	ui->setupUi(this);
 	m_display_client.reset(new Display_Client());
-	news_ticker_thread = new News_Ticker_Thread(parameters);
+	//news_ticker = new NewsTicker();
+	//news_ticker->Fetch();
+	//news_ticker->show();
+    //ui->gridLayout->addWidget(news_ticker);
+    //ui->gridLayout->setRowMinimumHeight(0, boost::lexical_cast<int, std::string>(parameters["news.video_size"]));
 
-    QFont font("Arial", boost::lexical_cast<int, std::string>(parameters["news.font_size"]));
-    ui->news_label->setFont(font);
+    //QFont font("Arial", boost::lexical_cast<int, std::string>(parameters["news.font_size"]));
+    //ui->news_label->setFont(font);
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Chekcing file directory" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -88,14 +101,6 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	m_display_client->set_identification(parameters["general.computer_name"]);
 	m_display_client->add_organization(parameters["general.organization_name"]);
 	m_display_client->set_last_ping();
-
-#ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << " - Setting up timers" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
-	Tactek_Display::update_timer = new QTimer(this);
-	Tactek_Display::check_update_timer = new QTimer(this);
-	Tactek_Display::identify_timer = new QTimer(this);
-	Tactek_Display::update_display_client_timer = new QTimer(this);
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up Network_Managers" << std::endl;
@@ -134,17 +139,15 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 			SLOT(play_next_media_in_queue()));
 	connect(this, SIGNAL(new_file_added(QString, int)), this,
 			SLOT(handle_new_file_added(QString, int)));
-    connect(news_ticker_thread, SIGNAL(news_ready(QString)), this, SLOT(display_news(QString)));
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Starting Timers" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-	update_timer->start(1000);
+	update_timer->start(30000);
 	check_update_timer->start(80000);
 	update_display_client_timer->start(40000);
 	identify_timer->start(30000);
 	update_display_client();
-	news_ticker_thread->start();
 }
 
 Tactek_Display::~Tactek_Display()
@@ -157,7 +160,7 @@ Tactek_Display::~Tactek_Display()
 	delete check_update_timer;
 	delete identify_timer;
 	delete update_display_client_timer;
-	delete news_ticker_thread;
+	//delete news_ticker;
 }
 
 void Tactek_Display::read_config()
@@ -626,7 +629,11 @@ void Tactek_Display::check_display_container()
 #endif // _SHOW_DEBUG_OUTPUT
     }
 }
-void Tactek_Display::display_news(QString news)
+void Tactek_Display::display_news()
 {
-    ui->news_label->setText(news);
+#ifdef _SHOW_DEBUG_OUTPUT
+    //std::cout << "=Tactek_Display::display_news" << std::endl;
+#endif //_SHOW_DEBUG_OUTPUT
+    this->update();
+    //ui->news_label->setText(news);
 }
