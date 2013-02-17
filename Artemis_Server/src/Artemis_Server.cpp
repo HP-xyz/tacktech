@@ -83,7 +83,8 @@ namespace Artemis
 								mail_file << "To: ";
 								mail_file << parameters["Tacktech.admin"] + "\n";
 								mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
-								mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
+								mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. \n";
+								mail_file << "The last ping was at: " << boost::posix_time::to_simple_string(it->get()->get_last_ping());
 								mail_file.close();
 								std::string sendmail_command = "sendmail -t < " + filename;
 #ifdef _SHOW_DEBUG_OUTPUT
@@ -109,6 +110,7 @@ namespace Artemis
 							mail_file << parameters["Tacktech.admin"] + "\n";
 							mail_file << "Subject: Warning for " + it->get()->get_identification() + "\n\n";
 							mail_file << "The display '" + it->get()->get_identification() + "' has not pinged in " + parameters["alerts.warning_minutes"] + " minutes. ";
+							mail_file << "The last ping was at: " << boost::posix_time::to_simple_string(it->get()->get_last_ping());
 							mail_file.close();
 							std::string sendmail_command = "sendmail -t < " + filename;
 #ifdef _SHOW_DEBUG_OUTPUT
