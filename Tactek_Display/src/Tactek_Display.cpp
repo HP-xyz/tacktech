@@ -71,7 +71,7 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 	std::cout << "= Tactek_Display()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     read_config();
-
+    identification_count = 0;
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up timers" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
@@ -256,6 +256,9 @@ void Tactek_Display::check_playlist_items_downloaded()
 
         if(!network_manager_file_transfer->busy)
         {
+#ifdef _IMPORTANT_OUTPUT
+            std::cout << " ## Network_Manager_File_Transfer is not busy" << std::endl;
+#endif // _IMPORTANT_OUTPUT
             boost::shared_ptr<std::string> string_to_send;
             string_to_send.reset(new std::string(writer.result));
 
@@ -271,6 +274,12 @@ void Tactek_Display::check_playlist_items_downloaded()
             boost::thread t(
                 boost::bind(&boost::asio::io_service::run, boost::ref(io_service_file_transfer)));
             t.join();
+        }
+        else
+        {
+#ifdef _IMPORTANT_OUTPUT
+            std::cout << " ## Network_Manager_File_Transfer is BUSY, WAITING" << std::endl;
+#endif // _IMPORTANT_OUTPUT
         }
     }
     else
@@ -314,7 +323,7 @@ void Tactek_Display::check_playlist_items_downloaded()
 void Tactek_Display::update_display_client()
 {
 #ifdef _SHOW_DEBUG_OUTPUT
-	std::cout << "= Tacktech_Manager::send_identity_to_server()" << std::endl;
+	std::cout << "= Tacktech_Manager::update_display_client()" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
     std::string upload_string = "<Tacktech>";
     upload_string += "<Type TYPE=\"";
@@ -332,6 +341,9 @@ void Tactek_Display::update_display_client()
 
     if(!network_manager_identification->busy)
     {
+#ifdef _IMPORTANT_OUTPUT
+        std::cout << " ## Network_Manager_Identification is not busy" << std::endl;
+#endif // _IMPORTANT_OUTPUT
         boost::shared_ptr<std::string> string_to_send;
         string_to_send.reset(new std::string(upload_string));
 
@@ -347,6 +359,21 @@ void Tactek_Display::update_display_client()
         boost::thread t(
             boost::bind(&boost::asio::io_service::run, boost::ref(io_service_identification)));
         t.join();
+    }
+    else
+    {
+#ifdef _IMPORTANT_OUTPUT
+        std::cout << " ## Network_Manager_Identification is BUSY, WAITING" << std::endl;
+        std::cout << " ## Tries: " << identification_count << std::endl;
+#endif // _IMPORTANT_OUTPUT
+        identification_count += 1;
+        if (identification_count > 2)
+        {
+            io_service_identification->reset();
+            network_manager_identification.reset(
+                    new Tacktech_Network_Manager(*io_service_identification, parameters));
+            identification_count = 0;
+        }
     }
 }
 

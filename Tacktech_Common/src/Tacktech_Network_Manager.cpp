@@ -99,6 +99,7 @@ void Tacktech_Network_Manager::connect(std::string dest_ip,
 	catch(std::exception &ex)
 	{
 		std::cerr << ex.what() << std::endl;
+		this->busy = false;
 	}
 }
 void Tacktech_Network_Manager::do_connect(

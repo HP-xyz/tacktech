@@ -136,10 +136,10 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "GET_VARIABLES")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-        std::cout << " - Received GET_VARIABLES command" << std::endl;
-        tacktech.print(std::cout);
-#endif // _DEBUG
+#ifdef _IMPORTANT_OUTPUT
+        std::cout << " - Received GET_VARIABLES command from Tacktech_Manager" << std::endl;
+        //tacktech.print(std::cout);
+#endif // _IMPORTANT_OUTPUT
         if(display_client_container.get() != 0)
         {
             std::string dest_ip =
@@ -178,9 +178,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "UPDATE_DISPLAY_CONTAINER")
     {
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
 		std::cout << " - Received UPDATE_DISPLAY_CONTAINER command" << std::endl;
-#endif // _DEBUG
+#endif // _IMPORTANT_OUTPUT
         xml_string_writer writer;
         pugi::xml_node container_node = tacktech.child("CONTAINER").child("Display_Client_Container");
         container_node.print(writer);
@@ -189,9 +189,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
     }
 	else if (type_string == "UPDATE_PLAYLIST_CONTAINER")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
 		std::cout << " - Received UPDATE_PLAYLIST_CONTAINER command" << std::endl;
-#endif // _DEBUG
+#endif // _IMPORTANT_OUTPUT
 		//TODO, CONSIDER REMOVING THIS
 		//xml_string_writer writer;
 		//pugi::xml_node container_node = tacktech.child("CONTAINER").child("Playlist_Container");
@@ -202,9 +202,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "UPDATE_DISPLAY_CLIENT")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Received UPDATE_DISPLAY_CLIENT command" << std::endl;
-#endif // _DEBUG
+#ifdef _IMPORTANT_OUTPUT
+		std::cout << " - Received UPDATE_DISPLAY_CLIENT command from " << tacktech.child("Identification").attribute("Computer_Name").as_string() << std::endl;
+#endif // _IMPORTANT_OUTPUT
 		std::string organization_name = tacktech.child("Identification").attribute("ORGANIZATION").as_string();
 
 		std::string upload_string = "<Tacktech>";
@@ -247,9 +247,9 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "GET_UPDATES")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
-		std::cout << " - Received GET_UPDATES command" << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
+		std::cout << " - Received GET_UPDATES command from " << tacktech.child("Identification_Node").attribute("Identification").as_string() << std::endl;
+#endif // _IMPORTANT_OUTPUT
 		std::string identification =
 			tacktech.child("Identification_Node").attribute("Identification").as_string();
 		std::string organization_name =
@@ -329,10 +329,11 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "IDENTIFY")
 	{
-#ifdef _SHOW_DEBUG_OUTPUT
+#ifdef _IMPORTANT_OUTPUT
 		std::cout << " - Received IDENTIFY command" << std::endl;
 		std::cout << "  ## Organization_Name: " << tacktech.child("Identity").attribute("Organization_Name").as_string() << std::endl;
-#endif // _SHOW_DEBUG_OUTPUT
+		std::cout << "  ## Computer_Name: " << tacktech.child("Identify").attribute("Computer_Name").as_string() << std::endl;
+#endif // _IMPORTANT_OUTPUT
 		pugi::xml_node indentification_node = tacktech.child("Identity");
 
 		xml_string_writer writer;
