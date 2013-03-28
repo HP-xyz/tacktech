@@ -288,6 +288,8 @@ void Edit_Playlist::add_file_slot()
 		{
 			if (add_file_dialog.get() != 0)
 				disconnect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
+			/* I think I fixed the problem of updating playlist not working correctly, but I may have to send the existing
+			 * playlist along to completely fix it */
 			add_file_dialog.reset(new Add_File_Dialog(filelist, selected_item->get_playlist_name(), QString::fromStdString(m_organization_name), QString::fromStdString(m_group_name)));
 			connect(add_file_dialog.get(), SIGNAL(playlist_added(Playlist_Ptr)), this, SLOT(playlist_added_slot(Playlist_Ptr)));
 			add_file_dialog->show();
