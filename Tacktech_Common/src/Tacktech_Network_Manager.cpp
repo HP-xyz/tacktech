@@ -136,6 +136,7 @@ void Tacktech_Network_Manager::handle_connect(
 #ifdef _SHOW_DEBUG_OUTPUT
 		std::cerr << "Error: " << error.message() << std::endl;
 #endif
+        this->busy = false;
 	}
 }
 void Tacktech_Network_Manager::do_close()

@@ -23,6 +23,7 @@ else (CMAKE_BUILD_TYPE MATCHES "Release")
 		message (STATUS "Adding _IMPORTANT_OUTPUT definition")
 		add_definitions(-D_SHOW_DEBUG_OUTPUT)
 		add_definitions(-D_IMPORTANT_OUTPUT)
+		add_definitions(-D_SHOW_VERBOSE_DEBUG_OUTPUT)
 endif (CMAKE_BUILD_TYPE MATCHES "Release")
 
 if(BUILD_32 AND UNIX)
