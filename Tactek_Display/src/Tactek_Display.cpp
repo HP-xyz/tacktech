@@ -367,7 +367,7 @@ void Tactek_Display::update_display_client()
         std::cout << " ## Tries: " << identification_count << std::endl;
 #endif // _IMPORTANT_OUTPUT
         identification_count += 1;
-        if (identification_count > 2)
+        if (identification_count >= 1)
         {
             io_service_identification->reset();
             network_manager_identification.reset(
@@ -516,7 +516,6 @@ void Tactek_Display::handle_recieved_data(QString data)
         pugi::xml_node container_node = tacktech_node.child("CONTAINER").child("Display_Client_Item");
         xml_string_writer writer;
         container_node.print(writer);
-        container_node.print(std::cout);
 
         if (writer.result.size() > 0)
         {
