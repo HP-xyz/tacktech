@@ -97,6 +97,11 @@ boost::shared_ptr<std::vector< std::pair<std::string,int> > > Playlist::get_play
 	return m_playlist_items;
 }
 
+std::string Playlist::get_current_item()
+{
+	return m_playlist_items->at(m_current_item_index).first;
+}
+
 int Playlist::get_current_item_index()
 {
 	return m_current_item_index;

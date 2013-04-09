@@ -202,8 +202,10 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 	}
 	else if (type_string == "UPDATE_DISPLAY_CLIENT")
 	{
+		//tacktech.child("CONTAINER").child("Display_Client_Item").child("Display_Client").child("Identification").child_value().print(std::cout);
 #ifdef _IMPORTANT_OUTPUT
-		std::cout << " - Received UPDATE_DISPLAY_CLIENT command from " << tacktech.child("Identification").attribute("Computer_Name").as_string() << std::endl;
+		std::cout << " - Received UPDATE_DISPLAY_CLIENT command from " 
+			<< tacktech.child("CONTAINER").child("Display_Client_Item").child("Display_Client").child("Identification").child_value() << std::endl;
 #endif // _IMPORTANT_OUTPUT
 		std::string organization_name = tacktech.child("Identification").attribute("ORGANIZATION").as_string();
 
@@ -332,7 +334,7 @@ void Artemis_Request_Handler::generate_queries(const std::string &request, boost
 #ifdef _IMPORTANT_OUTPUT
 		std::cout << " - Received IDENTIFY command" << std::endl;
 		std::cout << "  ## Organization_Name: " << tacktech.child("Identity").attribute("Organization_Name").as_string() << std::endl;
-		std::cout << "  ## Computer_Name: " << tacktech.child("Identify").attribute("Computer_Name").as_string() << std::endl;
+		std::cout << "  ## Computer_Name: " << tacktech.child("Identity").attribute("Computer_Name").as_string() << std::endl;
 #endif // _IMPORTANT_OUTPUT
 		pugi::xml_node indentification_node = tacktech.child("Identity");
 

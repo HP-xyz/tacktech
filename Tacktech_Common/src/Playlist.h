@@ -28,6 +28,9 @@ public:
 	/** Returns an int indicating the index of the file currently
 	 ** being played. */
 	int get_current_item_index();
+
+	std::string get_current_item();
+
 	/** Returns an boost::posix_time::time_duration to indicate the
 	 ** time the playlist should start playing. */
 	boost::posix_time::time_duration get_start_time();

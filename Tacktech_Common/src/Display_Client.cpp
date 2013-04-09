@@ -30,7 +30,6 @@ Display_Client::Display_Client( std::string display_client_str)
 	m_playlist_container.reset(new Playlist_Container());
 	pugi::xml_document disply_client_document;
 	disply_client_document.load(display_client_str.c_str());
-	disply_client_document.print(std::cout);
 	pugi::xml_node root_node = disply_client_document.child("Display_Client_Item").child("Display_Client");
 
 #ifdef _SHOW_DEBUG_OUTPUT

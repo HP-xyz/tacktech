@@ -105,12 +105,9 @@ Tactek_Display::Tactek_Display(QWidget *parent) :
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up Network_Managers" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
-    io_service_file_transfer.reset(new boost::asio::io_service);
-	io_service_identification.reset(new boost::asio::io_service);
-	network_manager_file_transfer.reset(
-		new Tacktech_Network_Manager(*io_service_file_transfer, parameters));
-    network_manager_identification.reset(
-		new Tacktech_Network_Manager(*io_service_identification, parameters));
+	io_service.reset(new boost::asio::io_service);
+	network_manager.reset(
+		new Tacktech_Network_Manager(*io_service, parameters));
 
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Setting up VLC" << std::endl;
@@ -254,7 +251,7 @@ void Tactek_Display::check_playlist_items_downloaded()
         document.save(writer);
         document.print(std::cout);
 
-        if(!network_manager_file_transfer->busy)
+        if(!network_manager->busy)
         {
 #ifdef _IMPORTANT_OUTPUT
             std::cout << " ## Network_Manager_File_Transfer is not busy" << std::endl;
@@ -262,17 +259,17 @@ void Tactek_Display::check_playlist_items_downloaded()
             boost::shared_ptr<std::string> string_to_send;
             string_to_send.reset(new std::string(writer.result));
 
-            io_service_file_transfer->reset();
-            network_manager_file_transfer.reset(
-                    new Tacktech_Network_Manager(*io_service_file_transfer, parameters));
-            network_manager_file_transfer->connect(parameters["general.server_ip"],
+            io_service->reset();
+            network_manager.reset(
+                    new Tacktech_Network_Manager(*io_service, parameters));
+            network_manager->connect(parameters["general.server_ip"],
                     parameters["general.server_port"]);
-            network_manager_file_transfer->busy = true;
-            connect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+            network_manager->busy = true;
+            connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
                         SLOT(handle_recieved_data(QString)));
-            network_manager_file_transfer->start_write(string_to_send);
+            network_manager->start_write(string_to_send);
             boost::thread t(
-                boost::bind(&boost::asio::io_service::run, boost::ref(io_service_file_transfer)));
+                boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
             t.join();
         }
         else
@@ -339,7 +336,7 @@ void Tactek_Display::update_display_client()
 	std::cout << upload_string << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
 
-    if(!network_manager_identification->busy)
+    if(!network_manager->busy)
     {
 #ifdef _IMPORTANT_OUTPUT
         std::cout << " ## Network_Manager_Identification is not busy" << std::endl;
@@ -347,33 +344,24 @@ void Tactek_Display::update_display_client()
         boost::shared_ptr<std::string> string_to_send;
         string_to_send.reset(new std::string(upload_string));
 
-        io_service_identification->reset();
-        network_manager_identification.reset(
-                    new Tacktech_Network_Manager(*io_service_identification, parameters));
-        network_manager_identification->connect(parameters["general.server_ip"],
+        io_service->reset();
+        network_manager.reset(
+                    new Tacktech_Network_Manager(*io_service, parameters));
+        network_manager->connect(parameters["general.server_ip"],
                 parameters["general.server_port"]);
-        network_manager_identification->busy = true;
-        connect(network_manager_identification.get(), SIGNAL(data_recieved(QString)), this,
+        network_manager->busy = true;
+        connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
                     SLOT(handle_recieved_data(QString)));
-        network_manager_identification->start_write(string_to_send);
+        network_manager->start_write(string_to_send);
         boost::thread t(
-            boost::bind(&boost::asio::io_service::run, boost::ref(io_service_identification)));
+            boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
         t.join();
     }
     else
     {
 #ifdef _IMPORTANT_OUTPUT
         std::cout << " ## Network_Manager_Identification is BUSY, WAITING" << std::endl;
-        std::cout << " ## Tries: " << identification_count << std::endl;
 #endif // _IMPORTANT_OUTPUT
-        identification_count += 1;
-        if (identification_count >= 1)
-        {
-            io_service_identification->reset();
-            network_manager_identification.reset(
-                    new Tacktech_Network_Manager(*io_service_identification, parameters));
-            identification_count = 0;
-        }
     }
 }
 
@@ -400,6 +388,9 @@ void Tactek_Display::open_and_play(QString filepath)
  */
 void Tactek_Display::check_media_state()
 {
+#ifdef _SHOW_DEBUG_OUTPUT
+    std::cout << " -> Current Media State: " << m_vlc_player->state() << std::endl;
+#endif // _SHOW_DEBUG_OUTPUT
 	if (Tactek_Display::m_vlc_player->state() == 0
 			|| Tactek_Display::m_vlc_player->state() == 6)
 		emit Tactek_Display::start_next_media();
@@ -455,9 +446,9 @@ void Tactek_Display::handle_recieved_data(QString data)
 	{
         /** Disconnect allows the network_manager smart pointer to be deleted
          *  as no further reference to it exists */
-        disconnect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+        disconnect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
                         SLOT(handle_recieved_data(QString)));
-        network_manager_file_transfer->busy = false;
+        network_manager->busy = false;
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved UPLOAD command" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
@@ -503,7 +494,7 @@ void Tactek_Display::handle_recieved_data(QString data)
     {
     /** Disconnect allows the network_manager smart pointer to be deleted
 	 *  as no further reference to it exists */
-        disconnect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+        disconnect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
 					SLOT(handle_recieved_data(QString)));
 #ifdef _SHOW_DEBUG_OUTPUT
         std::cout << " - Recieved UPDATE command" << std::endl;
@@ -523,7 +514,7 @@ void Tactek_Display::handle_recieved_data(QString data)
             bool playlist_container_changed =
                 m_display_client->get_playlist_container()->update_playlist(*client.get_playlist_container(), parameters["general.organization_name"]);
         }
-        network_manager_file_transfer->busy = false;
+        network_manager->busy = false;
 //        if(playlist_container_changed)
 //            check_playlist_items_downloaded();
 //#ifdef _SHOW_DEBUG_OUTPUT
@@ -545,7 +536,7 @@ void Tactek_Display::handle_recieved_data(QString data)
 	{
         /** Disconnect allows the network_manager smart pointer to be deleted
          *  as no further reference to it exists */
-        disconnect(network_manager_identification.get(), SIGNAL(data_recieved(QString)), this,
+        disconnect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
 					SLOT(handle_recieved_data(QString)));
 		/** This return is just to notify the display that its
 		 *  identity has been sent to the server. It does nothing
@@ -554,7 +545,7 @@ void Tactek_Display::handle_recieved_data(QString data)
 #ifdef _SHOW_DEBUG_OUTPUT
 	std::cout << " - Recieved IDENTIFY command" << std::endl;
 #endif //_SHOW_DEBUG_OUTPUT
-        network_manager_identification->busy = false;
+        network_manager->busy = false;
 	}
 	//tacktech.print(std::cout);
 }
@@ -628,24 +619,24 @@ void Tactek_Display::check_display_container()
     upload_string += "</CONTAINER>";
     upload_string += "</Tacktech>";
 
-    if(!network_manager_file_transfer->busy)
+    if(!network_manager->busy)
     {
 #ifdef _SHOW_DEBUG_OUTPUT
         std::cout << " - Sending update request" << std::endl;
 #endif // _SHOW_DEBUG_OUTPUT
         boost::shared_ptr<std::string> string_to_send;
         string_to_send.reset(new std::string(upload_string));
-        io_service_file_transfer->reset();
-        network_manager_file_transfer.reset(
-                    new Tacktech_Network_Manager(*io_service_file_transfer, parameters));
-        network_manager_file_transfer->connect(parameters["general.server_ip"],
+        io_service->reset();
+        network_manager.reset(
+                    new Tacktech_Network_Manager(*io_service, parameters));
+        network_manager->connect(parameters["general.server_ip"],
                 parameters["general.server_port"]);
-        network_manager_file_transfer->busy = true;
-        connect(network_manager_file_transfer.get(), SIGNAL(data_recieved(QString)), this,
+        network_manager->busy = true;
+        connect(network_manager.get(), SIGNAL(data_recieved(QString)), this,
                     SLOT(handle_recieved_data(QString)));
-        network_manager_file_transfer->start_write(string_to_send);
+        network_manager->start_write(string_to_send);
         boost::thread t(
-            boost::bind(&boost::asio::io_service::run, boost::ref(io_service_file_transfer)));
+            boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
         t.join();
     }
     else
