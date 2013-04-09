@@ -92,10 +92,8 @@ private:
 	VlcMedia *m_vlc_media;
 	VlcMediaPlayer *m_vlc_player;
 
-	Tacktech_Network_Manager_Ptr network_manager_file_transfer;
-	Tacktech_Network_Manager_Ptr network_manager_identification;
-	boost::shared_ptr<boost::asio::io_service> io_service_identification;
-	boost::shared_ptr<boost::asio::io_service> io_service_file_transfer;
+	Tacktech_Network_Manager_Ptr network_manager;
+	boost::shared_ptr<boost::asio::io_service> io_service;
 
 	QString playlist_name;
 	std::vector<std::string> filelist;
