@@ -477,7 +477,7 @@ std::pair<std::string,int> Playlist_Container::get_next_item()
 {
     try
     {
-        std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time());
+        std::string current_time_str = boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time());
         current_time_str = current_time_str.substr(current_time_str.find("T") + 1);
 #ifdef _SHOW_DEBUG_OUTPUT
         std::cout << "[" << current_time_str.substr(0, 2) << ":" << current_time_str.substr(2,2) << ":" << current_time_str.substr(4) << "]" << " => ";
